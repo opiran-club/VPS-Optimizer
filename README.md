@@ -12,7 +12,7 @@ rm -rf /etc/resolv.conf && touch /etc/resolv.conf && echo 'nameserver 8.8.8.8' >
 ## بهینه سازی سرور TCP-Tweaker
 نصب و حذف تنظیمات با دستور زیر 
 ```
-bash <(curl -Ls https://raw.githubusercontent.com/OPIran-CluB/TCPtweak/main/Tweaker.sh --ipv4)
+bash <(curl -Ls https://raw.githubusercontent.com/OPIran-CluB/VPS-Optimizer/main/Tweaker.sh --ipv4)
 ```
 
 # BBR Debian base
