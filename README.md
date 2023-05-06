@@ -91,5 +91,5 @@ now you can install anything with this "snap install"
 
 # Automatically Install the latest version of the Docker Engine and Docker compose
 ```
-
+bash <(curl -Ls https://raw.githubusercontent.com/OPIran-CluB/VPS-Optimizer/main/Docker-DockerCompose.sh --ipv4)
 ```
