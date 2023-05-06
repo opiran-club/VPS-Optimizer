@@ -18,34 +18,37 @@ to use this script ssh to your vps with root previllage then copy below ink and 
 ```
 rm -rf /etc/resolv.conf && touch /etc/resolv.conf && echo 'nameserver 8.8.8.8' >> /etc/resolv.conf && echo 'nameserver 8.8.4.4' >> /etc/resolv.conf
 ```
-
+-------------------------------------------------------------------------------------------------------------------------------------------------
 ## Install some Necessary 
 ```
 sudo apt install wget -y && apt install curl -y 
 ```
-
+-------------------------------------------------------------------------------------------------------------------------------------------------
 ## UDPGW for gaming and video call
 با دستور زیر
 ```
 bash <(curl -Ls https://raw.githubusercontent.com/OPIran-CluB/VPS-Optimizer/main/UDPGW.sh --ipv4)
 ```
-
+-------------------------------------------------------------------------------------------------------------------------------------------------
 ## Install Dropbear Debian Based And CentOs
 ```
 bash <(curl -Ls https://raw.githubusercontent.com/OPIran-CluB/VPS-Optimizer/main/Dropbear.sh --ipv4)
 ```
-
+-------------------------------------------------------------------------------------------------------------------------------------------------
 ## Install Stunnel Debian Base
 با دستور زیر
 ```
 bash <(curl -Ls https://raw.githubusercontent.com/OPIran-CluB/VPS-Optimizer/main/Stunnel.sh --ipv4)
 ```
-
+-------------------------------------------------------------------------------------------------------------------------------------------------
 ## Apache Auto SSL For Subdomain or Wildcard
 با دستور زیر
 ```
 bash <(curl -Ls https://raw.githubusercontent.com/OPIran-CluB/VPS-Optimizer/main/Apache-autoSSL.sh --ipv4)
 ```
+-------------------------------------------------------------------------------------------------------------------------------------------------
+# TCP-Tweaker & BBR
+
 ## بهینه سازی سرور TCP-Tweaker
 نصب و حذف تنظیمات با دستور زیر 
 ```
@@ -77,11 +80,13 @@ nano /root/lkl/haproxy.cfg
 ```
 and search for 9000-9999 and change it optioanally if you have Natvps select your range 
 
-
+-------------------------------------------------------------------------------------------------------------------------------------------------
 ## Time-Setting
 ```
 dpkg-reconfigure tzdata
 ```
+-------------------------------------------------------------------------------------------------------------------------------------------------
+# Snap
 
 ## Installing Snap And Speedtest In Debian Base
 
@@ -114,6 +119,7 @@ snap install core && snap refresh core
 ```
 now you can install anything with this "snap install"
 
+-------------------------------------------------------------------------------------------------------------------------------------------------
 ## Automatically Install the latest version of the Docker Engine and Docker compose
 ```
 bash <(curl -Ls https://raw.githubusercontent.com/OPIran-CluB/VPS-Optimizer/main/Docker-DockerCompose.sh --ipv4)
