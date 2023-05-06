@@ -8,6 +8,10 @@ to use this script ssh to your vps with root previllage then copy below ink and 
 ```
 rm -rf /etc/resolv.conf && touch /etc/resolv.conf && echo 'nameserver 8.8.8.8' >> /etc/resolv.conf && echo 'nameserver 8.8.4.4' >> /etc/resolv.conf
 ```
+## Install some Necessary Program
+```
+sudo apt install wget -y && apt install curl -y 
+```
 
 ## بهینه سازی سرور TCP-Tweaker
 نصب و حذف تنظیمات با دستور زیر 
@@ -19,6 +23,12 @@ bash <(curl -Ls https://raw.githubusercontent.com/OPIran-CluB/VPS-Optimizer/main
 با دستور زیر
 ```
 bash <(curl -Ls https://raw.githubusercontent.com/OPIran-CluB/VPS-Optimizer/main/UDPGW.sh --ipv4)
+```
+
+## Install Stunnel Debian Base
+با دستور زیر
+```
+bash <(curl -Ls https://raw.githubusercontent.com/OPIran-CluB/VPS-Optimizer/main/Stunnel.sh --ipv4)
 ```
 
 # Apache Auto SSL For Subdomain or Wildcard
