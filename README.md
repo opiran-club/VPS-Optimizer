@@ -52,7 +52,7 @@ wget "https://github.com/cx9208/bbrplus/raw/master/ok_bbrplus_centos.sh" && chmo
 ```
 wget --no-check-certificate https://raw.githubusercontent.com/cloudstarry/google-bbr/master/bbrvz.sh && bash bbrvz.sh
 ```
-# Change Speed up Port Range:
+then to Change Speed up for specific Port Range:
 ```
 nano /root/lkl/run.sh
 ```
