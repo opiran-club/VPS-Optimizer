@@ -1,7 +1,7 @@
 # VPS Optimizer
 
 Tlegram Channel
-``https://t.me/opiranv2rayproxy``
+https://t.me/opiranv2rayproxy
 
 to use this script ssh to your vps with root previllage then copy below ink and paste it to shell
 
