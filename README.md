@@ -3,6 +3,9 @@
 Tlegram Channel
 https://t.me/opiranv2rayproxy
 
+Gap Group
+https://t.me/OPIranClub
+
 to use this script ssh to your vps with root previllage then copy below ink and paste it to shell
 
 ## تغییر نیم سرور سرور به گوگل
