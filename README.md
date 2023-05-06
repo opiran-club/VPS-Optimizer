@@ -15,6 +15,12 @@ rm -rf /etc/resolv.conf && touch /etc/resolv.conf && echo 'nameserver 8.8.8.8' >
 bash <(curl -Ls https://raw.githubusercontent.com/OPIran-CluB/VPS-Optimizer/main/Tweaker.sh --ipv4)
 ```
 
+# UDPGW for gaming and video call
+با دستور زیر
+```
+bash <(curl -Ls https://raw.githubusercontent.com/OPIran-CluB/VPS-Optimizer/main/UDPGW.sh --ipv4)
+```
+
 # BBR Debian base
 با دستور زیر
 ```
