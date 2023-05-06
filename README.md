@@ -89,4 +89,7 @@ snap install core && snap refresh core
 ```
 now you can install anything with this "snap install"
 
+# Automatically Install the latest version of the Docker Engine and Docker compose
+```
 
+```
