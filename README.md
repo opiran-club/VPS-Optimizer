@@ -21,7 +21,7 @@ bash <(curl -Ls https://raw.githubusercontent.com/OPIran-CluB/VPS-Optimizer/main
 bash <(curl -Ls https://raw.githubusercontent.com/OPIran-CluB/VPS-Optimizer/main/UDPGW.sh --ipv4)
 ```
 
-# Auto SSL For Subdomain or Wildcard
+# Apache Auto SSL For Subdomain or Wildcard
 با دستور زیر
 ```
 bash <(curl -Ls https://raw.githubusercontent.com/OPIran-CluB/VPS-Optimizer/main/AutoSSL.sh --ipv4)
