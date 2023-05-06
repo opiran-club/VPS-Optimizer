@@ -21,7 +21,11 @@ rm -rf /etc/resolv.conf && touch /etc/resolv.conf && echo 'nameserver 8.8.8.8' >
 -------------------------------------------------------------------------------------------------------------------------------------------------
 ## Install some Necessary 
 ```
-sudo apt install wget -y && apt install curl -y 
+sudo apt install -y wget curl python python3 nano
+```
+### CentOS
+```
+yum install -y wget curl python python3 nano
 ```
 -------------------------------------------------------------------------------------------------------------------------------------------------
 ## UDPGW for gaming and video call
