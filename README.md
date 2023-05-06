@@ -60,8 +60,8 @@ or
 ```
 snap install fast
 ```
-# Speedtest Centos
-first you ness install snap core in centos
+# Snap in Centos
+first you need install snap core in centos
 
 ```
 yum install epel-release -y && install snapd -y
@@ -75,6 +75,6 @@ ln -s /var/lib/snapd/snap /snap
 ```
 snap install core && snap refresh core
 ```
-now you can repeat from debian base
+now you can install anything with this "snap install"
 
 
