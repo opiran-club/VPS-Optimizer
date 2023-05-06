@@ -39,7 +39,7 @@ bash <(curl -Ls https://raw.githubusercontent.com/OPIran-CluB/VPS-Optimizer/main
 # Apache Auto SSL For Subdomain or Wildcard
 با دستور زیر
 ```
-bash <(curl -Ls https://raw.githubusercontent.com/OPIran-CluB/VPS-Optimizer/main/AutoSSL.sh --ipv4)
+bash <(curl -Ls https://raw.githubusercontent.com/OPIran-CluB/VPS-Optimizer/main/Apache-autoSSL.sh --ipv4)
 ```
 
 # BBR Debian base
