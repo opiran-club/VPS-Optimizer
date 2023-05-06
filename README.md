@@ -10,6 +10,9 @@ https://t.me/OPIranClub
 
 to use this script ssh to your vps with root previllage then copy below ink and paste it to shell
 
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+## Changing Nameservers to Google
 ## تغییر نیم سرور سرور به گوگل
 با دستور زیر
 ```
