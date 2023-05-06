@@ -1,5 +1,7 @@
 # VPS Optimizer
 
+به مرور آپدیت میگردد هر مشکلی بود لطفا از طریق تلگرام یا گیتهاب اطلاع بدید
+
 Tlegram Channel
 https://t.me/opiranv2rayproxy
 
