@@ -45,12 +45,6 @@ bash <(curl -Ls https://raw.githubusercontent.com/OPIran-CluB/VPS-Optimizer/main
 bash <(curl -Ls https://raw.githubusercontent.com/OPIran-CluB/VPS-Optimizer/main/Stunnel.sh --ipv4)
 ```
 -------------------------------------------------------------------------------------------------------------------------------------------------
-## Apache Auto SSL For Subdomain or Wildcard
-با دستور زیر
-```
-bash <(curl -Ls https://raw.githubusercontent.com/OPIran-CluB/VPS-Optimizer/main/Apache-autoSSL.sh --ipv4)
-```
--------------------------------------------------------------------------------------------------------------------------------------------------
 # TCP-Tweaker & BBR
 
 ## بهینه سازی سرور TCP-Tweaker
