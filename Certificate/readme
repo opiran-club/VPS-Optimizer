@@ -1,10 +1,10 @@
-## Apache Auto SSL For Subdomain/Domain
+# Apache Auto SSL For Subdomain/Domain
 با دستور زیر
 ```
 bash <(curl -Ls https://raw.githubusercontent.com/OPIran-CluB/VPS-Optimizer/main/Apache-autoSSL.sh --ipv4)
 ```
 ---------------------------------------------------------------------------------------------------------------------------------------
-## Auto SSL For Wildcard 
+# Auto SSL For Wildcard 
 با دستور زیر
 ```
 sudo apt install certbot
