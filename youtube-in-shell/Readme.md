@@ -3,7 +3,7 @@
 
 ## Installing The Package 
 ```
-wget (https://raw.githubusercontent.com/OPIran-CluB/VPS-Optimizer/main/youtube-in-shell/install.sh --ipv4) && chmod +x install.sh && ./install.sh
+bash <(curl -Ls https://raw.githubusercontent.com/OPIran-CluB/VPS-Optimizer/main/youtube-in-shell/install.sh --ipv4)
 ```
 
 
