@@ -1,34 +1,5 @@
 #!/bin/sh
 
-# Function to print characters with delay
-print_with_delay() {
-    text=$1
-    delay=$2
-    for ((i = 0; i < ${#text}; i++)); do
-        echo -n "${text:$i:1}"
-        sleep $delay
-    done
-}
-
-# Introduction animation
-echo ""
-echo ""
-print_with_delay "b" 0.1
-print_with_delay "y" 0.1
-print_with_delay " " 0.1
-print_with_delay "O" 0.1
-print_with_delay "P" 0.1
-print_with_delay "I" 0.1
-print_with_delay "R" 0.1
-print_with_delay "N" 0.1
-print_with_delay "C" 0.1
-print_with_delay "L" 0.1
-print_with_delay "U" 0.1
-print_with_delay "B" 0.1
-print_with_delay ""
-echo ""
-echo ""
-
 # Intro
 echo
 echo $(tput setaf 2)=======================================================$(tput sgr0)
