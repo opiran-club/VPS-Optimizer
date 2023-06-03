@@ -1,4 +1,4 @@
-# VPS Optimizer
+# Optimizer One-click optimizer for servers
 
 به مرور آپدیت میگردد هر مشکلی بود لطفا از طریق تلگرام یا گیتهاب اطلاع بدید
 
@@ -10,7 +10,51 @@ https://t.me/OPIranClub
 
 to use this script ssh to your vps with root previllage then copy below ink and paste it to shell
 
+
+# UBUNTU
+وظایف زیر را انجام می دهد:
+ - Update, Upgrade, and Clean the server.
+ Install Useful Packages.
+ - Enable Packages at Server Boot.
+ - Create & Enable SWAP File. (Default is 2Gb)
+ - Enable IPv6 Support.
+ - Clean the Old SYSCTL Settings.
+ Optimize the SYSCTL Settings.
+ - SWAP
+ - Network
+ - BBR & hybla
+Optimize SSH.
+ - Back up the original sshd_config file
+ - Disable DNS lookups for connecting clients
+ - Enable compression for SSH connections
+ - Remove less efficient encryption ciphers
+ - Enable and Configure TCP keep-alive messages
+ - Allow agent forwarding
+ - Allow TCP forwarding
+ - Enable gateway ports
+ - Enable tunneling
+Optimize the System Limits.
+ - nproc
+ - nofile
+Optimize UFW & Open Common Ports.
+Reboot at the end.
+
+Prerequisites
+ - Ubuntu server (16+) with root access.
+ - curl
+```
+sudo apt install -y curl
+```
+
+```
+bash <(curl -s https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/optimizer.sh --ipv4)
+```
+
 -------------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+# Centos
 
 ## Changing Nameservers to Google
 ## تغییر نیم سرور سرور به گوگل
@@ -21,28 +65,7 @@ rm -rf /etc/resolv.conf && touch /etc/resolv.conf && echo 'nameserver 8.8.8.8' >
 -------------------------------------------------------------------------------------------------------------------------------------------------
 ## Install some Necessary 
 ```
-sudo apt install -y wget curl python python3 nano
-```
-### CentOS
-```
 yum install -y wget curl python python3 nano
-```
--------------------------------------------------------------------------------------------------------------------------------------------------
-## UDPGW for gaming and video call
-با دستور زیر
-```
-bash <(curl -Ls https://raw.githubusercontent.com/OPIran-CluB/VPS-Optimizer/main/UDPGW.sh --ipv4)
-```
--------------------------------------------------------------------------------------------------------------------------------------------------
-## Install Dropbear Debian Based And CentOs
-```
-bash <(curl -Ls https://raw.githubusercontent.com/OPIran-CluB/VPS-Optimizer/main/Dropbear.sh --ipv4)
-```
--------------------------------------------------------------------------------------------------------------------------------------------------
-## Install Stunnel Debian Base
-با دستور زیر
-```
-bash <(curl -Ls https://raw.githubusercontent.com/OPIran-CluB/VPS-Optimizer/main/Stunnel.sh --ipv4)
 ```
 -------------------------------------------------------------------------------------------------------------------------------------------------
 # TCP-Tweaker & BBR
@@ -52,7 +75,7 @@ bash <(curl -Ls https://raw.githubusercontent.com/OPIran-CluB/VPS-Optimizer/main
 ```
 bash <(curl -Ls https://raw.githubusercontent.com/OPIran-CluB/VPS-Optimizer/main/Tweaker.sh --ipv4)
 ```
-## Hybla Debian Based
+## Hybla 
 
 دستور زیر را اجرا کنید:
 
@@ -100,53 +123,11 @@ net.ipv4.tcp_wmem = 4096 65536 67108864
 ```
 بعد از سیو کردن فایل بالا سرور را ریبوت کنید
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
-## BBR Debian base
-با دستور زیر
-```
-wget --no-check-certificate -O /opt/bbr.sh https://github.com/teddysun/across/raw/master/bbr.sh && chmod 755 /opt/bbr.sh && bash /opt/bbr.sh
-```
-
 ## BBR CentOS
 ```
 wget "https://github.com/cx9208/bbrplus/raw/master/ok_bbrplus_centos.sh" && chmod +x ok_bbrplus_centos.sh && ./ok_bbrplus_centos.sh
 ```
-
-## BBR open-vz VM
-```
-wget --no-check-certificate https://raw.githubusercontent.com/cloudstarry/google-bbr/master/bbrvz.sh && bash bbrvz.sh
-```
-then to Change Speed up for specific Port Range:
-```
-nano /root/lkl/run.sh
-```
-and search for 9000-9999 and change it optioanally then  if you have Natvps select your range 
-```
-nano /root/lkl/haproxy.cfg
-```
-and search for 9000-9999 and change it optioanally if you have Natvps select your range 
-
--------------------------------------------------------------------------------------------------------------------------------------------------
-## Time-Setting
-```
-dpkg-reconfigure tzdata
-```
--------------------------------------------------------------------------------------------------------------------------------------------------
-# Snap
-
-## Installing Snap And Speedtest In Debian Base
-
-first you need install snap
-```
-sudo apt install snapd
-```
-then
-```
-snap install speedtest-cli
-```
-or
-```
-snap install fast
-```
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
 ## Snap in Centos
 first you need install snap core in centos
 
@@ -165,7 +146,55 @@ snap install core && snap refresh core
 now you can install anything with this "snap install"
 
 -------------------------------------------------------------------------------------------------------------------------------------------------
-## Automatically Install the latest version of the Docker Engine and Docker compose
+-------------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------
+# General Program For Both Ubuntu And Centos
+
+
+## A) UDPGW for gaming and video call
+با دستور زیر
+```
+bash <(curl -Ls https://raw.githubusercontent.com/OPIran-CluB/VPS-Optimizer/main/UDPGW.sh --ipv4)
+```
+-------------------------------------------------------------------------------------------------------------------------------------------------
+## B) Install Dropbear Debian Based And CentOs
+```
+bash <(curl -Ls https://raw.githubusercontent.com/OPIran-CluB/VPS-Optimizer/main/Dropbear.sh --ipv4)
+```
+-------------------------------------------------------------------------------------------------------------------------------------------------
+## C) Install Stunnel Debian Base
+با دستور زیر
+```
+bash <(curl -Ls https://raw.githubusercontent.com/OPIran-CluB/VPS-Optimizer/main/Stunnel.sh --ipv4)
+```
+-------------------------------------------------------------------------------------------------------------------------------------------------
+## D) Time-Setting
+```
+dpkg-reconfigure tzdata
+```
+-------------------------------------------------------------------------------------------------------------------------------------------------
+## E) Automatically Install the latest version of the Docker Engine and Docker compose
 ```
 bash <(curl -Ls https://raw.githubusercontent.com/OPIran-CluB/VPS-Optimizer/main/Docker-DockerCompose.sh --ipv4)
 ```
+-------------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+# BBR For OPENVZ VM
+
+```
+wget --no-check-certificate https://raw.githubusercontent.com/cloudstarry/google-bbr/master/bbrvz.sh && bash bbrvz.sh
+```
+then to Change Speed up for specific Port Range:
+```
+nano /root/lkl/run.sh
+```
+and search for 9000-9999 and change it optioanally then  if you have Natvps select your range 
+```
+nano /root/lkl/haproxy.cfg
+```
+and search for 9000-9999 and change it optioanally if you have Natvps select your range 
+
+
+
