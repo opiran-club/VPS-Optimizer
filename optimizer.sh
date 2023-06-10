@@ -3,7 +3,7 @@
 # Intro
 echo
 echo $(tput setaf 2)=======================================================$(tput sgr0)
-echo "$(tput setaf 2) C.F Warp/wiregaurd + این اسکریپت به طور خودکار سرور اوبونتو شما را بهینه می کند               $(tput sgr0)"
+echo "$(tput setaf 2)  این اسکریپت به طور خودکار سرور اوبونتو شما را بهینه می کند               $(tput sgr0)"
 echo "$(tput setaf 2)----- Root access is required.$(tput sgr0)"
 echo "$(tput setaf 2)----- Source is @opiranv2rayproxy & @OPIranclub $(tput sgr0)"
 echo $(tput setaf 2)=======================================================$(tput sgr0)
@@ -70,7 +70,7 @@ installations() {
   apt -y purge firewalld
 
   # Install
-  apt -y install nload nethogs autossh ssh iperf sshuttle software-properties-common apt-transport-https iptables lsb-release ca-certificates ubuntu-keyring gnupg2 apt-utils cron bash-completion curl git unzip zip ufw wget preload locales nano vim python3 jq qrencode socat busybox net-tools haveged htop && curl -fsSL https://gist.githubusercontent.com/hamid-gh98/dc5dd9b0cc5b0412af927b1ccdb294c7/raw/install_warp_proxy.sh | bash
+  apt -y install nload nethogs autossh ssh iperf sshuttle software-properties-common apt-transport-https iptables lsb-release ca-certificates ubuntu-keyring gnupg2 apt-utils cron bash-completion curl git unzip zip ufw wget preload locales nano vim python3 jq qrencode socat busybox net-tools haveged htop
   sleep 0.5
   
 }
