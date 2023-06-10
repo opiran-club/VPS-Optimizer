@@ -3,7 +3,7 @@
 # Intro
 echo
 echo $(tput setaf 2)=======================================================$(tput sgr0)
-echo "$(tput setaf 2) این اسکریپت به طور خودکار سرور اوبونتو شما را بهینه می کند               $(tput sgr0)"
+echo "$(tput setaf 2) C.F Warp/wiregaurd + این اسکریپت به طور خودکار سرور اوبونتو شما را بهینه می کند               $(tput sgr0)"
 echo "$(tput setaf 2)----- Root access is required.$(tput sgr0)"
 echo "$(tput setaf 2)----- Source is @opiranv2rayproxy & @OPIranclub $(tput sgr0)"
 echo $(tput setaf 2)=======================================================$(tput sgr0)
