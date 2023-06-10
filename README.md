@@ -11,7 +11,7 @@ https://t.me/OPIranClub
 to use this script ssh to your vps with root previllage then copy below ink and paste it to shell
 
 
-# UBUNTU
+# UBUNTU (V.1.0)
 وظایف زیر را انجام می دهد:
  - Update, Upgrade, and Clean the server.
  Install Useful Packages.
@@ -39,6 +39,10 @@ Optimize the System Limits.
 Optimize UFW & Open Common Ports.
 Reboot at the end.
 
+# (V.1.1)
+ - Added C.F Warp/Wiregaurd 
+ 
+ 
 Prerequisites
  - Ubuntu server (16+) with root access.
  - curl
