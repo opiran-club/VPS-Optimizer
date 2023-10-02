@@ -94,6 +94,7 @@ fix_dns() {
     echo ""
     echo -e "${YELLOW}______________________________________________________${NC}"
   echo ""
+  display_fancy_progress 20
   sed -i '/nameserver/d' $DNS_PATH
   echo 'nameserver 8.8.8.8' >>$DNS_PATH
   echo 'nameserver 8.8.4.4' >>$DNS_PATH
@@ -114,10 +115,10 @@ complete_update() {
     echo -e "${YELLOW}______________________________________________________${NC}"
   echo ""
   echo ""
-  echo -e "Please wait, it might take a while"
+  echo -e "${RED}Please wait, it might couple of minutes${NC}"
   echo ""
   sleep 1
-    secs=3
+    secs=20
     while [ $secs -gt 0 ]; do
         echo -ne "Continuing in $secs seconds\033[0K\r"
         sleep 1
@@ -260,7 +261,7 @@ remove_old_sysctl() {
   sed -i '/vm.vfs_cache_pressure/d' $SYS_PATH
   echo 'vm.swappiness=10' >>$SYS_PATH
   echo 'vm.vfs_cache_pressure=50' >>$SYS_PATH
-  sleep 0.5
+  sleep 1
   echo 'fs.file-max = 1000000' >>$SYS_PATH
   echo 'net.core.rmem_default = 1048576' >>$SYS_PATH
   echo 'net.core.rmem_max = 2097152' >>$SYS_PATH
@@ -337,12 +338,16 @@ sleep 0.5
 enable_packages
 sleep 0.5
 swap_maker
+display_fancy_progress 10
 sleep 0.5
 enable_ipv6_support
+display_fancy_progress 10
 sleep 0.5
 remove_old_sysctl
+display_fancy_progress 20
 sleep 0.5
 remove_old_ssh_conf
+display_fancy_progress 20
 sleep 0.5
     clear
     logo
