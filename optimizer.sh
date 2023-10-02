@@ -148,7 +148,7 @@ installations() {
     echo ""
     echo -e "${YELLOW}______________________________________________________${NC}"
   echo ""
-  echo -e "Please wait, it might take a while"
+  echo -e "${RED}Please wait, it might takes a while${NC}"
   echo ""
   sleep 1
     secs=4
@@ -170,20 +170,21 @@ installations() {
 }
 
 enable_packages() {
+echo -e "${GREEN}Enable snap and cron service as well.${NC}"
   systemctl enable preload haveged snapd cron
   press_enter
 }
 
 swap_maker() {
     clear
-  title="Configure swap file"
+  title="Setup and Configure swap file to boost performance"
     logo
     echo ""
     echo -e "${BLUE}$title ${NC}"
     echo ""
     echo -e "${YELLOW}______________________________________________________${NC}"
   echo ""
-  echo -e "Please wait, it might take a while"
+  echo -e "${RED}Please wait, it might takes a while${NC}"
   echo ""
   sleep 1
   echo ""
@@ -211,6 +212,7 @@ enable_ipv6_support() {
     echo ""
     echo -e "${YELLOW}______________________________________________________${NC}"
   echo ""
+  echo -e "${RED}Please wait, it might takes a while${NC}"
   if [[ $(sysctl -a | grep 'disable_ipv6.*=.*1') || $(cat /etc/sysctl.{conf,d/*} | grep 'disable_ipv6.*=.*1') ]]; then
     sed -i '/disable_ipv6/d' /etc/sysctl.{conf,d/*}
     echo 'net.ipv6.conf.all.disable_ipv6 = 0' >/etc/sysctl.d/ipv6.conf
@@ -231,6 +233,7 @@ remove_old_sysctl() {
     echo ""
     echo -e "${YELLOW}______________________________________________________${NC}"
   echo ""
+  echo -e "${RED}Please wait, it might takes a while${NC}"
   sed -i '/fs.file-max/d' $SYS_PATH
   sed -i '/fs.inotify.max_user_instances/d' $SYS_PATH
   sed -i '/net.ipv4.tcp_syncookies/d' $SYS_PATH
@@ -301,6 +304,7 @@ remove_old_ssh_conf() {
     echo ""
     echo -e "${YELLOW}______________________________________________________${NC}"
   echo ""
+  echo -e "${RED}Please wait, it might takes a while${NC}"
   cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
   sed -i 's/#UseDNS yes/UseDNS no/' $SSH_PATH
   sed -i 's/#Compression no/Compression yes/' $SSH_PATH
