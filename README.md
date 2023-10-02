@@ -28,7 +28,7 @@
 ##### Optimize the System Limits.
  - nproc
  - nofile
----------------------------------------------------------------------------------------------------------------------------------------
+   
 ---------------------------------------------------------------------------------------------------------------------------------------
 
 ###  ‼️ INSTRUCTION ‼️
@@ -45,9 +45,19 @@ apt install curl -y && bash <(curl -s https://raw.githubusercontent.com/opiran-c
 [VISIT HERE](https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/centos.md)
 
 
+---------------------------------------------------------------------------------------------------------------------------------------
+
+## Credits
+
+credited by [OPIran](https://github.com/opiran-club)
 #
-#
-#
+## Contacts
+
+[Telegram-Group](https://t,me/OPIranCluB)
+
+
+---------------------------------------------------------------------------------------------------------------------------------------
+
 
 #### 🎁 Donate OPIran 🎁
 
@@ -68,13 +78,3 @@ apt install curl -y && bash <(curl -s https://raw.githubusercontent.com/opiran-c
 
  ```
 </details>
-
-
-## Credits
-
-credited by [OPIran](https://github.com/opiran-club)
-#
-## Contacts
-
-[Telegram-Group](https://t,me/OPIranCluB)
-
