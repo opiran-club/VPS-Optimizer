@@ -33,9 +33,8 @@
 
 ###  ‼️ INSTRUCTION ‼️
 
-#### Prerequisites
+#### UBUNTU
  - Ubuntu server (16+) with root access.
- - curl
    
 ```
 apt install curl -y && bash <(curl -s https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/optimizer.sh --ipv4)
