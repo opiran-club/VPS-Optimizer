@@ -1,6 +1,6 @@
 ### Optimizer One-click optimizer for servers
 
-### (V.1.0)
+### Optimizer (V.1.0)
 
  - Update, Upgrade, and Clean the server.
  Install Useful Packages.
@@ -25,7 +25,6 @@ Optimize SSH.
 Optimize the System Limits.
  - nproc
  - nofile
-Optimize UFW & Open Common Ports.
 ---------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------
 
