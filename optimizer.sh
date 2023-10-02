@@ -94,12 +94,11 @@ fix_dns() {
     echo ""
     echo -e "${YELLOW}______________________________________________________${NC}"
   echo ""
-  display_fancy_progress 20
   sed -i '/nameserver/d' $DNS_PATH
   echo 'nameserver 8.8.8.8' >>$DNS_PATH
   echo 'nameserver 8.8.4.4' >>$DNS_PATH
   echo ""
-  echo "${GREEN}System DNS Optimized.${NC}"
+  echo -e "${GREEN}System DNS Optimized.${NC}"
   echo ""
   sleep 1
   press_enter
@@ -117,17 +116,16 @@ complete_update() {
   echo ""
   echo -e "${RED}Please wait, it might couple of minutes${NC}"
   echo ""
+  echo ""
+  apt-get update > /dev/null 2>&1
+  apt-get upgrade -y > /dev/null 2>&1
   sleep 1
-    secs=20
+    secs=10
     while [ $secs -gt 0 ]; do
         echo -ne "Continuing in $secs seconds\033[0K\r"
         sleep 1
         : $((secs--))
     done
-  echo ""
-  display_fancy_progress 30
-  apt-get update > /dev/null 2>&1
-  apt-get upgrade -y > /dev/null 2>&1
   apt-get dist-upgrade -y > /dev/null 2>&1
   apt-get autoremove -y > /dev/null 2>&1
   apt-get autoclean -y > /dev/null 2>&1
@@ -136,6 +134,7 @@ complete_update() {
   echo -e "${GREEN}System update & upgrade completed.${NC}"
   echo ""
   sleep 1
+  press_enter
 }
 
 installations() {
@@ -159,7 +158,6 @@ installations() {
   echo ""
   apt-get purge firewalld -y > /dev/null 2>&1
   apt-get install nload nethogs autossh ssh iperf sshuttle software-properties-common apt-transport-https iptables lsb-release ca-certificates ubuntu-keyring gnupg2 apt-utils cron bash-completion curl git unzip zip ufw wget preload locales nano vim python3 jq qrencode socat busybox net-tools haveged htop curl -y > /dev/null 2>&1
-  display_fancy_progress 40
   if [[! -d /snap ]]; then
       apt-get install snapd -y > /dev/null 2>&1
   fi
@@ -167,10 +165,12 @@ installations() {
   echo -e "${GREEN}Install usefull and neccessary packages completed.${NC}"
   echo ""
   sleep 1
+  press_enter
 }
 
 enable_packages() {
   systemctl enable preload haveged snapd cron
+  press_enter
 }
 
 swap_maker() {
@@ -185,12 +185,6 @@ swap_maker() {
   echo -e "Please wait, it might take a while"
   echo ""
   sleep 1
-    secs=4
-    while [ $secs -gt 0 ]; do
-        echo -ne "Continuing in $secs seconds\033[0K\r"
-        sleep 1
-        : $((secs--))
-    done
   echo ""
   SWAP_SIZE=2G
   SWAP_PATH="/swapfile"
@@ -203,6 +197,7 @@ swap_maker() {
   echo -e "${GREEN}Swap file configured.${NC}"
   echo ""
   sleep 1
+  press_enter
 }
 
 enable_ipv6_support() {
@@ -222,6 +217,7 @@ enable_ipv6_support() {
   echo ""
   echo -e "${GREEN}IPV6 enables complete${NC}"
   echo ""
+  press_enter
 }
 
 remove_old_sysctl() {
@@ -290,6 +286,7 @@ remove_old_sysctl() {
   echo ""
   echo -e "${GREEN}Sysctl Configuration and optimization complete${NC}"
   echo ""
+  press_enter
 }
 
 remove_old_ssh_conf() {
@@ -326,16 +323,21 @@ remove_old_ssh_conf() {
   echo ""
   echo -e "${GREEN}SSH and SSHD Configuration and optimization complete${NC}"
   echo ""
+  press_enter
 }
 check_if_running_as_root
 sleep 0.5
 fix_dns
+display_fancy_progress 10
 sleep 0.5
 complete_update
+display_fancy_progress 50
 sleep 0.5
 installations
+display_fancy_progress 40
 sleep 0.5
 enable_packages
+display_fancy_progress 10
 sleep 0.5
 swap_maker
 display_fancy_progress 10
