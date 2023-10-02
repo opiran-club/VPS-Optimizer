@@ -1,4 +1,4 @@
-### Optimizer One-click optimizer for servers (V.1.0)
+### VPS Optimizer One-click (V.1.0)
 
 ##### Description
  - Update, Upgrade, and Clean the server.
