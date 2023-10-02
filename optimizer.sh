@@ -119,7 +119,7 @@ complete_update() {
   sleep 1
     secs=4
     while [ $secs -gt 0 ]; do
-        echo -ne "Continuing in $secs seconds\033[0K\r"
+        echo -ne "Continuing in $secs minutes\033[0K\r"
         sleep 1
         : $((secs--))
     done
