@@ -1,21 +1,7 @@
-# Optimizer One-click optimizer for servers
+### Optimizer One-click optimizer for servers
 
-به مرور آپدیت میگردد هر مشکلی بود لطفا از طریق تلگرام یا گیتهاب اطلاع بدید
+### (V.1.0)
 
-Tlegram Channel
-https://t.me/opiranv2rayproxy
-
-Gap Group
-https://t.me/OPIranClub
-
-to use this script ssh to your vps with root previllage then copy below ink and paste it to shell
-
-
-# UBUNTU 
--------------------------------------------------------------------------------------------------------------------------------------------------
--------------------------------------------------------------------------------------------------------------------------------------------------
-# (V.1.0)
-وظایف زیر را انجام می دهد:
  - Update, Upgrade, and Clean the server.
  Install Useful Packages.
  - Enable Packages at Server Boot.
@@ -40,19 +26,50 @@ Optimize the System Limits.
  - nproc
  - nofile
 Optimize UFW & Open Common Ports.
-Reboot at the end.
-### Prerequisites
+---------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------
 
+###  ‼️ INSTRUCTION ‼️
+
+##### Prerequisites
  - Ubuntu server (16+) with root access.
  - curl
+   
 ```
-sudo apt install -y curl
+apt install curl -y && bash <(curl -s https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/optimizer.sh --ipv4)
 ```
+#
+#
+#
 
-```
-bash <(curl -s https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/optimizer.sh --ipv4)
-```
+#### 🎁 Donate OPIran 🎁
 
+<details>
+ 
+<summary><p><b> 👉 Click To View <b>⚡️ 🎁 Donate to give away great projects 🎁</b></b></p></summary>
+ 
+ ✅ USDT (ERC20)
+
+🔗 Link : 
+ ```
+
+ ```
+ 
+ ✅ TRX (TRC20)
+🔗 Link : 
+ ```
+
+ ```
+</details>
+
+
+## Credits
+
+credited by [OPIran](https://github.com/opiran-club)
+#
+## Contacts
+
+[Telegram-Group](https://t,me/OPIranCluB)
 
 
 
