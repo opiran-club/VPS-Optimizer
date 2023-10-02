@@ -117,21 +117,20 @@ complete_update() {
   echo -e "Please wait, it might take a while"
   echo ""
   sleep 1
-    secs=4
+    secs=3
     while [ $secs -gt 0 ]; do
-        echo -ne "Continuing in $secs minutes\033[0K\r"
+        echo -ne "Continuing in $secs seconds\033[0K\r"
         sleep 1
         : $((secs--))
     done
   echo ""
+  display_fancy_progress 30
   apt-get update > /dev/null 2>&1
   apt-get upgrade -y > /dev/null 2>&1
-  display_fancy_progress 30
-  sleep 0.5
-  apt-get dist-upgrade > /dev/null 2>&1
-  apt-get autoremove > /dev/null 2>&1
-  apt-get autoclean > /dev/null 2>&1
-  apt-get clean > /dev/null 2>&1
+  apt-get dist-upgrade -y > /dev/null 2>&1
+  apt-get autoremove -y > /dev/null 2>&1
+  apt-get autoclean -y > /dev/null 2>&1
+  apt-get clean -y > /dev/null 2>&1
   echo ""
   echo -e "${GREEN}System update & upgrade completed.${NC}"
   echo ""
