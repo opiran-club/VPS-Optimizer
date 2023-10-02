@@ -58,4 +58,4 @@ bash <(curl -s https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/
 
 #### CentOS
 
-(VISIT HERE)[https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/centos.md]
+[VISIT HERE](https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/centos.md)
