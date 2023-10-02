@@ -1,22 +1,20 @@
-### Optimizer One-click optimizer for servers
+### Optimizer One-click optimizer for servers (V.1.0)
 
-### Optimizer (V.1.0)
-
-###### Description
+##### Description
  - Update, Upgrade, and Clean the server.
    
- ###### Install Useful Packages.
+ ##### Install Useful Packages.
  - Enable Packages at Server Boot.
  - Create & Enable SWAP File. (Default is 2Gb)
  - Enable IPv6 Support.
  - Clean the Old SYSCTL Settings.
    
- ###### Optimize the SYSCTL Settings.
+ ##### Optimize the SYSCTL Settings.
  - SWAP
  - Network
  - BBR & hybla
    
-###### Optimize SSH.
+##### Optimize SSH.
  - Back up the original sshd_config file
  - Disable DNS lookups for connecting clients
  - Enable compression for SSH connections
@@ -27,7 +25,7 @@
  - Enable gateway ports
  - Enable tunneling
    
-###### Optimize the System Limits.
+##### Optimize the System Limits.
  - nproc
  - nofile
 ---------------------------------------------------------------------------------------------------------------------------------------
