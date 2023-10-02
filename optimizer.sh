@@ -169,34 +169,6 @@ installations() {
   sleep 1
 }
 
-speedtestinstall() {
-    clear
-  title="Install main speestest package"
-    logo
-    echo ""
-    echo -e "${BLUE}$title ${NC}"
-    echo ""
-    echo -e "${YELLOW}______________________________________________________${NC}"
-  echo ""
-  echo -e "Please wait, it might take a while"
-  echo ""
-  sleep 1
-    secs=4
-    while [ $secs -gt 0 ]; do
-        echo -ne "Continuing in $secs seconds\033[0K\r"
-        sleep 1
-        : $((secs--))
-    done
-  echo ""
-  curl -s https://packagecloud.io/install/repositories/ookla/speedtest-cli/script.deb.sh | bash
-  display_fancy_progress 40
-  apt-get install speedtest
-  echo ""
-  echo -e "${GREEN}Install main speestest package completed, please run ${YELLOW}'speedtest' ${GREEN}command anytime${NC}"
-  echo ""
-  sleep 1
-}
-
 enable_packages() {
   systemctl enable preload haveged snapd cron
 }
@@ -355,37 +327,24 @@ remove_old_ssh_conf() {
   echo -e "${GREEN}SSH and SSHD Configuration and optimization complete${NC}"
   echo ""
 }
-
 check_if_running_as_root
 sleep 0.5
-
 fix_dns
 sleep 0.5
-
 complete_update
 sleep 0.5
-
 installations
 sleep 0.5
-
-speedtestinstall
-sleep 0.5
-
 enable_packages
 sleep 0.5
-
 swap_maker
 sleep 0.5
-
 enable_ipv6_support
 sleep 0.5
-
 remove_old_sysctl
 sleep 0.5
-
 remove_old_ssh_conf
 sleep 0.5
-
     clear
     logo
     echo ""
