@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Wireguard IPV6 Tunnel Configuration Script
+# VPS OPtimizer Bash Script
 # Author: github.com/opiran-club
 #
 # This script is designed to simplify the installation and configuration as a optimizer vps
