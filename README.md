@@ -33,27 +33,25 @@
 
 ###  ‼️ INSTRUCTION ‼️
 
-#### UBUNTU
+#### 👉 UBUNTU
  - Ubuntu server (16+) with root access.
    
 ```
 apt install curl -y && bash <(curl -s https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/optimizer.sh --ipv4)
 ```
 
-#### CentOS
+#### 👉 CentOS
 
 [VISIT HERE](https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/centos.md)
 
 
 ---------------------------------------------------------------------------------------------------------------------------------------
 
-## Credits
+### Credits
+ - credited by [OPIran](https://github.com/opiran-club)
 
-credited by [OPIran](https://github.com/opiran-club)
-#
-## Contacts
-
-[Telegram-Group](https://t,me/OPIranCluB)
+### Contacts
+ - Visit Me [Telegram-Group](https://t,me/OPIranCluB)
 
 
 ---------------------------------------------------------------------------------------------------------------------------------------
