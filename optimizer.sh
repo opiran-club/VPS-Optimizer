@@ -234,6 +234,7 @@ remove_old_sysctl() {
     echo -e "${YELLOW}______________________________________________________${NC}"
   echo ""
   echo -e "${RED}Please wait, it might takes a while${NC}"
+  echo ""
   sed -i '/fs.file-max/d' $SYS_PATH
   sed -i '/fs.inotify.max_user_instances/d' $SYS_PATH
   sed -i '/net.ipv4.tcp_syncookies/d' $SYS_PATH
@@ -305,6 +306,7 @@ remove_old_ssh_conf() {
     echo -e "${YELLOW}______________________________________________________${NC}"
   echo ""
   echo -e "${RED}Please wait, it might takes a while${NC}"
+  echo ""
   cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
   sed -i 's/#UseDNS yes/UseDNS no/' $SSH_PATH
   sed -i 's/#Compression no/Compression yes/' $SSH_PATH
