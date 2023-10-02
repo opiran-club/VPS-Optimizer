@@ -94,6 +94,7 @@ fix_dns() {
     echo ""
     echo -e "${YELLOW}______________________________________________________${NC}"
   echo ""
+  display_fancy_progress 10
   sed -i '/nameserver/d' $DNS_PATH
   echo 'nameserver 8.8.8.8' >>$DNS_PATH
   echo 'nameserver 8.8.4.4' >>$DNS_PATH
@@ -117,6 +118,7 @@ complete_update() {
   echo -e "${RED}Please wait, it might couple of minutes${NC}"
   echo ""
   echo ""
+  display_fancy_progress 40
   apt-get update > /dev/null 2>&1
   apt-get upgrade -y > /dev/null 2>&1
   sleep 1
@@ -158,9 +160,8 @@ installations() {
   echo ""
   apt-get purge firewalld -y > /dev/null 2>&1
   apt-get install nload nethogs autossh ssh iperf sshuttle software-properties-common apt-transport-https iptables lsb-release ca-certificates ubuntu-keyring gnupg2 apt-utils cron bash-completion curl git unzip zip ufw wget preload locales nano vim python3 jq qrencode socat busybox net-tools haveged htop curl -y > /dev/null 2>&1
-  if [[! -d /snap ]]; then
-      apt-get install snapd -y > /dev/null 2>&1
-  fi
+  display_fancy_progress 30
+  apt-get install snapd -y > /dev/null 2>&1
   echo ""
   echo -e "${GREEN}Install usefull and neccessary packages completed.${NC}"
   echo ""
@@ -186,6 +187,7 @@ swap_maker() {
   echo ""
   sleep 1
   echo ""
+  display_fancy_progress 10
   SWAP_SIZE=2G
   SWAP_PATH="/swapfile"
   fallocate -l $SWAP_SIZE $SWAP_PATH
@@ -282,6 +284,7 @@ remove_old_sysctl() {
   echo 'root hard     nproc          655350' >>$LIM_PATH
   echo 'root soft     nofile         655350' >>$LIM_PATH
   echo 'root hard     nofile         655350' >>$LIM_PATH
+  display_fancy_progress 10
   sysctl -p
   echo ""
   echo -e "${GREEN}Sysctl Configuration and optimization complete${NC}"
@@ -319,6 +322,7 @@ remove_old_ssh_conf() {
   echo "AllowTcpForwarding yes" | tee -a $SSH_PATH
   echo "GatewayPorts yes" | tee -a $SSH_PATH
   echo "PermitTunnel yes" | tee -a $SSH_PATH
+  display_fancy_progress 10
   service ssh restart
   echo ""
   echo -e "${GREEN}SSH and SSHD Configuration and optimization complete${NC}"
@@ -328,28 +332,20 @@ remove_old_ssh_conf() {
 check_if_running_as_root
 sleep 0.5
 fix_dns
-display_fancy_progress 10
 sleep 0.5
 complete_update
-display_fancy_progress 50
 sleep 0.5
 installations
-display_fancy_progress 40
 sleep 0.5
 enable_packages
-display_fancy_progress 10
 sleep 0.5
 swap_maker
-display_fancy_progress 10
 sleep 0.5
 enable_ipv6_support
-display_fancy_progress 10
 sleep 0.5
 remove_old_sysctl
-display_fancy_progress 20
 sleep 0.5
 remove_old_ssh_conf
-display_fancy_progress 20
 sleep 0.5
     clear
     logo
