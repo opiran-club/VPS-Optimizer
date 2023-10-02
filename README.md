@@ -53,3 +53,9 @@ sudo apt install -y curl
 bash <(curl -s https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/optimizer.sh --ipv4)
 ```
 
+
+
+
+#### CentOS
+
+(VISIT HERE)[https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/centos.md]
