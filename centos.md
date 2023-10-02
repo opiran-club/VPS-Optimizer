@@ -13,7 +13,7 @@ rm -rf /etc/resolv.conf && touch /etc/resolv.conf && echo 'nameserver 8.8.8.8' >
 ## بهینه سازی سرور TCP-Tweaker
 نصب و حذف تنظیمات با دستور زیر 
 ```
-bash <(curl -Ls https://raw.githubusercontent.com/OPIran-CluB/VPS-Optimizer/main/Tweaker.sh --ipv4)
+bash <(curl -Ls https://raw.githubusercontent.com/OPIran-CluB/VPS-Optimizer/Install/main/Tweaker.sh --ipv4)
 ```
 ## Hybla 
 
@@ -72,7 +72,7 @@ wget "https://github.com/cx9208/bbrplus/raw/master/ok_bbrplus_centos.sh" && chmo
 ## A) UDPGW for gaming and video call
 با دستور زیر
 ```
-bash <(curl -Ls https://raw.githubusercontent.com/OPIran-CluB/VPS-Optimizer/main/UDPGW.sh --ipv4)
+bash <(curl -Ls https://raw.githubusercontent.com/OPIran-CluB/VPS-Optimizer/Install/main/udpgw.sh --ipv4)
 ```
 
 ## D) Time-Setting
