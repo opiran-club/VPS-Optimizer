@@ -104,11 +104,13 @@ set_timezone() {
             timezone="America/Los_Angeles"
             ;;
         4)
-            echo -e "${RED}No changes made.${NC}"
-            exit 1
+            echo -e "${RED}No changes made, press enter to continue optimization${NC}"
+            press_enter
+            return
             ;;
         *)
             echo -e "${RED}Invalid choice. No changes made.${NC}"
+            press_enter
             return 1
             ;;
     esac
