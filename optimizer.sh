@@ -104,6 +104,7 @@ set_timezone() {
             timezone="America/Los_Angeles"
             ;;
         4)
+            echo -e "${RED}No changes made.${NC}"
             exit 1
             ;;
         *)
