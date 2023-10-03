@@ -104,7 +104,7 @@ set_timezone() {
             timezone="America/Los_Angeles"
             ;;
         4)
-            exit1
+            exit 1
             ;;
         *)
             echo -e "${RED}Invalid choice. No changes made.${NC}"
@@ -390,7 +390,7 @@ remove_old_sysctl
 remove_old_ssh_conf
     clear
     logo
-    echo -e "    ${MAGENTA} Your server fully optimized successfully${NC}
+    echo -e "    ${MAGENTA} Your server fully optimized successfully${NC}"
     echo -e "${YELLOW}______________________________________________________________${NC}"
     echo ""
     echo ""
