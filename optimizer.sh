@@ -176,7 +176,7 @@ complete_update() {
   echo -e "${RED}Please wait, it might couple of minutes${NC}"
   echo ""
   echo ""
-  apt-get -qq update
+  apt-get update 2>&1 | tee /dev/tty > /dev/null
   apt-get upgrade -y 2>&1 | tee /dev/tty > /dev/null
   apt-get dist-upgrade -y > /dev/null 2>&1
   apt-get autoremove -y > /dev/null 2>&1
@@ -200,16 +200,9 @@ installations() {
   echo ""
   echo -e "${RED}Please wait, it might takes a while${NC}"
   echo ""
-  sleep 1
-    secs=4
-    while [ $secs -gt 0 ]; do
-        echo -ne "Continuing in $secs seconds\033[0K\r"
-        sleep 1
-        : $((secs--))
-    done
   echo ""
   apt-get purge firewalld -y > /dev/null 2>&1
-  apt-get install nload nethogs autossh ssh iperf sshuttle software-properties-common apt-transport-https iptables lsb-release ca-certificates ubuntu-keyring gnupg2 apt-utils cron bash-completion curl git unzip zip ufw wget preload locales nano vim python3 jq qrencode socat busybox net-tools haveged htop curl -y > /dev/null 2>&1
+  apt-get install nload nethogs autossh ssh iperf sshuttle software-properties-common apt-transport-https iptables lsb-release ca-certificates ubuntu-keyring gnupg2 apt-utils cron bash-completion curl git unzip zip ufw wget preload locales nano vim python3 jq qrencode socat busybox net-tools haveged htop curl -y > /dev/null
   display_fancy_progress 30
   apt-get install snapd -y 2>&1 | tee /dev/tty > /dev/null
   echo ""
@@ -397,7 +390,7 @@ remove_old_sysctl
 remove_old_ssh_conf
     clear
     logo
-    echo ""
+    echo -e "    ${MAGENTA} Your server fully optimized successfully${NC}
     echo -e "${YELLOW}______________________________________________________________${NC}"
     echo ""
     echo ""
