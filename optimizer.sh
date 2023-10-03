@@ -107,15 +107,14 @@ set_timezone() {
             exit1
             ;;
         *)
-            echo "Invalid choice. No changes made."
+            echo -e "${RED}Invalid choice. No changes made.${NC}"
             return 1
             ;;
     esac
-    
-    echo "Setting the timezone to $timezone..."
     sudo timedatectl set-timezone $timezone
-    
-    echo "Timezone has been set to $timezone."
+    echo ""
+    echo -e "${YELLOW}Timezone has been set to ${GREEN}$timezone.${NC}"
+    echo ""
     press_enter
 }
 
@@ -387,6 +386,7 @@ remove_old_ssh_conf() {
   press_enter
 }
 check_if_running_as_root
+set_timezone
 fix_dns
 complete_update
 installations
