@@ -62,6 +62,9 @@ apt install curl -y && bash <(curl -s https://raw.githubusercontent.com/opiran-c
 <details>
  
 <summary><p><b> 👉 Click To View <b>⚡️ 🎁 Donate to give away great projects 🎁</b></b></p></summary>
+
+ [Buy Me Coffee](https://hamibash.com/OPIran)
+
  
  ✅ USDT (ERC20)
 
