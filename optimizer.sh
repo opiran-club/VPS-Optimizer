@@ -90,7 +90,7 @@ set_timezone() {
     echo -e "${RED}3. ${YELLOW}USA-Los_Angeles (LA)${NC}"
     echo -e "${RED}4. ${YELLOW}NO CHANGE TIMEZONE${NC}"
     echo ""
-    echo -ne "${CYAN}Enter your choice [1-3]:${NC} "
+    echo -ne "${CYAN}Enter your choice [1-4]:${NC} "
     read choice
     
     case $choice in
