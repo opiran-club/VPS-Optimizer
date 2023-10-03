@@ -33,6 +33,22 @@ press_enter() {
     read
 }
 
+ask_reboot() {
+echo ""
+echo -e "\n ${YELLOW}Reboot now? (Recommended) ${GREEN}[y/n]${NC}"
+echo ""
+read reboot
+case "$reboot" in
+        [Yy]) 
+        systemctl reboot
+        ;;
+        *) 
+        return 
+        ;;
+    esac
+exit
+}
+
 display_fancy_progress() {
     local duration=$1
     local sleep_interval=0.1
@@ -58,6 +74,49 @@ display_fancy_progress() {
     done
     echo -ne "${RED}] ${progress}%"
     echo
+}
+
+set_timezone() {
+    clear
+    title="Select a timezone"
+    logo
+    echo ""
+    echo -e "${BLUE}$title ${NC}"
+    echo ""
+    echo -e "${YELLOW}______________________________________________________${NC}"
+    echo ""
+    echo -e "${RED}1. ${YELLOW}Asia-Tehran${NC}"
+    echo -e "${RED}2. ${YELLOW}Europe-Istanbul${NC}"
+    echo -e "${RED}3. ${YELLOW}USA-Los_Angeles (LA)${NC}"
+    echo -e "${RED}4. ${YELLOW}NO CHANGE TIMEZONE${NC}"
+    echo ""
+    echo -ne "${CYAN}Enter your choice [1-3]:${NC} "
+    read choice
+    
+    case $choice in
+        1)
+            timezone="Asia/Tehran"
+            ;;
+        2)
+            timezone="Europe/Istanbul"
+            ;;
+        3)
+            timezone="America/Los_Angeles"
+            ;;
+        4)
+            exit1
+            ;;
+        *)
+            echo "Invalid choice. No changes made."
+            return 1
+            ;;
+    esac
+    
+    echo "Setting the timezone to $timezone..."
+    sudo timedatectl set-timezone $timezone
+    
+    echo "Timezone has been set to $timezone."
+    press_enter
 }
 
 logo() {
@@ -118,20 +177,12 @@ complete_update() {
   echo -e "${RED}Please wait, it might couple of minutes${NC}"
   echo ""
   echo ""
-  display_fancy_progress 40
-  apt-get update > /dev/null 2>&1
-  apt-get upgrade -y > /dev/null 2>&1
-  sleep 1
-    secs=10
-    while [ $secs -gt 0 ]; do
-        echo -ne "Continuing in $secs seconds\033[0K\r"
-        sleep 1
-        : $((secs--))
-    done
+  apt-get -qq update
+  apt-get upgrade -y 2>&1 | tee /dev/tty > /dev/null
   apt-get dist-upgrade -y > /dev/null 2>&1
   apt-get autoremove -y > /dev/null 2>&1
   apt-get autoclean -y > /dev/null 2>&1
-  apt-get clean -y > /dev/null 2>&1
+  apt-get clean -y
   echo ""
   echo -e "${GREEN}System update & upgrade completed.${NC}"
   echo ""
@@ -161,7 +212,7 @@ installations() {
   apt-get purge firewalld -y > /dev/null 2>&1
   apt-get install nload nethogs autossh ssh iperf sshuttle software-properties-common apt-transport-https iptables lsb-release ca-certificates ubuntu-keyring gnupg2 apt-utils cron bash-completion curl git unzip zip ufw wget preload locales nano vim python3 jq qrencode socat busybox net-tools haveged htop curl -y > /dev/null 2>&1
   display_fancy_progress 30
-  apt-get install snapd -y > /dev/null 2>&1
+  apt-get install snapd -y 2>&1 | tee /dev/tty > /dev/null
   echo ""
   echo -e "${GREEN}Install usefull and neccessary packages completed.${NC}"
   echo ""
@@ -336,23 +387,14 @@ remove_old_ssh_conf() {
   press_enter
 }
 check_if_running_as_root
-sleep 0.5
 fix_dns
-sleep 0.5
 complete_update
-sleep 0.5
 installations
-sleep 0.5
 enable_packages
-sleep 0.5
 swap_maker
-sleep 0.5
 enable_ipv6_support
-sleep 0.5
 remove_old_sysctl
-sleep 0.5
 remove_old_ssh_conf
-sleep 0.5
     clear
     logo
     echo ""
@@ -365,3 +407,4 @@ sleep 0.5
     echo ""
     echo -e "${YELLOW}______________________________________________________________${NC}"
     echo ""
+    ask_reboot
