@@ -17,8 +17,53 @@
 bash <(curl -s https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/bbrv3.sh --ipv4)
 ```
 
-after complete succesfully reboot VPS
+#### Manually Instruction
 
+نصب کرنل xanmod و bbrv3 بصورت دستی یا manuall
+
+جهت دریافت لول سی پی یو cpu level
+```
+bash <(curl -s https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/bbrv3.sh --ipv4)
+```
+خط بالا رو در ترمینال لینوکس پیست کنید و لول سی پی یو رو بهتون میده و سپس خارج بشید
+
+و به ترتیب زیر مراحل را انجام بدید
+
+```
+apt update && apt upgrade -y
+```
+
+1- Register the PGP key:
+```
+wget -qO - https://dl.xanmod.org/archive.key | sudo gpg --dearmor -o /usr/share/keyrings/xanmod-archive-keyring.gpg
+```
+
+2- Add the repository:
+```
+echo 'deb [signed-by=/usr/share/keyrings/xanmod-archive-keyring.gpg] http://deb.xanmod.org releases main' | sudo tee /etc/apt/sources.list.d/xanmod-release.list
+```
+
+3- Then update and install: 
+```
+sudo apt update && sudo apt install linux-xanmod-x64v3
+```
+
+4- Reboot.
+
+برای کامند سوم تغییرات به نسبت سی پی یو لول خودتون
+
+apt install linux-xanmod-x64v1
+
+apt install linux-xanmod-x64v2
+
+apt install linux-xanmod-x64v3
+
+apt install linux-xanmod-x64v4
+
+
+اگر دبیان بیس هستید اقدام کنید
+
+after complete succesfully reboot VPS
 ---------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------
 
