@@ -6,7 +6,7 @@
 
 
 #### update
- - add cppu level 1
+ - add cpu level 1
 
 
 ###  ‼️ INSTRUCTION ‼️
@@ -112,6 +112,8 @@ apt install curl -y && bash <(curl -s https://raw.githubusercontent.com/opiran-c
 #### 👉 CentOS
 
 [VISIT HERE](https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/centos.md)
+
+-------------------------------------------------------
 
 ![image](https://github.com/opiran-club/VPS-Optimizer/assets/130220895/62af50c5-9b7c-48c1-b8a8-8dbe47ad21b1)
 
