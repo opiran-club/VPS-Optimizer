@@ -13,7 +13,7 @@
 bash <(curl -s https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/bbrv3.sh --ipv4)
 ```
 
-#### Manually Instruction
+#### ‼️ Manually Instruction
 
 نصب کرنل xanmod و bbrv3 بصورت دستی یا manuall
 
