@@ -281,8 +281,8 @@ while true; do
     echo -e "${BLUE}$yt_title  ${NC}"
     echo -e "${YELLOW}______________________________________________________${NC}"
     echo ""
-    echo -e "linux version Info：${GREEN}${linux_version}${NC}"
-    echo -e "kernel Info：${GREEN}${kernel_version}${NC}"
+    echo -e "${CYAN}linux version Info：${GREEN}${linux_version}${NC}"
+    echo -e "${CYAN}kernel Info：${GREEN}${kernel_version}${NC}"
     cpu_level
     echo ""
     echo -e "${RED} !! TIP !! ${NC}"
