@@ -2,6 +2,8 @@
 
 ##### kernel file uploaded by 👉 [superNG](https://github.com/SuperNG6/linux-setup.sh/releases)
 
+![image](https://github.com/opiran-club/VPS-Optimizer/assets/130220895/4ba8e535-5d4a-435d-8e0f-62216da06367)
+
 ###  ‼️ INSTRUCTION ‼️
 
 #### 👉 UBUNTU
@@ -13,6 +15,7 @@ bash <(curl -s https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/
 
 after complete succesfully reboot VPS
 
+---------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------
 
 ### VPS Optimizer One-click (V.1.0)
@@ -61,6 +64,7 @@ apt install curl -y && bash <(curl -s https://raw.githubusercontent.com/opiran-c
 
 [VISIT HERE](https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/centos.md)
 
+![image](https://github.com/opiran-club/VPS-Optimizer/assets/130220895/62af50c5-9b7c-48c1-b8a8-8dbe47ad21b1)
 
 ---------------------------------------------------------------------------------------------------------------------------------------
 
