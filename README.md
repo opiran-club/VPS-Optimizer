@@ -6,8 +6,7 @@
 
 ###  ‼️ INSTRUCTION ‼️
 
-#### 👉 UBUNTU
- - Ubuntu server (16+) with root access.
+#### 👉 UBUNTU / DEBIAN
    
 ```
 bash <(curl -s https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/bbrv3.sh --ipv4)
