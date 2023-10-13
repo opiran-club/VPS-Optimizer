@@ -47,19 +47,28 @@ sudo apt update && sudo apt install linux-xanmod-x64v3
 4- Reboot.
 
 برای کامند سوم تغییرات به نسبت سی پی یو لول خودتون
+```
+apt update && apt install linux-xanmod-x64v1
 
-apt install linux-xanmod-x64v1
+apt update && apt install linux-xanmod-x64v2
 
-apt install linux-xanmod-x64v2
+apt update && apt install linux-xanmod-x64v3
 
-apt install linux-xanmod-x64v3
+apt update && apt install linux-xanmod-x64v4
+```
 
-apt install linux-xanmod-x64v4
-
-
-اگر دبیان بیس هستید اقدام کنید
+اگر دبیان بیس هستید اقدام کنید (اوبونتو یا دبیان)
 
 after complete succesfully reboot VPS
+
+
+برای حذف کردن کرنل و برگشت به حالت قبل
+
+```
+apt-get purge linux-xanmod-x64v*
+```
+
+که با شماره سی پی یو لول خودتون کامل کنید
 ---------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------
 
