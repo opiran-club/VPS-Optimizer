@@ -21,6 +21,10 @@ bash <(curl -s https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/
 ```
 bash <(curl -s https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/bbrv3.sh --ipv4)
 ```
+یا از این اسکریپت استفاده کنید برای تعیین cpu level
+```
+bash <(curl -s https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/bbrv3.sh --ipv4)
+```
 خط بالا رو در ترمینال لینوکس پیست کنید و لول سی پی یو رو بهتون میده و سپس خارج بشید
 
 و به ترتیب زیر مراحل را انجام بدید
