@@ -41,7 +41,7 @@ echo 'deb [signed-by=/usr/share/keyrings/xanmod-archive-keyring.gpg] http://deb.
 
 3- Then update and install: 
 ```
-sudo apt update && sudo apt install linux-xanmod-x64v3
+sudo apt update && sudo apt install linux-xanmod-x64v*
 ```
 
 4- Reboot.
@@ -69,6 +69,8 @@ apt-get purge linux-xanmod-x64v*
 ```
 
 که با شماره سی پی یو لول خودتون کامل کنید
+
+
 ---------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------
 
