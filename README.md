@@ -142,14 +142,5 @@ apt install curl -y && bash <(curl -s https://raw.githubusercontent.com/opiran-c
  - credited by [OPIran](https://github.com/opiran-club)
 
 ### Contacts
- - Visit Me [Telegram-Group](https://t,me/OPIranCluB)
-
-
----------------------------------------------------------------------------------------------------------------------------------------
-
-
-#### 🎁 Donate OPIran 🎁
-
-
-[👉🏼 Buy Me Coffee 👈🏼](https://hamibash.com/OPIran)
+ - Visit Me at [OPIran-Gap](https://t.me/opiranclub)
 
