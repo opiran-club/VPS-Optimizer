@@ -4,6 +4,11 @@
 
 ![image](https://github.com/opiran-club/VPS-Optimizer/assets/130220895/4ba8e535-5d4a-435d-8e0f-62216da06367)
 
+
+#### update
+ - add cppu level 1
+
+
 ###  ‼️ INSTRUCTION ‼️
 
 #### 👉 UBUNTU / DEBIAN
