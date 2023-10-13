@@ -44,7 +44,6 @@ echo 'deb [signed-by=/usr/share/keyrings/xanmod-archive-keyring.gpg] http://deb.
 sudo apt update && sudo apt install linux-xanmod-x64v*
 ```
 
-4- Reboot.
 
 برای کامند سوم تغییرات به نسبت سی پی یو لول خودتون
 ```
@@ -59,6 +58,7 @@ apt update && apt install linux-xanmod-x64v4
 
 اگر دبیان بیس هستید اقدام کنید (اوبونتو یا دبیان)
 
+4- Reboot.
 after complete succesfully reboot VPS
 
 
