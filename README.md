@@ -1,3 +1,20 @@
+### Xanmod kernel and BBRv3 
+
+##### kernel file uploaded by 👉 [superNG](https://github.com/SuperNG6/linux-setup.sh/releases)
+
+###  ‼️ INSTRUCTION ‼️
+
+#### 👉 UBUNTU
+ - Ubuntu server (16+) with root access.
+   
+```
+bash <(curl -s https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/bbrv3.sh --ipv4)
+```
+
+after complete succesfully reboot VPS
+
+---------------------------------------------------------------------------------------------------------------------------------------
+
 ### VPS Optimizer One-click (V.1.0)
 
 ##### Description
