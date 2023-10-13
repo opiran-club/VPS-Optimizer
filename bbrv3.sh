@@ -119,6 +119,11 @@ install_xanmod() {
         cd $temp_folder
         cpu_level
             case $cpu_support_level in
+                1)
+                    wget -qO - https://dl.xanmod.org/archive.key | sudo gpg --dearmor -o /usr/share/keyrings/xanmod-archive-keyring.gpg
+                    echo 'deb [signed-by=/usr/share/keyrings/xanmod-archive-keyring.gpg] http://deb.xanmod.org releases main' | sudo tee /etc/apt/sources.list.d/xanmod-release.list
+                    sudo apt update && sudo apt install linux-xanmod-x64v1
+                    ;;
                 2)
                     headers_file="linux-headers-6.1.46-x64v2-xanmod1_6.1.46-x64v2-xanmod1-0.20230816.g11dcd23_amd64.deb"
                     image_file="linux-image-6.1.46-x64v2-xanmod1_6.1.46-x64v2-xanmod1-0.20230816.g11dcd23_amd64.deb"
@@ -205,6 +210,7 @@ uninstall_xanmod() {
         if [[ $confirm == [yY] ]]; then
             echo -e "${GREEN}Uninstalling XanMod kernel and restoring the original kernel...${NC}"
             apt-get purge linux-image-*xanmod* linux-headers-*xanmod* -y
+            apt-get purge linux-xanmod-x64v1
             apt-get autoremove -y
             update-grub
 
