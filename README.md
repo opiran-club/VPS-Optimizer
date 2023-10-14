@@ -1,8 +1,8 @@
-### VPS Optimizer One-click (V.1.1) with optional TCP congestion control (Westwood, BBR, BBRv3, Hybla)
+### VPS Optimizer One-click (V.1.1) with optional TCP congestion control (Tweaker, Westwood, BBR, BBRv3, Hybla)
 
 ##### Summurize configuration
  - Upgrade, Time setting, Install Useful Packages, Optimize the SYSCTL, Optimize SSH
- - TCP congestion control (Westwood, BBR, BBRv3, Hybla)
+ - TCP congestion control (Tweaker, Westwood, BBR, BBRv3, Hybla)
    
  ##### Details configuration
  - Enable Packages at Server Boot.
@@ -33,6 +33,7 @@ apt install curl -y && bash <(curl -s https://raw.githubusercontent.com/opiran-c
 ```
 
 -------------------------------------------------------
+![image](https://github.com/opiran-club/VPS-Optimizer/assets/130220895/94970d55-b70f-460b-9d06-e75a2141d271)
 
 ![image](https://github.com/opiran-club/VPS-Optimizer/assets/130220895/62af50c5-9b7c-48c1-b8a8-8dbe47ad21b1)
 
