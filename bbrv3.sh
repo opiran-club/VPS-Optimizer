@@ -120,27 +120,28 @@ install_xanmod() {
         cpu_level
             case $cpu_support_level in
                 1)
-                    wget -qO - https://dl.xanmod.org/archive.key | sudo gpg --dearmor -o /usr/share/keyrings/xanmod-archive-keyring.gpg
+                    wget -qO - https://gitlab.com/afrd.gpg | sudo gpg --dearmor -o /usr/share/keyrings/xanmod-archive-keyring.gpg
                     echo 'deb [signed-by=/usr/share/keyrings/xanmod-archive-keyring.gpg] http://deb.xanmod.org releases main' | sudo tee /etc/apt/sources.list.d/xanmod-release.list
-                    sudo apt update && sudo apt install linux-xanmod-x64v1
+                    apt-get update
+                    apt-get install linux-xanmod-x64v1
                     ;;
                 2)
-                    headers_file="linux-headers-6.1.46-x64v2-xanmod1_6.1.46-x64v2-xanmod1-0.20230816.g11dcd23_amd64.deb"
-                    image_file="linux-image-6.1.46-x64v2-xanmod1_6.1.46-x64v2-xanmod1-0.20230816.g11dcd23_amd64.deb"
-                    headers_md5="45c85d1bcb07bf171006a3e34b804db0"
-                    image_md5="63c359cef963a2e9f1b7181829521fc3"
+                    wget -qO - https://gitlab.com/afrd.gpg | sudo gpg --dearmor -o /usr/share/keyrings/xanmod-archive-keyring.gpg
+                    echo 'deb [signed-by=/usr/share/keyrings/xanmod-archive-keyring.gpg] http://deb.xanmod.org releases main' | sudo tee /etc/apt/sources.list.d/xanmod-release.list
+                    apt-get update
+                    apt-get install linux-xanmod-x64v1
                     ;;
                 3)
-                    headers_file="linux-headers-6.1.46-x64v3-xanmod1_6.1.46-x64v3-xanmod1-0.20230816.g11dcd23_amd64.deb"
-                    image_file="linux-image-6.1.46-x64v3-xanmod1_6.1.46-x64v3-xanmod1-0.20230816.g11dcd23_amd64.deb"
-                    headers_md5="6ae3e253a8aeabd80458df4cb4da70cf"
-                    image_md5="d6ea43a2a6686b86e0ac23f800eb95a4"
+                    wget -qO - https://gitlab.com/afrd.gpg | sudo gpg --dearmor -o /usr/share/keyrings/xanmod-archive-keyring.gpg
+                    echo 'deb [signed-by=/usr/share/keyrings/xanmod-archive-keyring.gpg] http://deb.xanmod.org releases main' | sudo tee /etc/apt/sources.list.d/xanmod-release.list
+                    apt-get update
+                    apt-get install linux-xanmod-x64v1
                     ;;
                 4)
-                    headers_file="linux-headers-6.1.46-x64v4-xanmod1_6.1.46-x64v4-xanmod1-0.20230816.g11dcd23_amd64.deb"
-                    image_file="linux-image-6.1.46-x64v4-xanmod1_6.1.46-x64v4-xanmod1-0.20230816.g11dcd23_amd64.deb"
-                    headers_md5="9c41a4090a8068333b7dd56b87dd01df"
-                    image_md5="7d30eef4b9094522fc067dc19f7cc92e"
+                    wget -qO - https://gitlab.com/afrd.gpg | sudo gpg --dearmor -o /usr/share/keyrings/xanmod-archive-keyring.gpg
+                    echo 'deb [signed-by=/usr/share/keyrings/xanmod-archive-keyring.gpg] http://deb.xanmod.org releases main' | sudo tee /etc/apt/sources.list.d/xanmod-release.list
+                    apt-get update
+                    apt-get install linux-xanmod-x64v1
                     ;;
                 *)
                      echo -e "${RED}Your CPU is not supported by the XanMod kernel and cannot be installed.${NC}"
@@ -148,22 +149,6 @@ install_xanmod() {
                         ;;
             esac
 
-            wget "https://github.com/SuperNG6/linux-setup.sh/releases/download/0816/$headers_file"
-            wget "https://github.com/SuperNG6/linux-setup.sh/releases/download/0816/$image_file"
-
-            if [ "$(md5sum $headers_file | awk '{print $1}')" != "$headers_md5" ]; then
-                echo -e "${RED}The downloaded ${YELLOW} $headers_file MD5 value does not match. The file may have been tampered with.${NC}"
-                return 1
-            fi
-
-            if [ "$(md5sum $image_file | awk '{print $1}')" != "$image_md5" ]; then
-                echo -e "${RED}The downloaded ${YELLOW} $image_file MD5 value does not match, the file may have been tampered with.${NC}"
-                return 1
-            fi
-
-            dpkg -i linux-image-*xanmod*.deb linux-headers-*xanmod*.deb
-
-            if [ $? -eq 0 ]; then
             echo -e "${GREEN}The XanMod kernel has been installed successfully.${NC}"
             echo -e "${YELLOW}Do you need to update the GRUB boot configuration? (y/n) [Default: y]:${NC}"
             read grub
@@ -185,7 +170,6 @@ install_xanmod() {
             echo -e "${RED}XanMod kernel installation failed.${NC}"
         fi
 
-        rm -f "$image_file" "$headers_file"
     elif [[ $continue == [Nn] ]]; then
         echo ""
         echo -e "${RED}Installation of the XanMod kernel was aborted.${NC}"
@@ -198,7 +182,6 @@ install_xanmod() {
 uninstall_xanmod() {
     clear
     current_kernel_version=$(uname -r)
-    cpu_level
 
     if [[ $current_kernel_version == *-xanmod* ]]; then
         echo -e "${CYAN}Current kernel: ${GREEN}$current_kernel_version${NC}"
@@ -209,8 +192,7 @@ uninstall_xanmod() {
 
         if [[ $confirm == [yY] ]]; then
             echo -e "${GREEN}Uninstalling XanMod kernel and restoring the original kernel...${NC}"
-            apt-get purge linux-image-*xanmod* linux-headers-*xanmod* -y
-            apt-get purge linux-xanmod-x64v1
+            apt-get purge linux-xanmod-x64v1 -y && apt-get purge linux-xanmod-x64v2 -y && apt-get purge linux-xanmod-x64v3 -y && apt-get purge linux-xanmod-x64v4 -y
             apt-get autoremove -y
             update-grub
 
@@ -287,8 +269,8 @@ while true; do
     echo -e "${BLUE}$yt_title  ${NC}"
     echo -e "${YELLOW}______________________________________________________${NC}"
     echo ""
-    echo -e "${CYAN}linux version Info：${GREEN}${linux_version}${NC}"
-    echo -e "${CYAN}kernel Info：${GREEN}${kernel_version}${NC}"
+    echo -e "linux version Info：${GREEN}${linux_version}${NC}"
+    echo -e "kernel Info：${GREEN}${kernel_version}${NC}"
     cpu_level
     echo ""
     echo -e "${RED} !! TIP !! ${NC}"
