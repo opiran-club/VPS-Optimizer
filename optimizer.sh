@@ -272,7 +272,7 @@ enable_ipv6_support() {
 
 remove_old_sysctl() {
     clear
-  title="OPtimizing system configuration (BBR, Hybla, Swap) and removing old sysctl configs"
+  title="Optimizing system configuration and ubdating sysctl configs"
     logo
     echo ""
     echo -e "${BLUE}$title ${NC}"
@@ -342,6 +342,177 @@ remove_old_sysctl() {
   press_enter
 }
 
+check_Hybla() {
+    local param=$(sysctl net.ipv4.tcp_congestion_control | awk '{print $3}')
+    if [[ x"${param}" == x"hybla" ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+kernel_version() {
+    local kernel_version=$(uname -r | cut -d- -f1)
+    if _version_ge ${kernel_version} 4.9; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+check_os() {
+    if _exists "virt-what"; then
+        virt="$(virt-what)"
+    elif _exists "systemd-detect-virt"; then
+        virt="$(systemd-detect-virt)"
+    fi
+    if [ -n "${virt}" -a "${virt}" = "lxc" ]; then
+        echo -e "${RED} Virtualization method is LXC, which is not supported. ${NC}"
+    fi
+    if [ -n "${virt}" -a "${virt}" = "openvz" ] || [ -d "/proc/vz" ]; then
+        echo -e "${RED}Virtualization method is OpenVZ, which is not supported. ${NC}"
+    fi
+}
+
+ask_bbr_version() {
+    clear
+    title="Select a TCP congestion control"
+    logo
+    echo ""
+    echo -e "${BLUE}$title ${NC}"
+    echo ""
+    echo -e "${YELLOW}______________________________________________________${NC}"
+    echo ""
+    echo -e "${RED}1. ${YELLOW}TCP-Tweaker${NC}"
+    echo -e "${RED}2. ${YELLOW}TCP-Westwood${NC}"
+    echo -e "${RED}3. ${YELLOW}TCP-BBR${NC}"
+    echo -e "${RED}4. ${YELLOW}XanMod & BBRv3${NC}"
+    echo -e "${RED}5. ${YELLOW}TCP-Hybla${NC}"
+    echo ""
+    echo -e "${RED}6. ${YELLOW}No TCP congestion control${NC}"
+    echo ""
+    echo -ne "${CYAN}Enter your choice [1-4]: ${NC}"
+    read choice
+    
+    case $choice in
+        1)
+            clear
+            echo -e "${YELLOW}Backing up original kernel parameter configuration... ${NC}"
+            cp /etc/sysctl.conf /etc/sysctl.conf.bak
+            echo -e "${YELLOW}Optimizing kernel parameters for TCP-Tweaker ${NC}"
+cat <<EOL >> /etc/sysctl.conf
+#PH56
+net.ipv4.tcp_window_scaling = 1
+net.core.rmem_max = 16777216
+net.core.wmem_max = 16777216
+net.ipv4.tcp_rmem = 4096 87380 16777216
+net.ipv4.tcp_wmem = 4096 16384 16777216
+net.ipv4.tcp_low_latency = 1
+net.ipv4.tcp_slow_start_after_idle = 0
+net.core.default_qdisc = fq
+net.ipv4.tcp_congestion_control = bbr
+EOL
+sysctl -p
+            if [ $? -eq 0 ]; then
+                echo -e "${GREEN}Kernel parameter optimization for TCP-Tweaker was successful.${NC}"
+            else
+                echo -e "${RED}Kernel parameter optimization failed. Restoring the original configuration...${NC}"
+                mv /etc/sysctl.conf.bak /etc/sysctl.conf
+            fi
+            ;;
+        2)
+            clear
+            echo -e "${YELLOW}Backing up original kernel parameter configuration... ${NC}"
+            cp /etc/sysctl.conf /etc/sysctl.conf.bak
+            echo -e "${YELLOW}Optimizing kernel parameters for TCP-Westwood ${NC}"
+cat <<EOL >> /etc/sysctl.conf
+# BBR Westwood Optimization
+net.core.default_qdisc = fq
+net.ipv4.tcp_congestion_control = westwood
+net.ipv4.tcp_moderate_rcvbuf = 0
+net.ipv4.tcp_ecn = 0
+net.ipv4.tcp_sack = 1
+net.ipv4.tcp_dsack = 1
+EOL
+sysctl -p
+            if [ $? -eq 0 ]; then
+                echo -e "${GREEN}Kernel parameter optimization for TCP-Westwood was successful.${NC}"
+            else
+                echo -e "${RED}Kernel parameter optimization failed. Restoring the original configuration...${NC}"
+                mv /etc/sysctl.conf.bak /etc/sysctl.conf
+            fi
+            ;;
+
+        3)
+            clear
+            echo -e "${YELLOW}Backing up original kernel parameter configuration... ${NC}"
+            cp /etc/sysctl.conf /etc/sysctl.conf.bak
+            echo -e "${YELLOW}Optimizing kernel parameters for TCP-BBR (Bottleneck Bandwidth and Round-Trip Propagation Time) ${NC}"
+cat <<EOL >> /etc/sysctl.conf
+# BBR Optimization
+net.core.default_qdisc = fq
+net.ipv4.tcp_congestion_control = bbr
+EOL
+sysctl -p
+            if [ $? -eq 0 ]; then
+                echo -e "${GREEN}Kernel parameter optimization for TCP-BBR was successful.${NC}"
+            else
+                echo -e "${RED}Kernel parameter optimization failed. Restoring the original configuration...${NC}"
+                mv /etc/sysctl.conf.bak /etc/sysctl.conf
+            fi
+            ;;
+        4)
+            clear
+            echo -e "${YELLOW}If you have ubuntu or debian system, you can use this script to install and configure BBRv3. ${NC}"
+            echo ""
+            press_enter
+            bash <(curl -s https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/bbrv3.sh --ipv4)
+            ;;
+        5)
+            clear
+            echo -e "${YELLOW}    Optimizing kernel parameters for TCP-Hybla    ${NC}"
+            echo ""
+            echo -e "${YELLOW}Backing up original kernel parameter configuration... ${NC}"
+            cp /etc/sysctl.conf /etc/sysctl.conf.bak
+            check_Hybla
+            kernel_version
+            check_os
+            sed -i '/net.core.default_qdisc/d' /etc/sysctl.conf
+            sed -i '/net.ipv4.tcp_congestion_control/d' /etc/sysctl.conf
+cat <<EOL >> /etc/sysctl.conf
+# Hybla Optimization
+net.core.default_qdisc = fq
+net.ipv4.tcp_congestion_control = hybla
+net.ipv4.tcp_ecn = 2
+net.ipv4.tcp_frto = 2
+net.ipv4.tcp_low_latency = 1
+net.ipv4.tcp_mtu_probing = 1
+net.ipv4.tcp_no_metrics_save = 1
+net.ipv4.tcp_window_scaling = 1
+net.ipv4.tcp_sack = 1
+net.ipv4.tcp_timestamps = 1
+EOL
+sysctl -p >/dev/null 2>&1
+
+            if [ $? -eq 0 ]; then
+                echo -e "${GREEN}Kernel parameter optimization for TCP-Hybla was successful.${NC}"
+            else
+                echo -e "${RED}Kernel parameter optimization failed. Restoring the original configuration...${NC}"
+                mv /etc/sysctl.conf.bak /etc/sysctl.conf
+            fi
+            ;;
+        6)
+            clear
+            echo -e "${YELLOW}No TCP congestion control selected.${NC}"
+            ;;
+        *)
+            echo -e "${RED}Invalid choice.${NC}"
+            return 1
+            ;;
+    esac
+    press_enter
+}
+
 remove_old_ssh_conf() {
     clear
   title="OPtimizing SSH configuration to improve security and performance"
@@ -391,6 +562,7 @@ swap_maker
 enable_ipv6_support
 remove_old_sysctl
 remove_old_ssh_conf
+ask_bbr_version
     clear
     logo
     echo -e "    ${MAGENTA} Your server fully optimized successfully${NC}"
