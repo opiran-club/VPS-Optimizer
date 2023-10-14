@@ -109,68 +109,60 @@ install_xanmod() {
     echo -ne "${YELLOW}Do you want to continue downloading and installing the XanMod kernel? [y/n]:${NC}   "
     read continue
 
-        if [[ $continue == [Yy] ]]; then
+    if [[ $continue == [Yy] ]]; then
         echo ""
         echo ""
-                    wget -qO - https://gitlab.com/afrd.gpg | sudo gpg --dearmor -o /usr/share/keyrings/xanmod-archive-keyring.gpg
-                    echo 'deb [signed-by=/usr/share/keyrings/xanmod-archive-keyring.gpg] http://deb.xanmod.org releases main' | sudo tee /etc/apt/sources.list.d/xanmod-release.list
-        
+        wget -qO - https://gitlab.com/afrd.gpg | sudo gpg --dearmor -o /usr/share/keyrings/xanmod-archive-keyring.gpg
+        echo 'deb [signed-by=/usr/share/keyrings/xanmod-archive-keyring.gpg] http://deb.xanmod.org releases main' | sudo tee /etc/apt/sources.list.d/xanmod-release.list
+
         temp_folder=$(mktemp -d)
         cd $temp_folder
 
         cpu_level
 
-            case $cpu_support_level in
-                1)
-                    apt-get update
-                    apt-get install linux-xanmod-x64v1
-                    ;;
-                2)
-                    apt-get update
-                    apt-get install linux-xanmod-x64v2
-                    ;;
-                3)
-                    apt-get update
-                    apt-get install linux-xanmod-x64v3
-                    ;;
-                4)
-                    apt-get update
-                    apt-get install linux-xanmod-x64v4
-                    ;;
-                *)
-                     echo -e "${RED}Your CPU is not supported by the XanMod kernel and cannot be installed.${NC}"
-                        return 1
-                        ;;
-            esac
+        case $cpu_support_level in
+            1)
+                apt-get update
+                apt-get install linux-xanmod-x64v1
+                ;;
+            2)
+                apt-get update
+                apt-get install linux-xanmod-x64v2
+                ;;
+            3)
+                apt-get update
+                apt-get install linux-xanmod-x64v3
+                ;;
+            4)
+                apt-get update
+                apt-get install linux-xanmod-x64v4
+                ;;
+            *)
+                echo -e "${RED}Your CPU is not supported by the XanMod kernel and cannot be installed.${NC}"
+                return 1
+                ;;
+        esac
 
-            echo -e "${GREEN}The XanMod kernel has been installed successfully.${NC}"
-            echo -e "${YELLOW}Do you need to update the GRUB boot configuration? (y/n) [Default: y]:${NC}"
-            read grub
+        echo -e "${GREEN}The XanMod kernel has been installed successfully.${NC}"
+        echo -e "${YELLOW}Do you need to update the GRUB boot configuration? (y/n) [Default: y]:${NC}"
+        read grub
 
-            case $grub in
-                [Yy])
-                    update-grub
-                    echo -e "${GREEN}The GRUB boot configuration has been updated.${NC}"
-                    echo -e "${GREEN}To enable BBRv3, please restart and run the BBR optimization option.${NC}"
-                    ;;
-                [Nn])
-                    echo -e "${RED}It is not recommended, but the optimization has been aborted.${NC}"
-                    ;;
-                *)
-                    echo -e "${RED}Invalid option, skipping GRUB boot configuration update.${NC}"
-                    ;;
-            esac
-        else
-            echo -e "${RED}XanMod kernel installation failed.${NC}"
-        fi
-
-        elif [[ $continue == [Nn] ]]; then
-            echo ""
-            echo -e "${RED}Installation of the XanMod kernel was aborted.${NC}"
-        else
-            echo ""
-            echo -e "${RED}Invalid option.${NC}"
-        fi
+        case $grub in
+            [Yy])
+                update-grub
+                echo -e "${GREEN}The GRUB boot configuration has been updated.${NC}"
+                echo -e "${GREEN}To enable BBRv3, please restart and run the BBR optimization option.${NC}"
+                ;;
+            [Nn])
+                echo -e "${RED}It is not recommended, but the optimization has been aborted.${NC}"
+                ;;
+            *)
+                echo -e "${RED}Invalid option, skipping GRUB boot configuration update.${NC}"
+                ;;
+        esac
+    else
+        echo -e "${RED}XanMod kernel installation failed.${NC}"
+    fi
 }
 
 uninstall_xanmod() {
