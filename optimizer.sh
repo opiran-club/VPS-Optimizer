@@ -28,6 +28,29 @@ BLUE="\e[94m "
 MAGENTA="\e[95m"
 NC="\e[0m"
 
+if [ "$EUID" -ne 0 ]; then
+echo -e "\n ${RED}This script must be run as root.${NC}"
+exit 1
+fi
+
+if [ -f /etc/os-release ]; then
+source /etc/os-release
+case $ID in
+    "ubuntu")
+echo "deb http://archive.ubuntu.com/ubuntu/ jammy main restricted" >> /etc/apt/sources.list
+echo "deb http://archive.ubuntu.com/ubuntu/ jammy-updates main restricted" >> /etc/apt/sources.list
+echo "deb http://archive.ubuntu.com/ubuntu/ jammy universe" >> /etc/apt/sources.list
+echo "deb http://archive.ubuntu.com/ubuntu/ jammy-updates universe" >> /etc/apt/sources.list
+echo "deb http://archive.ubuntu.com/ubuntu/ jammy multiverse" >> /etc/apt/sources.list
+echo "deb http://archive.ubuntu.com/ubuntu/ jammy-updates multiverse" >> /etc/apt/sources.list
+echo "deb http://archive.ubuntu.com/ubuntu/ jammy-backports main restricted universe multiverse" >> /etc/apt/sources.list
+echo "deb http://archive.ubuntu.com/ubuntu/ jammy-security main restricted" >> /etc/apt/sources.list
+echo "deb http://archive.ubuntu.com/ubuntu/ jammy-security universe" >> /etc/apt/sources.list
+echo "deb http://archive.ubuntu.com/ubuntu/ jammy-security multiverse" >> /etc/apt/sources.list
+        ;;
+esac
+fi
+
 press_enter() {
     echo -e "\n ${RED}Press Enter to continue... ${NC}"
     read
@@ -136,13 +159,6 @@ LIM_PATH="/etc/security/limits.conf"
 PROF_PATH="/etc/profile"
 SSH_PATH="/etc/ssh/sshd_config"
 DNS_PATH="/etc/resolv.conf"
-
-check_if_running_as_root() {
-  if [ "$EUID" -ne 0 ]; then
-    echo -e "\n ${RED}This script must be run as root.${NC}"
-    exit 1
-fi
-}
 
 fix_dns() {
   clear
@@ -566,8 +582,6 @@ sysctl -p >/dev/null 2>&1
     esac
     press_enter
 }
-
-check_if_running_as_root
 set_timezone
 fix_dns
 complete_update
