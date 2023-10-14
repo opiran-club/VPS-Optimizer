@@ -1,5 +1,22 @@
 #!/bin/bash
-
+#
+# VPS OPtimizer Bash Script
+# Author: github.com/opiran-club
+#
+# This script is designed to simplify the installation and configuration XanMod kernel and BBRv3 
+# It provides options to install required packages, configure sysctl, uninstall and rolling back
+# download the appropriate GPG key
+#
+# supported architectures: x86_64 CPU level 1,2,3,4
+# Supported operating systems: Ubuntu 18.04/20.04/22.04 , Debian 10/11
+# Usage:
+#   - Run the script with root privileges.
+#   - Follow the on-screen prompts to install, configure, or uninstall 
+#
+# For more information and updates, visit github.com/opiran-club and @opiranclub on telegram.
+#
+# Disclaimer:
+# This script comes with no warranties or guarantees. Use it at your own risk.
 CYAN="\e[36m"
 GREEN="\e[32m"
 YELLOW="\e[33m"
