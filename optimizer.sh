@@ -207,7 +207,7 @@ installations() {
   echo ""
   echo ""
   apt-get purge firewalld -y > /dev/null 2>&1
-  apt-get install nload nethogs autossh ssh iperf sshuttle software-properties-common apt-transport-https iptables lsb-release ca-certificates ubuntu-keyring gnupg2 apt-utils cron bash-completion curl git unzip zip ufw wget preload locales nano vim python3 jq qrencode socat busybox net-tools haveged htop curl -y > /dev/null 2>&1
+  apt-get install gpg nload nethogs autossh ssh iperf sshuttle software-properties-common apt-transport-https iptables lsb-release ca-certificates ubuntu-keyring gnupg2 apt-utils cron bash-completion curl git unzip zip ufw wget preload locales nano vim python3 jq qrencode socat busybox net-tools haveged htop curl -y > /dev/null 2>&1
   display_fancy_progress 30
   apt-get install snapd -y > /dev/null 2>&1
   echo ""
