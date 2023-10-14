@@ -1,4 +1,22 @@
 #!/bin/bash
+#
+# XanMod kernel and BBRv3 Bash Script
+# Author: github.com/opiran-club
+#
+# It provides options to install required packages, configure XanMod kernel and BBRv3
+# download the appropriate configuration and program.
+#
+# supported architectures: x86_64, amd64
+# Supported operating systems: Ubuntu 18.04/20.04/22.04 , Debian 10/11
+#
+# Usage:
+#   - Run the script with root privileges.
+#   - Follow the on-screen prompts to install, configure, or uninstall
+#
+# For more information and updates, visit github.com/opiran-club and @opiranclub on telegram.
+#
+# Disclaimer:
+# This script comes with no warranties or guarantees. Use it at your own risk.
 
 CYAN="\e[36m"
 GREEN="\e[32m"
