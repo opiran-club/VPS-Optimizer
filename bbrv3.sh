@@ -1,22 +1,5 @@
 #!/bin/bash
-#
-# VPS OPtimizer Bash Script
-# Author: github.com/opiran-club
-#
-# This script is designed to simplify the installation and configuration XanMod kernel and BBRv3 
-# It provides options to install required packages, configure sysctl, uninstall and rolling back
-# download the appropriate GPG key
-#
-# supported architectures: x86_64 CPU level 1,2,3,4
-# Supported operating systems: Ubuntu 18.04/20.04/22.04 , Debian 10/11
-# Usage:
-#   - Run the script with root privileges.
-#   - Follow the on-screen prompts to install, configure, or uninstall 
-#
-# For more information and updates, visit github.com/opiran-club and @opiranclub on telegram.
-#
-# Disclaimer:
-# This script comes with no warranties or guarantees. Use it at your own risk.
+
 CYAN="\e[36m"
 GREEN="\e[32m"
 YELLOW="\e[33m"
@@ -70,10 +53,8 @@ cpu_level() {
         esac
     fi
 
-    cpu_support_level=1
-    cpu_support_level=2
-    cpu_support_level=3
-    cpu_support_level=4
+    # Initialize the CPU support level to 0
+    cpu_support_level=0
 
     while read -r line; do
         if [[ $line =~ "flags" ]]; then
@@ -97,8 +78,8 @@ cpu_level() {
     done < /proc/cpuinfo
 
     if [[ $cpu_support_level -ge 1 && $cpu_support_level -le 4 ]]; then
-        echo -e "${CYAN}Current OS : ${GREEN}$os${NC}"
-        echo -e "${CYAN}Current CPU Level : ${GREEN}x86-64 Level $cpu_support_level${NC}"
+        echo -e "${CYAN}Current OS: ${GREEN}$os${NC}"
+        echo -e "${CYAN}Current CPU Level: x86-64 Level $cpu_support_level${NC}"
         return $cpu_support_level
     else
         echo -e "${RED}OS or CPU level is not supported by the XanMod kernel and cannot be installed.${NC}"
@@ -128,7 +109,7 @@ install_xanmod() {
     echo -ne "${YELLOW}Do you want to continue downloading and installing the XanMod kernel? [y/n]:${NC}   "
     read continue
 
-    if [[ $continue == [Yy] ]]; then
+        if [[ $continue == [Yy] ]]; then
         echo ""
         echo ""
                     wget -qO - https://gitlab.com/afrd.gpg | sudo gpg --dearmor -o /usr/share/keyrings/xanmod-archive-keyring.gpg
@@ -183,13 +164,13 @@ install_xanmod() {
             echo -e "${RED}XanMod kernel installation failed.${NC}"
         fi
 
-    elif [[ $continue == [Nn] ]]; then
-        echo ""
-        echo -e "${RED}Installation of the XanMod kernel was aborted.${NC}"
-    else
-        echo ""
-        echo -e "${RED}Invalid option.${NC}"
-    fi
+        elif [[ $continue == [Nn] ]]; then
+            echo ""
+            echo -e "${RED}Installation of the XanMod kernel was aborted.${NC}"
+        else
+            echo ""
+            echo -e "${RED}Invalid option.${NC}"
+        fi
 }
 
 uninstall_xanmod() {
@@ -206,7 +187,7 @@ uninstall_xanmod() {
         if [[ $confirm == [yY] ]]; then
             echo -e "${GREEN}Uninstalling XanMod kernel and restoring the original kernel...${NC}"
             for i in $(seq 1 4); do
-                apt-get purge linux-xanmod-x64v$i -y
+            apt-get purge linux-xanmod-x64v$i -y
             done
             apt-get update
             apt-get autoremove -y
