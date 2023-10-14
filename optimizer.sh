@@ -85,16 +85,12 @@ set_timezone() {
     echo ""
     echo -e "${YELLOW}______________________________________________________${NC}"
     
-    # List common region/city options for timezones
     regions=("Asia/Tehran" "Europe/Istanbul" "America/Los_Angeles")
     
-    # List additional timezones if desired
     additional_timezones=("Asia/Tokyo" "Europe/London" "Australia/Sydney")
     
-    # Combine common and additional timezones
     timezones=("${regions[@]}" "${additional_timezones[@]}")
     
-    # Display the available timezones with corresponding numbers
     for ((i = 0; i < ${#timezones[@]}; i++)); do
         echo -e "${RED}$((i+1)). ${YELLOW}${timezones[i]}${NC}"
     done
@@ -207,7 +203,7 @@ installations() {
   echo ""
   echo ""
   apt-get purge firewalld -y > /dev/null 2>&1
-  apt-get install gpg nload nethogs autossh ssh iperf sshuttle software-properties-common apt-transport-https iptables lsb-release ca-certificates ubuntu-keyring gnupg2 apt-utils cron bash-completion curl git unzip zip ufw wget preload locales nano vim python3 jq qrencode socat busybox net-tools haveged htop curl -y > /dev/null 2>&1
+  apt-get install nload nethogs autossh ssh iperf sshuttle software-properties-common apt-transport-https iptables lsb-release ca-certificates ubuntu-keyring gnupg2 apt-utils cron bash-completion curl git unzip zip ufw wget preload locales nano vim python3 jq qrencode socat busybox net-tools haveged htop curl -y > /dev/null 2>&1
   display_fancy_progress 30
   apt-get install snapd -y > /dev/null 2>&1
   echo ""
@@ -252,24 +248,21 @@ swap_maker() {
 }
 
 enable_ipv6_support() {
-    clear
-  title="Enabling IPV6 Support"
-    logo
-    echo ""
-    echo -e "${BLUE}$title ${NC}"
-    echo ""
-    echo -e "${YELLOW}______________________________________________________${NC}"
-  echo ""
-  echo -e "${RED}Please wait, it might takes a while${NC}"
+    sysctl -w net.ipv4.ip_forward=1
+    sysctl -w net.ipv6.conf.all.forwarding=1
+    sysctl -w net.ipv6.conf.default.forwarding=1
+    echo "net.ipv4.ip_forward = 1" > /etc/sysctl.d/ip_forward.conf
+    echo "net.ipv6.conf.all.forwarding = 1" >> /etc/sysctl.d/ip_forward.conf
+    echo "net.ipv6.conf.default.forwarding = 1" >> /etc/sysctl.d/ip_forward.conf
+    sysctl -p /etc/sysctl.d/ip_forward.conf
   if [[ $(sysctl -a | grep 'disable_ipv6.*=.*1') || $(cat /etc/sysctl.{conf,d/*} | grep 'disable_ipv6.*=.*1') ]]; then
     sed -i '/disable_ipv6/d' /etc/sysctl.{conf,d/*}
     echo 'net.ipv6.conf.all.disable_ipv6 = 0' >/etc/sysctl.d/ipv6.conf
     sysctl -w net.ipv6.conf.all.disable_ipv6=0
   fi
-  echo ""
-  echo -e "${GREEN}IPV6 enables complete${NC}"
-  echo ""
-  press_enter
+    echo ""
+    echo -e "${GREEN}IPV6 enabled.${NC}"
+    echo ""
 }
 
 remove_old_sysctl() {
@@ -283,6 +276,7 @@ remove_old_sysctl() {
   echo ""
   echo -e "${RED}Please wait, it might takes a while${NC}"
   echo ""
+  enable_ipv6_support
   sed -i '/fs.file-max/d' $SYS_PATH
   sed -i '/fs.inotify.max_user_instances/d' $SYS_PATH
   sed -i '/net.ipv4.tcp_syncookies/d' $SYS_PATH
@@ -340,6 +334,46 @@ remove_old_sysctl() {
   sysctl -p
   echo ""
   echo -e "${GREEN}Sysctl Configuration and optimization complete${NC}"
+  echo ""
+  press_enter
+}
+
+remove_old_ssh_conf() {
+    clear
+  title="OPtimizing SSH configuration to improve security and performance"
+    logo
+    echo ""
+    echo -e "${BLUE}$title ${NC}"
+    echo ""
+    echo -e "${YELLOW}______________________________________________________${NC}"
+  echo ""
+  echo -e "${RED}Please wait, it might takes a while${NC}"
+  echo ""
+  cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
+  sed -i 's/#UseDNS yes/UseDNS no/' $SSH_PATH
+  sed -i 's/#Compression no/Compression yes/' $SSH_PATH
+  sed -i 's/Ciphers .*/Ciphers aes256-ctr,chacha20-poly1305@openssh.com/' $SSH_PATH
+  sed -i '/MaxAuthTries/d' $SSH_PATH
+  sed -i '/MaxSessions/d' $SSH_PATH
+  sed -i '/TCPKeepAlive/d' $SSH_PATH
+  sed -i '/ClientAliveInterval/d' $SSH_PATH
+  sed -i '/ClientAliveCountMax/d' $SSH_PATH
+  sed -i '/AllowAgentForwarding/d' $SSH_PATH
+  sed -i '/AllowTcpForwarding/d' $SSH_PATH
+  sed -i '/GatewayPorts/d' $SSH_PATH
+  sed -i '/PermitTunnel/d' $SSH_PATH
+  echo "TCPKeepAlive yes" | tee -a $SSH_PATH
+  echo "ClientAliveInterval 3000" | tee -a $SSH_PATH
+  echo "ClientAliveCountMax 100" | tee -a $SSH_PATH
+  echo "PermitRootLogin yes" >>/etc/ssh/sshd_config
+  echo "AllowAgentForwarding yes" | tee -a $SSH_PATH
+  echo "AllowTcpForwarding yes" | tee -a $SSH_PATH
+  echo "GatewayPorts yes" | tee -a $SSH_PATH
+  echo "PermitTunnel yes" | tee -a $SSH_PATH
+  display_fancy_progress 10
+  service ssh restart
+  echo ""
+  echo -e "${GREEN}SSH and SSHD Configuration and optimization complete${NC}"
   echo ""
   press_enter
 }
@@ -449,7 +483,6 @@ sysctl -p
             cp /etc/sysctl.conf /etc/sysctl.conf.bak
             echo -e "${YELLOW}Optimizing kernel parameters for TCP-Westwood ${NC}"
 cat <<EOL >> /etc/sysctl.conf
-# BBR Westwood Optimization
 net.core.default_qdisc = fq
 net.ipv4.tcp_congestion_control = westwood
 net.ipv4.tcp_moderate_rcvbuf = 0
@@ -472,7 +505,6 @@ sysctl -p
             cp /etc/sysctl.conf /etc/sysctl.conf.bak
             echo -e "${YELLOW}Optimizing kernel parameters for TCP-BBR (Bottleneck Bandwidth and Round-Trip Propagation Time) ${NC}"
 cat <<EOL >> /etc/sysctl.conf
-# BBR Optimization
 net.core.default_qdisc = fq
 net.ipv4.tcp_congestion_control = bbr
 EOL
@@ -503,7 +535,6 @@ sysctl -p
             sed -i '/net.core.default_qdisc/d' /etc/sysctl.conf
             sed -i '/net.ipv4.tcp_congestion_control/d' /etc/sysctl.conf
 cat <<EOL >> /etc/sysctl.conf
-# Hybla Optimization
 net.core.default_qdisc = fq
 net.ipv4.tcp_congestion_control = hybla
 net.ipv4.tcp_ecn = 2
@@ -536,45 +567,6 @@ sysctl -p >/dev/null 2>&1
     press_enter
 }
 
-remove_old_ssh_conf() {
-    clear
-  title="OPtimizing SSH configuration to improve security and performance"
-    logo
-    echo ""
-    echo -e "${BLUE}$title ${NC}"
-    echo ""
-    echo -e "${YELLOW}______________________________________________________${NC}"
-  echo ""
-  echo -e "${RED}Please wait, it might takes a while${NC}"
-  echo ""
-  cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
-  sed -i 's/#UseDNS yes/UseDNS no/' $SSH_PATH
-  sed -i 's/#Compression no/Compression yes/' $SSH_PATH
-  sed -i 's/Ciphers .*/Ciphers aes256-ctr,chacha20-poly1305@openssh.com/' $SSH_PATH
-  sed -i '/MaxAuthTries/d' $SSH_PATH
-  sed -i '/MaxSessions/d' $SSH_PATH
-  sed -i '/TCPKeepAlive/d' $SSH_PATH
-  sed -i '/ClientAliveInterval/d' $SSH_PATH
-  sed -i '/ClientAliveCountMax/d' $SSH_PATH
-  sed -i '/AllowAgentForwarding/d' $SSH_PATH
-  sed -i '/AllowTcpForwarding/d' $SSH_PATH
-  sed -i '/GatewayPorts/d' $SSH_PATH
-  sed -i '/PermitTunnel/d' $SSH_PATH
-  echo "TCPKeepAlive yes" | tee -a $SSH_PATH
-  echo "ClientAliveInterval 3000" | tee -a $SSH_PATH
-  echo "ClientAliveCountMax 100" | tee -a $SSH_PATH
-  echo "PermitRootLogin yes" >>/etc/ssh/sshd_config
-  echo "AllowAgentForwarding yes" | tee -a $SSH_PATH
-  echo "AllowTcpForwarding yes" | tee -a $SSH_PATH
-  echo "GatewayPorts yes" | tee -a $SSH_PATH
-  echo "PermitTunnel yes" | tee -a $SSH_PATH
-  display_fancy_progress 10
-  service ssh restart
-  echo ""
-  echo -e "${GREEN}SSH and SSHD Configuration and optimization complete${NC}"
-  echo ""
-  press_enter
-}
 check_if_running_as_root
 set_timezone
 fix_dns
@@ -582,7 +574,6 @@ complete_update
 installations
 enable_packages
 swap_maker
-enable_ipv6_support
 remove_old_sysctl
 remove_old_ssh_conf
 ask_bbr_version
