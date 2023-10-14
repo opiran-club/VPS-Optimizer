@@ -84,41 +84,43 @@ set_timezone() {
     echo -e "${BLUE}$title ${NC}"
     echo ""
     echo -e "${YELLOW}______________________________________________________${NC}"
+    
+    # List common region/city options for timezones
+    regions=("Asia/Tehran" "Europe/Istanbul" "America/Los_Angeles")
+    
+    # List additional timezones if desired
+    additional_timezones=("Asia/Tokyo" "Europe/London" "Australia/Sydney")
+    
+    # Combine common and additional timezones
+    timezones=("${regions[@]}" "${additional_timezones[@]}")
+    
+    # Display the available timezones with corresponding numbers
+    for ((i = 0; i < ${#timezones[@]}; i++)); do
+        echo -e "${RED}$((i+1)). ${YELLOW}${timezones[i]}${NC}"
+    done
+
+    echo -e "${RED}$((i+1)). ${YELLOW}NO CHANGE TIMEZONE${NC}"
     echo ""
-    echo -e "${RED}1. ${YELLOW}Asia-Tehran${NC}"
-    echo -e "${RED}2. ${YELLOW}Europe-Istanbul${NC}"
-    echo -e "${RED}3. ${YELLOW}USA-Los_Angeles (LA)${NC}"
-    echo -e "${RED}4. ${YELLOW}NO CHANGE TIMEZONE${NC}"
-    echo ""
-    echo -ne "${CYAN}Enter your choice [1-4]:${NC} "
+    echo -ne "${CYAN}Enter your choice [1-$((i+1))]:${NC} "
     read choice
     
-    case $choice in
-        1)
-            timezone="Asia/Tehran"
-            ;;
-        2)
-            timezone="Europe/Istanbul"
-            ;;
-        3)
-            timezone="America/Los_Angeles"
-            ;;
-        4)
+    if [ "$choice" -ge 1 ] && [ "$choice" -le $((i+1)) ]; then
+        if [ "$choice" -eq $((i+1)) ]; then
             echo -e "${RED}No changes made, press enter to continue optimization${NC}"
             press_enter
-            return
-            ;;
-        *)
-            echo -e "${RED}Invalid choice. No changes made.${NC}"
+        else
+            timezone="${timezones[choice-1]}"
+            sudo timedatectl set-timezone $timezone
+            echo ""
+            echo -e "${YELLOW}Timezone has been set to ${GREEN}$timezone.${NC}"
+            echo ""
             press_enter
-            return 1
-            ;;
-    esac
-    sudo timedatectl set-timezone $timezone
-    echo ""
-    echo -e "${YELLOW}Timezone has been set to ${GREEN}$timezone.${NC}"
-    echo ""
-    press_enter
+        fi
+    else
+        echo -e "${RED}Invalid choice. No changes made.${NC}"
+        press_enter
+        return 1
+    fi
 }
 
 logo() {
@@ -342,6 +344,27 @@ remove_old_sysctl() {
   press_enter
 }
 
+_version() {
+    local ver1 ver2
+    ver1="$1"
+    ver2="$2"
+    if dpkg --compare-versions "$ver1" ge "$ver2"; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+_exists() {
+    local cmd
+    cmd="$1"
+    if command -v "$cmd" >/dev/null 2>&1; then
+        return 0
+    else
+        return 1
+    fi
+}
+
 check_Hybla() {
     local param=$(sysctl net.ipv4.tcp_congestion_control | awk '{print $3}')
     if [[ x"${param}" == x"hybla" ]]; then
@@ -353,7 +376,7 @@ check_Hybla() {
 
 kernel_version() {
     local kernel_version=$(uname -r | cut -d- -f1)
-    if _version_ge ${kernel_version} 4.9; then
+    if _version ${kernel_version} 4.9; then
         return 0
     else
         return 1
