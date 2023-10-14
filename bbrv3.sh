@@ -114,34 +114,30 @@ install_xanmod() {
     if [[ $continue == [Yy] ]]; then
         echo ""
         echo ""
-
-        temp_folder=$(mktemp -d)
-        cd $temp_folder
-        cpu_level
-            case $cpu_support_level in
-                1)
                     wget -qO - https://gitlab.com/afrd.gpg | sudo gpg --dearmor -o /usr/share/keyrings/xanmod-archive-keyring.gpg
                     echo 'deb [signed-by=/usr/share/keyrings/xanmod-archive-keyring.gpg] http://deb.xanmod.org releases main' | sudo tee /etc/apt/sources.list.d/xanmod-release.list
+        
+        temp_folder=$(mktemp -d)
+        cd $temp_folder
+
+        cpu_level
+
+            case $cpu_support_level in
+                1)
                     apt-get update
                     apt-get install linux-xanmod-x64v1
                     ;;
                 2)
-                    wget -qO - https://gitlab.com/afrd.gpg | sudo gpg --dearmor -o /usr/share/keyrings/xanmod-archive-keyring.gpg
-                    echo 'deb [signed-by=/usr/share/keyrings/xanmod-archive-keyring.gpg] http://deb.xanmod.org releases main' | sudo tee /etc/apt/sources.list.d/xanmod-release.list
                     apt-get update
-                    apt-get install linux-xanmod-x64v1
+                    apt-get install linux-xanmod-x64v2
                     ;;
                 3)
-                    wget -qO - https://gitlab.com/afrd.gpg | sudo gpg --dearmor -o /usr/share/keyrings/xanmod-archive-keyring.gpg
-                    echo 'deb [signed-by=/usr/share/keyrings/xanmod-archive-keyring.gpg] http://deb.xanmod.org releases main' | sudo tee /etc/apt/sources.list.d/xanmod-release.list
                     apt-get update
-                    apt-get install linux-xanmod-x64v1
+                    apt-get install linux-xanmod-x64v3
                     ;;
                 4)
-                    wget -qO - https://gitlab.com/afrd.gpg | sudo gpg --dearmor -o /usr/share/keyrings/xanmod-archive-keyring.gpg
-                    echo 'deb [signed-by=/usr/share/keyrings/xanmod-archive-keyring.gpg] http://deb.xanmod.org releases main' | sudo tee /etc/apt/sources.list.d/xanmod-release.list
                     apt-get update
-                    apt-get install linux-xanmod-x64v1
+                    apt-get install linux-xanmod-x64v4
                     ;;
                 *)
                      echo -e "${RED}Your CPU is not supported by the XanMod kernel and cannot be installed.${NC}"
@@ -187,19 +183,22 @@ uninstall_xanmod() {
         echo -e "${CYAN}Current kernel: ${GREEN}$current_kernel_version${NC}"
         echo -e "${RED}Uninstalling XanMod Kernel...${NC}"
         echo ""
-        echo -e "${GREEN}Do you want to uninstall the XanMod kernel and restore the original kernel? (y/n): ${NC}"
+        echo -ne "${GREEN}Do you want to uninstall the XanMod kernel and restore the original kernel? (y/n): ${NC}"
         read confirm
 
         if [[ $confirm == [yY] ]]; then
             echo -e "${GREEN}Uninstalling XanMod kernel and restoring the original kernel...${NC}"
-            apt-get purge linux-xanmod-x64v1 -y && apt-get purge linux-xanmod-x64v2 -y && apt-get purge linux-xanmod-x64v3 -y && apt-get purge linux-xanmod-x64v4 -y
+            for i in $(seq 1 4); do
+                apt-get purge linux-xanmod-x64v$i -y
+            done
+            apt-get update
             apt-get autoremove -y
             update-grub
 
             if [ $? -eq 0 ]; then
                 echo ""
                 echo -e "${GREEN}The XanMod kernel has been uninstalled, and the original kernel has been restored.${NC}"
-                echo -e "${GREEN}The Grub boot configuration has been updated. Please reboot to take effect.${NC}"
+                echo -e "${GREEN}The GRUB boot configuration has been updated. Please reboot to take effect.${NC}"
             else
                 echo ""
                 echo -e "${RED}XanMod kernel uninstallation failed.${NC}"
@@ -216,7 +215,7 @@ uninstall_xanmod() {
 
 bbrv3() {
     clear
-    echo -e "${CYAN}Are you sure you want to optimize kernel parameters? (y/n): ${NC}"
+    echo -e "${CYAN}Are you sure you want to optimize kernel parameters for better network performance? (y/n): ${NC}"
     read optimize_choice
 
     case $optimize_choice in
@@ -224,20 +223,23 @@ bbrv3() {
             clear
             echo -e "${YELLOW}Backing up original kernel parameter configuration... ${NC}"
             cp /etc/sysctl.conf /etc/sysctl.conf.bak
-            echo -e "${YELLOW}Optimizing kernel parameters... ${NC}"
-            
+            echo -e "${YELLOW}Optimizing kernel parameters for better network performance... ${NC}"
+
             cat <<EOL >> /etc/sysctl.conf
-# BBRv3 Optimization
-net.ipv4.tcp_fastopen=3
-net.ipv4.tcp_slow_start_after_idle=0
-net.ipv4.tcp_notsent_lowat=16384
-net.core.default_qdisc=fq
-net.ipv4.tcp_congestion_control=bbr
+# BBRv3 Optimization for Better Network Performance
+net.ipv4.tcp_timestamps = 1
+net.ipv4.tcp_sack = 1
+net.ipv4.tcp_window_scaling = 1
+net.core.rmem_max = 16777216
+net.core.wmem_max = 16777216
+net.ipv4.tcp_rmem = 4096 87380 16777216
+net.ipv4.tcp_wmem = 4096 65536 16777216
+net.ipv4.tcp_congestion_control = bbr
 EOL
 
             sysctl -p
             if [ $? -eq 0 ]; then
-                echo -e "${GREEN}Kernel parameter optimization was successful.${NC}"
+                echo -e "${GREEN}Kernel parameter optimization for better network performance was successful.${NC}"
             else
                 echo -e "${RED}Kernel parameter optimization failed. Restoring the original configuration...${NC}"
                 mv /etc/sysctl.conf.bak /etc/sysctl.conf
@@ -253,6 +255,7 @@ EOL
             ;;
     esac
 }
+
 
 while true; do
     linux_version=$(awk -F= '/^PRETTY_NAME=/{gsub(/"/, "", $2); print $2}' /etc/os-release)
