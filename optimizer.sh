@@ -158,90 +158,134 @@ logo() {
 echo -e "\033[1;34m$logo\033[0m"
 }
 
-SYS_PATH="/etc/sysctl.conf"
-LIM_PATH="/etc/security/limits.conf"
-PROF_PATH="/etc/profile"
-SSH_PATH="/etc/ssh/sshd_config"
-DNS_PATH="/etc/resolv.conf"
-
 fix_dns() {
-  clear
-  title="DNS replacement with Google"
+    clear
+    DNS_PATH="/etc/resolv.conf"
+    title="DNS replacement with Google"
     logo
     echo ""
     echo -e "${BLUE}$title ${NC}"
     echo ""
     printf "\e[93m+-------------------------------------+\e[0m\n" 
-  echo ""
-  display_fancy_progress 10
-  sed -i '/nameserver/d' $DNS_PATH
-  echo 'nameserver 8.8.8.8' >>$DNS_PATH
-  echo 'nameserver 8.8.4.4' >>$DNS_PATH
-  echo ""
-  echo -e "${GREEN}System DNS Optimized.${NC}"
-  echo ""
-  sleep 1
-  press_enter
+    echo ""
+    SPINNER="⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
+
+    spin() {
+        local i
+        for i in $(seq 1 30); do
+            local c
+            c=${SPINNER:i%${#SPINNER}:1}
+            echo -ne "${RED}${c}${NC}"
+            sleep 0.1
+            echo -ne "\b"
+        done
+    }
+
+    sed -i '/nameserver/d' $DNS_PATH
+    echo 'nameserver 8.8.8.8' >>$DNS_PATH
+    echo 'nameserver 8.8.4.4' >>$DNS_PATH
+    spin & SPIN_PID=$!
+
+    wait $SPIN_PID
+    echo ""
+    echo -e "${GREEN}System DNS Optimized.${NC}"
+    echo ""
+    sleep 1
+    press_enter
 }
 
 complete_update() {
     clear
-  title="update and upgrade packages"
+    title="update and upgrade packages"
     logo
     echo ""
     echo -e "${BLUE}$title ${NC}"
     echo ""
     printf "\e[93m+-------------------------------------+\e[0m\n" 
-  echo ""
-  echo ""
-  echo -e "${RED}Please wait, it might couple of minutes${NC}"
-  echo ""
-  echo ""
-  apt-get update 2>&1 | tee /dev/tty > /dev/null
-  apt-get upgrade -y 2>&1 | tee /dev/tty > /dev/null
-  apt-get dist-upgrade -y > /dev/null 2>&1
-  apt-get autoremove -y > /dev/null 2>&1
-  apt-get autoclean -y > /dev/null 2>&1
-  apt-get clean -y
-  echo ""
-  echo -e "${GREEN}System update & upgrade completed.${NC}"
-  echo ""
-  sleep 1
-  press_enter
+    echo ""
+    echo ""
+    echo -e "${RED}Please wait, it might couple of minutes${NC}"
+    echo ""
+    echo ""
+    SPINNER="⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
+
+    spin() {
+        local i
+        for i in $(seq 1 30); do
+            local c
+            c=${SPINNER:i%${#SPINNER}:1}
+            echo -ne "${RED}${c}${NC}"
+            sleep 0.1
+            echo -ne "\b"
+        done
+    }
+
+    apt-get update 2>&1 | tee /dev/tty > /dev/null
+    apt-get upgrade -y > /dev/null 2>&1
+    apt-get dist-upgrade -y > /dev/null 2>&1
+    apt-get autoremove -y > /dev/null 2>&1
+    apt-get autoclean -y > /dev/null 2>&1
+    apt-get clean -y
+    spin & SPIN_PID=$!
+
+    wait $SPIN_PID
+    echo ""
+    echo -e "${GREEN}System update & upgrade completed.${NC}"
+    echo ""
+    sleep 1
+    press_enter
 }
 
 installations() {
     clear
-  title="Install neccessary packages"
+    title="Install necessary packages"
     logo
     echo ""
     echo -e "${BLUE}$title ${NC}"
     echo ""
-    printf "\e[93m+-------------------------------------+\e[0m\n" 
-  echo ""
-  echo -e "${RED}Please wait, it might takes a while${NC}"
-  echo ""
-  echo ""
-  apt-get purge firewalld -y > /dev/null 2>&1
-  apt-get install nload nethogs autossh ssh iperf sshuttle software-properties-common apt-transport-https iptables lsb-release ca-certificates ubuntu-keyring gnupg2 apt-utils cron bash-completion curl git unzip zip ufw wget preload locales nano vim python3 jq qrencode socat busybox net-tools haveged htop curl -y > /dev/null 2>&1
-  display_fancy_progress 30
-  apt-get install snapd -y > /dev/null 2>&1
-  echo ""
-  echo -e "${GREEN}Install usefull and neccessary packages completed.${NC}"
-  echo ""
-  sleep 1
-  press_enter
+    printf "\e[93m+-------------------------------------+\e[0m\n"
+    echo ""
+    echo -e "${RED}Please wait, it might take a while${NC}"
+    echo ""
+
+    SPINNER="⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
+
+    spin() {
+        local i
+        for i in $(seq 1 30); do
+            local c
+            c=${SPINNER:i%${#SPINNER}:1}
+            echo -ne "${RED}${c}${NC}"
+            sleep 0.1
+            echo -ne "\b"
+        done
+    }
+
+    apt-get purge firewalld -y > /dev/null 2>&1
+    apt-get install fail2ban certbot rsync emacs nload nethogs autossh ssh iperf sshuttle software-properties-common apt-transport-https iptables lsb-release ca-certificates ubuntu-keyring gnupg2 apt-utils cron bash-completion curl git unzip zip ufw wget preload locales nano vim python3 jq qrencode socat busybox net-tools haveged htop curl -y > /dev/null 2>&1
+
+    spin & SPIN_PID=$!
+
+    wait $SPIN_PID
+
+    apt-get install snapd -y > /dev/null 2>&1
+
+    echo ""
+    echo -e "${GREEN}Install useful and necessary packages completed.${NC}"
+    echo ""
+    sleep 1
+    press_enter
 }
 
 enable_packages() {
-echo -e "${GREEN}Enable snap and cron service as well.${NC}"
-  systemctl enable preload haveged snapd cron
-  press_enter
+    echo -e "${GREEN}Enable snap and cron service as well.${NC}"
+    systemctl enable preload haveged snapd cron
+    press_enter
 }
 
 swap_maker() {
     clear
-  title="Setup and Configure swap file to boost performance"
+    title="Setup and Configure swap file to boost performance"
     logo
     echo ""
     echo -e "${BLUE}$title ${NC}"
@@ -334,11 +378,11 @@ swap_maker() {
     fi
     sysctl -p
 
-  echo ""
-  echo -e "${GREEN}Swap file created and vm.swappiness value has been set to ${RED} $swap_value ${NC}"
-  echo ""
-  sleep 1
-  press_enter
+    echo ""
+    echo -e "${GREEN}Swap file created and vm.swappiness value has been set to ${RED} $swap_value ${NC}"
+    echo ""
+    sleep 1
+    press_enter
 }
 
 enable_ipv6_support() {
@@ -349,11 +393,11 @@ enable_ipv6_support() {
     echo "net.ipv6.conf.all.forwarding = 1" >> /etc/sysctl.d/ip_forward.conf
     echo "net.ipv6.conf.default.forwarding = 1" >> /etc/sysctl.d/ip_forward.conf
     sysctl -p /etc/sysctl.d/ip_forward.conf
-  if [[ $(sysctl -a | grep 'disable_ipv6.*=.*1') || $(cat /etc/sysctl.{conf,d/*} | grep 'disable_ipv6.*=.*1') ]]; then
+    if [[ $(sysctl -a | grep 'disable_ipv6.*=.*1') || $(cat /etc/sysctl.{conf,d/*} | grep 'disable_ipv6.*=.*1') ]]; then
     sed -i '/disable_ipv6/d' /etc/sysctl.{conf,d/*}
     echo 'net.ipv6.conf.all.disable_ipv6 = 0' >/etc/sysctl.d/ipv6.conf
     sysctl -w net.ipv6.conf.all.disable_ipv6=0
-  fi
+    fi
     echo ""
     echo -e "${GREEN}IPV6 enabled.${NC}"
     echo ""
@@ -361,115 +405,88 @@ enable_ipv6_support() {
 
 remove_old_sysctl() {
     clear
-  title="Optimizing system configuration and ubdating sysctl configs"
+    title="Optimizing system configuration and updating sysctl configs"
     logo
-    echo ""
     echo -e "${BLUE}$title ${NC}"
+    echo -e "\e[93m+-------------------------------------+\e[0m"
+    echo -e "${RED}Please wait, it might take a while${NC}"
+    enable_ipv6_support
+    sed -i '/1000000/d' /etc/profile
+    cat <<EOL > "/etc/sysctl.conf"
+# System Configuration Settings for Improved Performance and Security
+
+fs.file-max = 1000000
+net.core.rmem_default = 1048576
+net.core.rmem_max = 2097152
+net.core.wmem_default = 1048576
+net.core.wmem_max = 2097152
+net.core.netdev_max_backlog = 16384
+net.core.somaxconn = 32768
+net.ipv4.tcp_fastopen = 3
+net.ipv4.tcp_mtu_probing = 1
+net.ipv4.tcp_retries2 = 8
+net.ipv4.tcp_slow_start_after_idle = 0
+net.ipv6.conf.all.disable_ipv6 = 0
+net.ipv6.conf.default.disable_ipv6 = 0
+net.ipv6.conf.all.forwarding = 1
+EOL
+  
+    cat <<EOL >"/etc/security/limits.conf"
+* soft     nproc          655350
+* hard     nproc          655350
+* soft     nofile         655350
+* hard     nofile         655350
+root soft     nproc          655350
+root hard     nproc          655350
+root soft     nofile         655350
+root hard     nofile         655350
+EOL
+
+    sysctl -p
+
+    echo -e "${GREEN}Sysctl configuration and optimization complete${NC}"
     echo ""
-    printf "\e[93m+-------------------------------------+\e[0m\n" 
-  echo ""
-  echo -e "${RED}Please wait, it might takes a while${NC}"
-  echo ""
-  enable_ipv6_support
-  sed -i '/fs.file-max/d' $SYS_PATH
-  sed -i '/fs.inotify.max_user_instances/d' $SYS_PATH
-  sed -i '/net.ipv4.tcp_syncookies/d' $SYS_PATH
-  sed -i '/net.ipv4.tcp_fin_timeout/d' $SYS_PATH
-  sed -i '/net.ipv4.tcp_tw_reuse/d' $SYS_PATH
-  sed -i '/net.ipv4.ip_local_port_range/d' $SYS_PATH
-  sed -i '/net.ipv4.tcp_max_syn_backlog/d' $SYS_PATH
-  sed -i '/net.ipv4.tcp_max_tw_buckets/d' $SYS_PATH
-  sed -i '/net.ipv4.route.gc_timeout/d' $SYS_PATH
-  sed -i '/net.ipv4.tcp_syn_retries/d' $SYS_PATH
-  sed -i '/net.ipv4.tcp_synack_retries/d' $SYS_PATH
-  sed -i '/net.core.somaxconn/d' $SYS_PATH
-  sed -i '/net.core.netdev_max_backlog/d' $SYS_PATH
-  sed -i '/net.ipv4.tcp_timestamps/d' $SYS_PATH
-  sed -i '/net.ipv4.tcp_max_orphans/d' $SYS_PATH
-  sed -i '/net.ipv6.conf.all.disable_ipv6/d' $SYS_PATH
-  sed -i '/net.ipv6.conf.default.disable_ipv6/d' $SYS_PATH
-  sed -i '/net.ipv6.conf.all.forwarding/d' $SYS_PATH
-  sed -i '/soft/d' $LIM_PATH
-  sed -i '/hard/d' $LIM_PATH
-  sed -i '/net.core.default_qdisc/d' $SYS_PATH
-  sed -i '/net.ipv4.tcp_congestion_control/d' $SYS_PATH
-  sed -i '/net.ipv4.tcp_ecn/d' $SYS_PATH
-  sed -i '/1000000/d' $PROF_PATH
-  sed -i '/vm.swappiness/d' $SYS_PATH
-  sed -i '/vm.vfs_cache_pressure/d' $SYS_PATH
-  echo 'vm.swappiness=10' >>$SYS_PATH
-  echo 'vm.vfs_cache_pressure=50' >>$SYS_PATH
-  sleep 1
-  echo 'fs.file-max = 1000000' >>$SYS_PATH
-  echo 'net.core.rmem_default = 1048576' >>$SYS_PATH
-  echo 'net.core.rmem_max = 2097152' >>$SYS_PATH
-  echo 'net.core.wmem_default = 1048576' >>$SYS_PATH
-  echo 'net.core.wmem_max = 2097152' >>$SYS_PATH
-  echo 'net.core.netdev_max_backlog = 16384' >>$SYS_PATH
-  echo 'net.core.somaxconn = 32768' >>$SYS_PATH
-  echo 'net.ipv4.tcp_fastopen = 3' >>$SYS_PATH
-  echo 'net.ipv4.tcp_mtu_probing = 1' >>$SYS_PATH
-  echo 'net.ipv4.tcp_retries2 = 8' >>$SYS_PATH
-  echo 'net.ipv4.tcp_slow_start_after_idle = 0' >>$SYS_PATH
-  echo 'net.ipv6.conf.all.disable_ipv6 = 0' >>$SYS_PATH
-  echo 'net.ipv6.conf.default.disable_ipv6 = 0' >>$SYS_PATH
-  echo 'net.ipv6.conf.all.forwarding = 1' >>$SYS_PATH
-  echo 'net.core.default_qdisc = fq' >>$SYS_PATH
-  echo 'net.ipv4.tcp_congestion_control = bbr' >>$SYS_PATH
-  echo '* soft     nproc          655350' >>$LIM_PATH
-  echo '* hard     nproc          655350' >>$LIM_PATH
-  echo '* soft     nofile         655350' >>$LIM_PATH
-  echo '* hard     nofile         655350' >>$LIM_PATH
-  echo 'root soft     nproc          655350' >>$LIM_PATH
-  echo 'root hard     nproc          655350' >>$LIM_PATH
-  echo 'root soft     nofile         655350' >>$LIM_PATH
-  echo 'root hard     nofile         655350' >>$LIM_PATH
-  display_fancy_progress 10
-  sysctl -p
-  echo ""
-  echo -e "${GREEN}Sysctl Configuration and optimization complete${NC}"
-  echo ""
-  press_enter
+    press_enter
 }
 
-remove_old_ssh_conf() {
+optimize_ssh_configuration() {
     clear
-  title="OPtimizing SSH configuration to improve security and performance"
+    SSH_PATH="/etc/ssh/sshd_config"
+    title="Improve SSH conf. and optimize SSHD"
     logo
-    echo ""
     echo -e "${BLUE}$title ${NC}"
     echo ""
-    printf "\e[93m+-------------------------------------+\e[0m\n" 
-  echo ""
-  echo -e "${RED}Please wait, it might takes a while${NC}"
-  echo ""
-  cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
-  sed -i 's/#UseDNS yes/UseDNS no/' $SSH_PATH
-  sed -i 's/#Compression no/Compression yes/' $SSH_PATH
-  sed -i 's/Ciphers .*/Ciphers aes256-ctr,chacha20-poly1305@openssh.com/' $SSH_PATH
-  sed -i '/MaxAuthTries/d' $SSH_PATH
-  sed -i '/MaxSessions/d' $SSH_PATH
-  sed -i '/TCPKeepAlive/d' $SSH_PATH
-  sed -i '/ClientAliveInterval/d' $SSH_PATH
-  sed -i '/ClientAliveCountMax/d' $SSH_PATH
-  sed -i '/AllowAgentForwarding/d' $SSH_PATH
-  sed -i '/AllowTcpForwarding/d' $SSH_PATH
-  sed -i '/GatewayPorts/d' $SSH_PATH
-  sed -i '/PermitTunnel/d' $SSH_PATH
-  echo "TCPKeepAlive yes" | tee -a $SSH_PATH
-  echo "ClientAliveInterval 3000" | tee -a $SSH_PATH
-  echo "ClientAliveCountMax 100" | tee -a $SSH_PATH
-  echo "PermitRootLogin yes" >>/etc/ssh/sshd_config
-  echo "AllowAgentForwarding yes" | tee -a $SSH_PATH
-  echo "AllowTcpForwarding yes" | tee -a $SSH_PATH
-  echo "GatewayPorts yes" | tee -a $SSH_PATH
-  echo "PermitTunnel yes" | tee -a $SSH_PATH
-  display_fancy_progress 10
-  service ssh restart
-  echo ""
-  echo -e "${GREEN}SSH and SSHD Configuration and optimization complete${NC}"
-  echo ""
-  press_enter
+    echo -e "\e[93m+-------------------------------------+\e[0m"
+    echo ""
+    echo -e "${RED}Please wait, it might take a while${NC}"
+    cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
+    cat <<EOL > "/etc/ssh/sshd_config"
+# SSH configuration settings for improved security and performance
+
+UseDNS no
+Compression yes
+Ciphers aes256-ctr,chacha20-poly1305@openssh.com
+TCPKeepAlive yes
+ClientAliveInterval 3000
+ClientAliveCountMax 100
+PermitRootLogin yes
+AllowAgentForwarding yes
+AllowTcpForwarding yes
+GatewayPorts yes
+PermitTunnel yes
+Banner /etc/ssh/banner
+X11Forwarding yes
+PrintMotd no
+PrintLastLog yes
+EOL
+
+echo "WARNING: Unauthorized access is prohibited." > /etc/ssh/banner
+
+    service ssh restart
+    echo ""
+    echo -e "${GREEN}SSH and SSHD Configuration and optimization complete${NC}"
+    echo ""
+    press_enter
 }
 
 _version() {
@@ -660,25 +677,25 @@ sysctl -p >/dev/null 2>&1
     esac
     press_enter
 }
-set_timezone
-fix_dns
-complete_update
-installations
-enable_packages
-swap_maker
-remove_old_sysctl
-remove_old_ssh_conf
-ask_bbr_version
-    clear
-    logo
-    echo -e "    ${MAGENTA} Your server fully optimized successfully${NC}"
-    echo -e "${YELLOW}______________________________________________________________${NC}"
-    echo ""
-    echo ""
-    echo -e "${MAGENTA}Please reboot the system to take effect, by running the following command: ${GREEN}reboot${NC}"
-    echo ""
-    echo -e "${MAGENTA}Please visit me at: ${GREEN}@OPIranCluB ${NC}"
-    echo ""
-    echo -e "${YELLOW}______________________________________________________________${NC}"
-    echo ""
-    ask_reboot
+    set_timezone
+    fix_dns
+    complete_update
+    installations
+    enable_packages
+    swap_maker
+    remove_old_sysctl
+    remove_old_ssh_conf
+    ask_bbr_version
+clear
+logo
+echo -e "    ${MAGENTA} Your server fully optimized successfully${NC}"
+echo -e "${YELLOW}______________________________________________________________${NC}"
+echo ""
+echo ""
+echo -e "${MAGENTA}Please reboot the system to take effect, by running the following command: ${GREEN}reboot${NC}"
+echo ""
+echo -e "${MAGENTA}Please visit me at: ${GREEN}@OPIranCluB ${NC}"
+echo ""
+echo -e "${YELLOW}______________________________________________________________${NC}"
+echo ""
+ask_reboot
