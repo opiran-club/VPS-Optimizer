@@ -74,7 +74,7 @@ cpu_level() {
 cpu_support_info=$(/usr/bin/awk -f <(wget -qO - https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/checkcpu.sh))
     if [[ $cpu_support_info == "CPU supports x86-64-v"* ]]; then
         cpu_support_level=${cpu_support_info#CPU supports x86-64-v}
-        echo -e "${CYAN}Current CPU Level: x86-64 Level $cpu_support_level${NC}"
+        echo -e "${MAGENTA}Current CPU Level:${GREEN} x86-64 Level $cpu_support_level${NC}"
         return $cpu_support_level
     else
         echo -e "${RED}OS or CPU level is not supported by the XanMod kernel and cannot be installed.${NC}"
@@ -262,8 +262,8 @@ while true; do
     echo -e "${BLUE}$yt_title  ${NC}"
     echo -e "${YELLOW}______________________________________________________${NC}"
     echo ""
-    echo -e "${CYAN}linux version Info：${GREEN}${linux_version}${NC}"
-    echo -e "${CYAN}kernel Info：${GREEN}${kernel_version}${NC}"
+    echo -e "${MAGENTA}linux version Info：${GREEN}${linux_version}${NC}"
+    echo -e "${MAGENTA}kernel Info：${GREEN}${kernel_version}${NC}"
     cpu_level
     echo ""
     echo -e "${RED} !! TIP !! ${NC}"
