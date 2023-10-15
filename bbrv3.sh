@@ -92,7 +92,7 @@ install_xanmod() {
         echo -e "${CYAN}Current CPU Level: x86-64 Level $cpu_support_level${NC}"
     else
         echo -e "${RED}OS or CPU level is not supported by the XanMod kernel and cannot be installed.${NC}"
-        return 1  # Return an error code here
+        return 1
     fi
     echo ""
     echo ""
@@ -117,23 +117,23 @@ install_xanmod() {
         case $cpu_support_level in
             1)
                 apt-get update
-                apt-get install linux-xanmod-x64v1
+                apt-get install linux-xanmod-x64v1 -y
                 ;;
             2)
                 apt-get update
-                apt-get install linux-xanmod-x64v2
+                apt-get install linux-xanmod-x64v2 -y
                 ;;
             3)
                 apt-get update
-                apt-get install linux-xanmod-x64v3
+                apt-get install linux-xanmod-x64v3 -y
                 ;;
             4)
                 apt-get update
-                apt-get install linux-xanmod-x64v4
+                apt-get install linux-xanmod-x64v4 -y
                 ;;
             *)
                 echo -e "${RED}Your CPU is not supported by the XanMod kernel and cannot be installed.${NC}"
-                return 1  # Return an error code here
+                return 1
                 ;;
         esac
 
