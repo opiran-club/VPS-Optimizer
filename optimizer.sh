@@ -34,21 +34,21 @@ exit 1
 fi
 
 if [ -f /etc/os-release ]; then
-source /etc/os-release
-case $ID in
-    "ubuntu")
-echo "deb http://archive.ubuntu.com/ubuntu/ jammy main restricted" >> /etc/apt/sources.list
-echo "deb http://archive.ubuntu.com/ubuntu/ jammy-updates main restricted" >> /etc/apt/sources.list
-echo "deb http://archive.ubuntu.com/ubuntu/ jammy universe" >> /etc/apt/sources.list
-echo "deb http://archive.ubuntu.com/ubuntu/ jammy-updates universe" >> /etc/apt/sources.list
-echo "deb http://archive.ubuntu.com/ubuntu/ jammy multiverse" >> /etc/apt/sources.list
-echo "deb http://archive.ubuntu.com/ubuntu/ jammy-updates multiverse" >> /etc/apt/sources.list
-echo "deb http://archive.ubuntu.com/ubuntu/ jammy-backports main restricted universe multiverse" >> /etc/apt/sources.list
-echo "deb http://archive.ubuntu.com/ubuntu/ jammy-security main restricted" >> /etc/apt/sources.list
-echo "deb http://archive.ubuntu.com/ubuntu/ jammy-security universe" >> /etc/apt/sources.list
-echo "deb http://archive.ubuntu.com/ubuntu/ jammy-security multiverse" >> /etc/apt/sources.list
-        ;;
-esac
+    source /etc/os-release
+    case $ID in
+        "ubuntu")
+            add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ jammy main restricted"
+            add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ jammy-updates main restricted"
+            add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ jammy universe"
+            add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ jammy-updates universe"
+            add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ jammy multiverse"
+            add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ jammy-updates multiverse"
+            add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ jammy-backports main restricted universe multiverse"
+            add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ jammy-security main restricted"
+            add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ jammy-security universe"
+            add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ jammy-security multiverse"
+            ;;
+    esac
 fi
 
 press_enter() {
@@ -70,33 +70,6 @@ case "$reboot" in
         ;;
     esac
 exit
-}
-
-display_fancy_progress() {
-    local duration=$1
-    local sleep_interval=0.1
-    local progress=0
-    local bar_length=40
-
-    while [ $progress -lt $duration ]; do
-        echo -ne "\r[${YELLOW}"
-        for ((i = 0; i < bar_length; i++)); do
-            if [ $i -lt $((progress * bar_length / duration)) ]; then
-                echo -ne "▓"
-            else
-                echo -ne "░"
-            fi
-        done
-        echo -ne "${RED}] ${progress}%"
-        progress=$((progress + 1))
-        sleep $sleep_interval
-    done
-    echo -ne "\r[${YELLOW}"
-    for ((i = 0; i < bar_length; i++)); do
-        echo -ne "#"
-    done
-    echo -ne "${RED}] ${progress}%"
-    echo
 }
 
 set_timezone() {
