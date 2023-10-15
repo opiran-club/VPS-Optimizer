@@ -268,17 +268,16 @@ EOL
 while true; do
     linux_version=$(awk -F= '/^PRETTY_NAME=/{gsub(/"/, "", $2); print $2}' /etc/os-release)
     kernel_version=$(uname -r)
-    title_text="BBRv3 Optimization Script using xanmod kernel"
     tg_title="https://t.me/OPIranCluB"
     yt_title="youtube.com/@opiran-inistitute"
     clear
     logo
     echo -e "\e[93m╔═══════════════════════════════════════════════╗\e[0m"  
-    echo -e "\e[93m║            \e[94mBBRv3 using xanmod kernel          \e[93m║\e[0m"   
+    echo -e "\e[93m║            \e[96mBBRv3 using xanmod kernel          \e[93m║\e[0m"   
     echo -e "\e[93m╠═══════════════════════════════════════════════╣\e[0m"
     echo ""
-    echo -e "${BLUE}   ${tg_title}   ${NC}"
-    echo -e "${BLUE}   ${yt_title}   ${NC}"
+    echo -e "${CYAN}   ${tg_title}   ${NC}"
+    echo -e "${CYAN}   ${yt_title}   ${NC}"
     echo ""
     printf "\e[93m+-----------------------------------------------+\e[0m\n" 
     echo ""
