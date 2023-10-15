@@ -18,12 +18,12 @@
 # Disclaimer:
 # This script comes with no warranties or guarantees. Use it at your own risk.
 
-CYAN="\e[36m"
-GREEN="\e[32m"
-YELLOW="\e[33m"
-RED="\e[31m"
-BLUE="\e[34m"
-MAGENTA="\e[35m"
+CYAN="\e[96m"
+GREEN="\e[92m"
+YELLOW="\e[93m"
+RED="\e[91m"
+BLUE="\e[94m"
+MAGENTA="\e[95m"
 NC="\e[0m"
 
 press_enter() {
@@ -267,6 +267,7 @@ while true; do
     cpu_level
     echo ""
     echo -e "${RED} !! TIP !! ${NC}"
+    echo ""
     echo -e "${CYAN}Supported OS: ${GREEN}Ubuntu / Debian ${CYAN} CPU level ${GREEN} [1/2/3/4] ${NC}"
     echo ""
     echo -e "${YELLOW}______________________________________________________${NC}"
