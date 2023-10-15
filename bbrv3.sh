@@ -93,7 +93,7 @@ install_xanmod() {
     else
         echo -e "${RED}OS or CPU level is not supported by the XanMod kernel and cannot be installed.${NC}"
         return 1  # Return an error code here
-    
+    fi
     echo ""
     echo ""
     echo -e "${YELLOW}     Installing XanMod kernel${NC}"
