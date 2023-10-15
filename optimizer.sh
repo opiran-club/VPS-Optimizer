@@ -34,21 +34,22 @@ exit 1
 fi
 
 if [ -f /etc/os-release ]; then
-    source /etc/os-release
-    case $ID in
-        "ubuntu")
-            add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ jammy main restricted"
-            add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ jammy-updates main restricted"
-            add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ jammy universe"
-            add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ jammy-updates universe"
-            add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ jammy multiverse"
-            add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ jammy-updates multiverse"
-            add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ jammy-backports main restricted universe multiverse"
-            add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ jammy-security main restricted"
-            add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ jammy-security universe"
-            add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ jammy-security multiverse"
-            ;;
-    esac
+source /etc/os-release
+case $ID in
+    "ubuntu")
+    rm -rf /etc/apt/sources.list && touch /etc/apt/sources.list
+echo "deb http://archive.ubuntu.com/ubuntu/ jammy main restricted" >> /etc/apt/sources.list
+echo "deb http://archive.ubuntu.com/ubuntu/ jammy-updates main restricted" >> /etc/apt/sources.list
+echo "deb http://archive.ubuntu.com/ubuntu/ jammy universe" >> /etc/apt/sources.list
+echo "deb http://archive.ubuntu.com/ubuntu/ jammy-updates universe" >> /etc/apt/sources.list
+echo "deb http://archive.ubuntu.com/ubuntu/ jammy multiverse" >> /etc/apt/sources.list
+echo "deb http://archive.ubuntu.com/ubuntu/ jammy-updates multiverse" >> /etc/apt/sources.list
+echo "deb http://archive.ubuntu.com/ubuntu/ jammy-backports main restricted universe multiverse" >> /etc/apt/sources.list
+echo "deb http://archive.ubuntu.com/ubuntu/ jammy-security main restricted" >> /etc/apt/sources.list
+echo "deb http://archive.ubuntu.com/ubuntu/ jammy-security universe" >> /etc/apt/sources.list
+echo "deb http://archive.ubuntu.com/ubuntu/ jammy-security multiverse" >> /etc/apt/sources.list
+        ;;
+esac
 fi
 
 press_enter() {
@@ -169,45 +170,58 @@ fix_dns() {
 
 complete_update() {
     clear
-    title="update and upgrade packages"
+    title="Update and upgrade packages"
     logo
     echo ""
     echo -e "${BLUE}$title ${NC}"
     echo ""
-    printf "\e[93m+-------------------------------------+\e[0m\n" 
+    printf "\e[93m+-------------------------------------+\e[0m\n"
     echo ""
     echo ""
-    echo -e "${RED}Please wait, it might couple of minutes${NC}"
+    echo -e "${RED}Please wait, it might take a couple of minutes${NC}"
     echo ""
     echo ""
-    SPINNER="⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
+
+    SPINNER="/-\\|"
+    SPINNER_INDEX=0
 
     spin() {
-        local i
-        for i in $(seq 1 30); do
-            local c
-            c=${SPINNER:i%${#SPINNER}:1}
-            echo -ne "${RED}${c}${NC}"
-            sleep 0.1
-            echo -ne "\b"
-        done
+        local c
+        c=${SPINNER:SPINNER_INDEX%4:1}
+        echo -ne "${RED}[${c}] ${NC}"
+        SPINNER_INDEX=$((SPINNER_INDEX + 1))
     }
 
-    apt-get update 2>&1 | tee /dev/tty > /dev/null
+    while true; do
+        spin
+        sleep 0.1
+        echo -ne "\b\b\b\b\b"
+        [[ $SPINNER_INDEX -eq 4 ]] && SPINNER_INDEX=0
+    done &
+
+    SPIN_PID=$!
+
+    apt-get update > /dev/null 2>&1
     apt-get upgrade -y > /dev/null 2>&1
     apt-get dist-upgrade -y > /dev/null 2>&1
     apt-get autoremove -y > /dev/null 2>&1
     apt-get autoclean -y > /dev/null 2>&1
     apt-get clean -y
-    spin & SPIN_PID=$!
 
-    wait $SPIN_PID
+    kill $SPIN_PID > /dev/null 2>&1
+    wait $SPIN_PID > /dev/null 2>&1
+
+    echo -e "\e[K"
+
+    echo -e "\e[0m"
+
     echo ""
     echo -e "${GREEN}System update & upgrade completed.${NC}"
     echo ""
     sleep 1
     press_enter
 }
+
 
 installations() {
     clear
@@ -221,7 +235,7 @@ installations() {
     echo -e "${RED}Please wait, it might take a while${NC}"
     echo ""
 
-    SPINNER="⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
+    SPINNER="⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
 
     spin() {
         local i
@@ -234,13 +248,13 @@ installations() {
         done
     }
 
+    spin & SPIN_PID=$!
+
     apt-get purge firewalld -y > /dev/null 2>&1
     apt-get install fail2ban certbot rsync emacs nload nethogs autossh ssh iperf sshuttle software-properties-common apt-transport-https iptables lsb-release ca-certificates ubuntu-keyring gnupg2 apt-utils cron bash-completion curl git unzip zip ufw wget preload locales nano vim python3 jq qrencode socat busybox net-tools haveged htop curl -y > /dev/null 2>&1
 
-    spin & SPIN_PID=$!
-
     wait $SPIN_PID
-
+    echo -e "\e[0m"
     apt-get install snapd -y > /dev/null 2>&1
 
     echo ""
@@ -259,6 +273,8 @@ enable_packages() {
 swap_maker() {
     clear
     title="Setup and Configure swap file to boost performance"
+    swap_files=$(swapon -s | awk '{if($1!~"^Filename"){print $1}}')
+    swap_partitions=$(grep -E '^\S+\s+\S+\sswap\s+' /proc/swaps | awk '{print $1}')
     logo
     echo ""
     echo -e "${BLUE}$title ${NC}"
@@ -266,7 +282,13 @@ swap_maker() {
     printf "\e[93m+-------------------------------------+\e[0m\n" 
     echo ""
     echo ""
-    swap_files=$(swapon -s | awk '{if($1!~"^Filename"){print $1}}')
+
+    remove_all_swap() {
+    for item in $swap_files $swap_partitions; do
+        swapoff "$item"
+        rm -f "$item"
+    done
+    }
 
     if [ -n "$swap_files" ]; then
         remove_all_swap
