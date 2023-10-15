@@ -242,10 +242,9 @@ installations() {
     spin & SPIN_PID=$!
 
     apt-get purge firewalld -y > /dev/null 2>&1
-    apt-get install fail2ban certbot rsync emacs nload nethogs autossh ssh iperf sshuttle software-properties-common apt-transport-https iptables lsb-release ca-certificates ubuntu-keyring gnupg2 apt-utils cron bash-completion curl git unzip zip ufw wget preload locales nano vim python3 jq qrencode socat busybox net-tools haveged htop curl -y > /dev/null 2>&1
+    apt-get install certbot nload nethogs autossh ssh iperf sshuttle software-properties-common apt-transport-https iptables lsb-release ca-certificates ubuntu-keyring gnupg2 apt-utils cron bash-completion curl git unzip zip ufw wget preload locales nano vim python3 jq qrencode socat busybox net-tools haveged htop curl -y > /dev/null 2>&1
 
     wait $SPIN_PID
-    echo -e "\e[0m"
     apt-get install snapd -y > /dev/null 2>&1
 
     echo ""
