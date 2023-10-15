@@ -254,13 +254,13 @@ while true; do
     tg_title="TG-Group @OPIranCluB"
     yt_title="youtube.com/@opiran-inistitute"
     clear
-    echo -e "                 ${MAGENTA}${title_text}${NC}"
-    echo -e "${YELLOW}______________________________________________________${NC}"
+    echo -e "             ${MAGENTA}${title_text}${NC}"
+    echo -e "${YELLOW}____________________________________________________________${NC}"
     logo
     echo -e ""
     echo -e "${BLUE}$tg_title ${NC}"
     echo -e "${BLUE}$yt_title  ${NC}"
-    echo -e "${YELLOW}______________________________________________________${NC}"
+    echo -e "${YELLOW}____________________________________________________________${NC}"
     echo ""
     echo -e "${MAGENTA}linux version Info：${GREEN}${linux_version}${NC}"
     echo -e "${MAGENTA}kernel Info：${GREEN}${kernel_version}${NC}"
@@ -268,12 +268,13 @@ while true; do
     echo ""
     echo -e "${RED} !! TIP !! ${NC}"
     echo ""
-    echo -e "${CYAN}Supported OS: ${GREEN}Ubuntu / Debian ${CYAN} CPU level ${GREEN} [1/2/3/4] ${NC}"
+    echo -e "${CYAN}Supported OS: ${GREEN} Ubuntu / Debian ${NC}"
+    echo -e "${CYAN}Supported CPU level ${GREEN} [1/2/3/4] ${NC}"
     echo ""
-    echo -e "${YELLOW}______________________________________________________${NC}"
+    echo -e "${YELLOW}____________________________________________________________${NC}"
     echo ""
     echo -e "${GREEN} 1) ${NC} Install XanMod kernel & BBRv3 & Grub boot conf. ${NC}"
-    echo -e "${GREEN} 3) ${NC} Uninstall XanMod kernel and restore to default ${NC}"
+    echo -e "${GREEN} 2) ${NC} Uninstall XanMod kernel and restore to default ${NC}"
     echo ""
     echo -e "${GREEN} E) ${NC} Exit the menu${NC}"
     echo ""
@@ -287,9 +288,6 @@ while true; do
             bbrv3
             ;;
         2)
-            bbrv3
-            ;;
-        3)
             uninstall_xanmod
             ;;
         E|e)
