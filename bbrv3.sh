@@ -107,7 +107,7 @@ cpu_level() {
 
 install_xanmod() {
         clear
-        cpu_support_info=$(/usr/bin/awk -f <(wget -qO - https://raw.githubusercontent.com/SuperNG6/linux-setup.sh/main/checkcpu.sh))
+        cpu_support_info=$(/usr/bin/awk -f <(wget -qO - https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/checkcpu.sh))
     if [[ $cpu_support_info == "CPU supports x86-64-v"* ]]; then
         cpu_support_level=${cpu_support_info#CPU supports x86-64-v}
         echo -e "${CYAN}Current CPU Level: x86-64 Level $cpu_support_level${NC}"
