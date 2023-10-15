@@ -84,16 +84,16 @@ cpu_support_info=$(/usr/bin/awk -f <(wget -qO - https://raw.githubusercontent.co
 }
 
 install_xanmod() {
-        clear
-        cpu_support_info=$(/usr/bin/awk -f <(wget -qO - https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/checkcpu.sh))
+    clear
+    cpu_support_info=$(/usr/bin/awk -f <(wget -qO - https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/checkcpu.sh))
+    
     if [[ $cpu_support_info == "CPU supports x86-64-v"* ]]; then
         cpu_support_level=${cpu_support_info#CPU supports x86-64-v}
         echo -e "${CYAN}Current CPU Level: x86-64 Level $cpu_support_level${NC}"
-        return $cpu_support_level
     else
         echo -e "${RED}OS or CPU level is not supported by the XanMod kernel and cannot be installed.${NC}"
-        return 0
-    fi
+        return 1  # Return an error code here
+    
     echo ""
     echo ""
     echo -e "${YELLOW}     Installing XanMod kernel${NC}"
@@ -114,8 +114,6 @@ install_xanmod() {
         temp_folder=$(mktemp -d)
         cd $temp_folder
 
-        cpu_level
-
         case $cpu_support_level in
             1)
                 apt-get update
@@ -135,7 +133,7 @@ install_xanmod() {
                 ;;
             *)
                 echo -e "${RED}Your CPU is not supported by the XanMod kernel and cannot be installed.${NC}"
-                return 1
+                return 1  # Return an error code here
                 ;;
         esac
 
