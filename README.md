@@ -3,6 +3,7 @@
 ##### Summurize configuration
  - Upgrade, Time setting, Install Useful Packages, Optimize the SYSCTL, Optimize SSH
  - TCP congestion control (Tweaker, Westwood, BBR, BBRv3, Hybla)
+ - Swap file + vm.swapiness value 
    
  ##### Details configuration
  - Enable Packages at Server Boot.
