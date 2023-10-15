@@ -26,6 +26,22 @@ BLUE="\e[94m"
 MAGENTA="\e[95m"
 NC="\e[0m"
 
+ask_reboot() {
+echo ""
+echo -e "\n ${YELLOW}Reboot now? (Recommended) ${GREEN}[y/n]${NC}"
+echo ""
+read reboot
+case "$reboot" in
+        [Yy]) 
+        systemctl reboot
+        ;;
+        *) 
+        return 
+        ;;
+    esac
+exit
+}
+
 press_enter() {
     echo -e "\n ${RED}Press Enter to continue... ${NC}"
     read
@@ -290,9 +306,11 @@ while true; do
         1)
             install_xanmod
             bbrv3
+            ask_reboot
             ;;
         2)
             uninstall_xanmod
+            ask_reboot
             ;;
         E|e)
             echo "Exiting..."
