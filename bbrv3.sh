@@ -31,16 +31,19 @@ press_enter() {
     read
 }
 
+logo=$(cat << "EOF"
+    ______    _______   __      _______        __      _____  ___  
+   /    " \  |   __ "\ |" \    /"      \      /""\    (\"   \|"  \ 
+  // ____  \ (. |__) :)||  |  |:        |    /    \   |.\\   \    |
+ /  /    ) :)|:  ____/ |:  |  |_____/   )   /' /\  \  |: \.   \\  |
+(: (____/ // (|  /     |.  |   //      /   //  __'  \ |.  \    \. |
+ \        / /|__/ \    /\  |\ |:  __   \  /   /  \\  \|    \    \ |
+  \"_____/ (_______)  (__\_|_)|__|  \___)(___/    \___)\___|\____\)
+EOF
+)
+
 logo() {
-    echo -e "\n${BLUE}
-      ::::::::  ::::::::: ::::::::::: :::::::::      :::     ::::    ::: 
-    :+:    :+: :+:    :+:    :+:     :+:    :+:   :+: :+:   :+:+:   :+:  
-   +:+    +:+ +:+    +:+    +:+     +:+    +:+  +:+   +:+  :+:+:+  +:+   
-  +#+    +:+ +#++:++#+     +#+     +#++:++#:  +#++:++#++: +#+ +:+ +#+    
- +#+    +#+ +#+           +#+     +#+    +#+ +#+     +#+ +#+  +#+#+#     
-#+#    #+# #+#           #+#     #+#    #+# #+#     #+# #+#   #+#+#      
-########  ###       ########### ###    ### ###     ### ###    ####       
-    ${NC}\n"
+echo -e "\033[1;94m$logo\033[0m"
 }
 
 if [ "$EUID" -ne 0 ]; then
@@ -246,21 +249,22 @@ EOL
     esac
 }
 
-
 while true; do
     linux_version=$(awk -F= '/^PRETTY_NAME=/{gsub(/"/, "", $2); print $2}' /etc/os-release)
     kernel_version=$(uname -r)
     title_text="BBRv3 Optimization Script using xanmod kernel"
-    tg_title="TG-Group @OPIranCluB"
+    tg_title="https://t.me/OPIranCluB"
     yt_title="youtube.com/@opiran-inistitute"
     clear
-    echo -e "             ${MAGENTA}${title_text}${NC}"
-    echo -e "${YELLOW}____________________________________________________________${NC}"
     logo
-    echo -e ""
-    echo -e "${BLUE}$tg_title ${NC}"
-    echo -e "${BLUE}$yt_title  ${NC}"
-    echo -e "${YELLOW}____________________________________________________________${NC}"
+    echo -e "\e[93m╔═══════════════════════════════════════════════╗\e[0m"  
+    echo -e "\e[93m║            \e[94mBBRv3 using xanmod kernel          \e[93m║\e[0m"   
+    echo -e "\e[93m╠═══════════════════════════════════════════════╣\e[0m"
+    echo ""
+    echo -e "${BLUE}   ${tg_title}   ${NC}"
+    echo -e "${BLUE}   ${yt_title}   ${NC}"
+    echo ""
+    printf "\e[93m+-------------------------------------+\e[0m\n" 
     echo ""
     echo -e "${MAGENTA}linux version Info：${GREEN}${linux_version}${NC}"
     echo -e "${MAGENTA}kernel Info：${GREEN}${kernel_version}${NC}"
@@ -271,14 +275,14 @@ while true; do
     echo -e "${CYAN}Supported OS: ${GREEN} Ubuntu / Debian ${NC}"
     echo -e "${CYAN}Supported CPU level ${GREEN} [1/2/3/4] ${NC}"
     echo ""
-    echo -e "${YELLOW}____________________________________________________________${NC}"
+    printf "\e[93m+-------------------------------------+\e[0m\n" 
     echo ""
     echo -e "${GREEN} 1) ${NC} Install XanMod kernel & BBRv3 & Grub boot conf. ${NC}"
     echo -e "${GREEN} 2) ${NC} Uninstall XanMod kernel and restore to default ${NC}"
     echo ""
     echo -e "${GREEN} E) ${NC} Exit the menu${NC}"
     echo ""
-    echo -ne "${GREEN}Select an option ${RED}[1-3]: ${NC}"
+    echo -ne "${GREEN}Select an option: ${NC}  "
     read choice
 
     case $choice in
