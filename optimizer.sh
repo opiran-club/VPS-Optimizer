@@ -182,7 +182,7 @@ complete_update() {
     echo ""
     echo ""
 
-    SPINNER_SIZE=100
+    SPINNER_SIZE=30
 
     PROGRESS="["
     for ((i = 0; i < SPINNER_SIZE; i++)); do
@@ -202,7 +202,7 @@ complete_update() {
 
     SPIN_PID=$!
 
-    apt-get update 2>&1 | tee /dev/tty > /dev/null
+    apt-get update > /dev/null 2>&1
     apt-get upgrade -y > /dev/null 2>&1
     apt-get dist-upgrade -y > /dev/null 2>&1
     apt-get autoremove -y > /dev/null 2>&1
