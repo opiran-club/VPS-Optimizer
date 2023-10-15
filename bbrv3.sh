@@ -74,7 +74,6 @@ cpu_level() {
 cpu_support_info=$(/usr/bin/awk -f <(wget -qO - https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/checkcpu.sh))
     if [[ $cpu_support_info == "CPU supports x86-64-v"* ]]; then
         cpu_support_level=${cpu_support_info#CPU supports x86-64-v}
-         echo -e "${CYAN}Current OS: ${GREEN}$os${NC}"
         echo -e "${CYAN}Current CPU Level: x86-64 Level $cpu_support_level${NC}"
         return $cpu_support_level
     else
@@ -138,14 +137,21 @@ install_xanmod() {
         esac
 
         echo -e "${GREEN}The XanMod kernel has been installed successfully.${NC}"
-        echo -e "${YELLOW}Do you need to update the GRUB boot configuration? (y/n) [Default: y]:${NC}"
+        press_enter
+        sleep 0.5
+        clear
+        echo ""
+        echo -e "${GREEN}       GRUB boot updating ${NC}"
+        echo ""
+        echo ""
+        echo -ne "${YELLOW}Do you need to update the GRUB boot configuration? (y/n) [Default: y]:${NC}    "
         read grub
 
         case $grub in
             [Yy])
                 update-grub
+                echo ""
                 echo -e "${GREEN}The GRUB boot configuration has been updated.${NC}"
-                echo -e "${GREEN}To enable BBRv3, please restart and run the BBR optimization option.${NC}"
                 ;;
             [Nn])
                 echo -e "${RED}It is not recommended, but the optimization has been aborted.${NC}"
@@ -256,8 +262,8 @@ while true; do
     echo -e "${BLUE}$yt_title  ${NC}"
     echo -e "${YELLOW}______________________________________________________${NC}"
     echo ""
-    echo -e "linux version Info：${GREEN}${linux_version}${NC}"
-    echo -e "kernel Info：${GREEN}${kernel_version}${NC}"
+    echo -e "${CYAN}linux version Info：${GREEN}${linux_version}${NC}"
+    echo -e "${CYAN}kernel Info：${GREEN}${kernel_version}${NC}"
     cpu_level
     echo ""
     echo -e "${RED} !! TIP !! ${NC}"
@@ -265,12 +271,9 @@ while true; do
     echo ""
     echo -e "${YELLOW}______________________________________________________${NC}"
     echo ""
-    echo -e "${GREEN} 1) ${NC} Install grub boot & xanmod kernel (Neccessary for BBRv3)${NC}"
-    echo -e "${GREEN} 2) ${NC} BBRv3 optimization${NC}"
+    echo -e "${GREEN} 1) ${NC} Install XanMod kernel & BBRv3 & Grub boot conf. ${NC}"
+    echo -e "${GREEN} 3) ${NC} Uninstall XanMod kernel and restore to default ${NC}"
     echo ""
-    echo -e "${YELLOW}______________________________________________________${NC}"
-    echo ""
-    echo -e "${GREEN} 3) ${NC} Rolling back and restore the original kernel${NC}"
     echo -e "${GREEN} E) ${NC} Exit the menu${NC}"
     echo ""
     echo -ne "${GREEN}Select an option ${RED}[1-3]: ${NC}"
@@ -280,6 +283,7 @@ while true; do
  
         1)
             install_xanmod
+            bbrv3
             ;;
         2)
             bbrv3
