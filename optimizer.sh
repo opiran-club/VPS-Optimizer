@@ -182,26 +182,27 @@ complete_update() {
     echo ""
     echo ""
 
-    SPINNER="/-\\|"
-    SPINNER_INDEX=0
+    SPINNER_SIZE=100
+
+    PROGRESS="["
+    for ((i = 0; i < SPINNER_SIZE; i++)); do
+        PROGRESS="${PROGRESS}░"
+    done
+    PROGRESS="${PROGRESS}]"
 
     spin() {
-        local c
-        c=${SPINNER:SPINNER_INDEX%4:1}
-        echo -ne "${RED}[${c}] ${NC}"
-        SPINNER_INDEX=$((SPINNER_INDEX + 1))
+        echo -ne "\r${RED}${PROGRESS}${NC}"
+        sleep 0.1
     }
 
     while true; do
+        PROGRESS="[▓${PROGRESS:2}]"
         spin
-        sleep 0.1
-        echo -ne "\b\b\b\b\b"
-        [[ $SPINNER_INDEX -eq 4 ]] && SPINNER_INDEX=0
     done &
 
     SPIN_PID=$!
 
-    apt-get update > /dev/null 2>&1
+    apt-get update 2>&1 | tee /dev/tty > /dev/null
     apt-get upgrade -y > /dev/null 2>&1
     apt-get dist-upgrade -y > /dev/null 2>&1
     apt-get autoremove -y > /dev/null 2>&1
@@ -211,7 +212,7 @@ complete_update() {
     kill $SPIN_PID > /dev/null 2>&1
     wait $SPIN_PID > /dev/null 2>&1
 
-    echo -e "\e[K"
+    echo -e "\r\e[K"
 
     echo -e "\e[0m"
 
@@ -221,7 +222,6 @@ complete_update() {
     sleep 1
     press_enter
 }
-
 
 installations() {
     clear
