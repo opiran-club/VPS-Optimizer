@@ -35,8 +35,6 @@ apt install curl -y && bash <(curl -s https://raw.githubusercontent.com/opiran-c
 
 ### Xanmod kernel and BBRv3 
 
-##### kernel file uploaded by 👉 [superNG](https://github.com/SuperNG6/linux-setup.sh/releases)
-
 ![image](https://github.com/opiran-club/VPS-Optimizer/assets/130220895/edb14f2d-7558-4808-9ee6-f69e58cd863a)
 
 
