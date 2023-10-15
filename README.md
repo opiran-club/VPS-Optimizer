@@ -31,19 +31,6 @@
 apt install curl -y && bash <(curl -s https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/optimizer.sh --ipv4)
 ```
 
--------------------------------------------------------
-![image](https://github.com/opiran-club/VPS-Optimizer/assets/130220895/94970d55-b70f-460b-9d06-e75a2141d271)
-
-![image](https://github.com/opiran-club/VPS-Optimizer/assets/130220895/62af50c5-9b7c-48c1-b8a8-8dbe47ad21b1)
-
-![image](https://github.com/opiran-club/VPS-Optimizer/assets/130220895/d583e73b-fa4f-45ec-8a14-9bc1e0d5dfd3)
-
-![image](https://github.com/opiran-club/VPS-Optimizer/assets/130220895/5632b209-86a3-4bd4-827a-ad4f8f52cd34)
-
-![image](https://github.com/opiran-club/VPS-Optimizer/assets/130220895/015b3e29-d36b-478c-b63e-fb09e42d969e)
-
-![image](https://github.com/opiran-club/VPS-Optimizer/assets/130220895/20445d26-b5cb-40a9-af2a-f3d8e6819f44)
-
 ---------------------------------------------------------------------------------------------------------------------------------------
 
 ### Xanmod kernel and BBRv3 
