@@ -175,32 +175,27 @@ complete_update() {
     echo ""
     echo -e "${BLUE}$title ${NC}"
     echo ""
-    printf "\e[93m+-------------------------------------+\e[0m\n"
+    printf "\e[93m+-------------------------------------+\e[0m\n" 
     echo ""
     echo ""
     echo -e "${RED}Please wait, it might take a couple of minutes${NC}"
     echo ""
     echo ""
-
-    SPINNER_SIZE=30
-
-    PROGRESS="["
-    for ((i = 0; i < SPINNER_SIZE; i++)); do
-        PROGRESS="${PROGRESS}░"
-    done
-    PROGRESS="${PROGRESS}]"
+    
+    SPINNER="░░░░░░░░░░░░░░░░░░░░░░░░░░░░░"
 
     spin() {
-        echo -ne "\r${RED}${PROGRESS}${NC}"
-        sleep 0.1
+        local i
+        for i in $(seq 1 30); do
+            local c
+            c="${SPINNER:i%${#SPINNER}:1}"
+            echo -ne "${GREEN}${SPINNER:0:i}${RED}${SPINNER:i}${NC}"
+            sleep 0.1
+            echo -ne "\r"
+        done
     }
 
-    while true; do
-        PROGRESS="[▓${PROGRESS:2}]"
-        spin
-    done &
-
-    SPIN_PID=$!
+    spin & SPIN_PID=$!
 
     apt-get update > /dev/null 2>&1
     apt-get upgrade -y > /dev/null 2>&1
@@ -209,19 +204,15 @@ complete_update() {
     apt-get autoclean -y > /dev/null 2>&1
     apt-get clean -y
 
-    kill $SPIN_PID > /dev/null 2>&1
-    wait $SPIN_PID > /dev/null 2>&1
-
-    echo -e "\r\e[K"
-
-    echo -e "\e[0m"
-
+    wait $SPIN_PID
+    
     echo ""
     echo -e "${GREEN}System update & upgrade completed.${NC}"
     echo ""
     sleep 1
     press_enter
 }
+
 
 installations() {
     clear
@@ -235,16 +226,16 @@ installations() {
     echo -e "${RED}Please wait, it might take a while${NC}"
     echo ""
 
-    SPINNER="⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
+    SPINNER="░░░░░░░░░░░░░░░░░░░░░░░░░░░░░"
 
     spin() {
         local i
         for i in $(seq 1 30); do
             local c
-            c=${SPINNER:i%${#SPINNER}:1}
-            echo -ne "${RED}${c}${NC}"
+            c="${SPINNER:i%${#SPINNER}:1}"
+            echo -ne "${GREEN}${SPINNER:0:i}${RED}${SPINNER:i}${NC}"
             sleep 0.1
-            echo -ne "\b"
+            echo -ne "\r"
         done
     }
 
