@@ -149,7 +149,7 @@ fix_dns() {
         for i in $(seq 1 30); do
             local c
             c=${SPINNER:i%${#SPINNER}:1}
-            echo -ne "  ${YELLOW} ${c}  ${c}  ${c} ${NC}"
+            echo -ne "${RED}${c}${NC}"
             sleep 0.1
             echo -ne "\b"
         done
@@ -393,9 +393,11 @@ remove_old_sysctl() {
     clear
     title="Optimizing system configuration and updating sysctl configs"
     logo
+    echo ""
     echo -e "${BLUE}$title ${NC}"
+    echo ""
     echo -e "\e[93m+-------------------------------------+\e[0m"
-    echo -e "${RED}Please wait, it might take a while${NC}"
+    echo ""
     enable_ipv6_support
     sed -i '/1000000/d' /etc/profile
     cat <<EOL > "/etc/sysctl.conf"
@@ -444,7 +446,6 @@ optimize_ssh_configuration() {
     echo ""
     echo -e "\e[93m+-------------------------------------+\e[0m"
     echo ""
-    echo -e "${RED}Please wait, it might take a while${NC}"
     cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
     cat <<EOL > "/etc/ssh/sshd_config"
 # SSH configuration settings for improved security and performance
@@ -551,9 +552,13 @@ ask_bbr_version() {
     case $choice in
         1)
             clear
+            echo ""
             echo -e "${YELLOW}Backing up original kernel parameter configuration... ${NC}"
+            echo ""
             cp /etc/sysctl.conf /etc/sysctl.conf.bak
+            echo ""
             echo -e "${YELLOW}Optimizing kernel parameters for TCP-Tweaker ${NC}"
+            echo ""
 cat <<EOL >> /etc/sysctl.conf
 #PH56
 net.ipv4.tcp_window_scaling = 1
@@ -568,17 +573,23 @@ net.ipv4.tcp_congestion_control = bbr
 EOL
 sysctl -p
             if [ $? -eq 0 ]; then
+            echo ""
                 echo -e "${GREEN}Kernel parameter optimization for TCP-Tweaker was successful.${NC}"
             else
+            echo ""
                 echo -e "${RED}Kernel parameter optimization failed. Restoring the original configuration...${NC}"
                 mv /etc/sysctl.conf.bak /etc/sysctl.conf
             fi
             ;;
         2)
             clear
+            echo ""
             echo -e "${YELLOW}Backing up original kernel parameter configuration... ${NC}"
+            echo ""
+            echo ""
             cp /etc/sysctl.conf /etc/sysctl.conf.bak
             echo -e "${YELLOW}Optimizing kernel parameters for TCP-Westwood ${NC}"
+            echo ""
 cat <<EOL >> /etc/sysctl.conf
 net.core.default_qdisc = fq
 net.ipv4.tcp_congestion_control = westwood
@@ -598,9 +609,13 @@ sysctl -p
 
         3)
             clear
+            echo ""
             echo -e "${YELLOW}Backing up original kernel parameter configuration... ${NC}"
+            echo ""
+            echo ""
             cp /etc/sysctl.conf /etc/sysctl.conf.bak
             echo -e "${YELLOW}Optimizing kernel parameters for TCP-BBR (Bottleneck Bandwidth and Round-Trip Propagation Time) ${NC}"
+            echo ""
 cat <<EOL >> /etc/sysctl.conf
 net.core.default_qdisc = fq
 net.ipv4.tcp_congestion_control = bbr
@@ -615,6 +630,7 @@ sysctl -p
             ;;
         4)
             clear
+            echo ""
             echo -e "${YELLOW}If you have ubuntu or debian system, you can use this script to install and configure BBRv3. ${NC}"
             echo ""
             press_enter
@@ -622,9 +638,12 @@ sysctl -p
             ;;
         5)
             clear
+            echo ""
             echo -e "${YELLOW}    Optimizing kernel parameters for TCP-Hybla    ${NC}"
             echo ""
+            echo ""
             echo -e "${YELLOW}Backing up original kernel parameter configuration... ${NC}"
+            echo ""
             cp /etc/sysctl.conf /etc/sysctl.conf.bak
             check_Hybla
             kernel_version
@@ -654,6 +673,7 @@ sysctl -p >/dev/null 2>&1
             ;;
         6)
             clear
+            echo ""
             echo -e "${YELLOW}No TCP congestion control selected.${NC}"
             ;;
         *)
@@ -674,14 +694,15 @@ sysctl -p >/dev/null 2>&1
     ask_bbr_version
 clear
 logo
+echo ""
 echo -e "    ${MAGENTA} Your server fully optimized successfully${NC}"
-echo -e "${YELLOW}______________________________________________________________${NC}"
+printf "\e[93m+-------------------------------------+\e[0m\n" 
 echo ""
 echo ""
 echo -e "${MAGENTA}Please reboot the system to take effect, by running the following command: ${GREEN}reboot${NC}"
 echo ""
-echo -e "${MAGENTA}Please visit me at: ${GREEN}@OPIranCluB ${NC}"
+echo -e "${MAGENTA}Please visit me at: ${GREEN}https://t.me/OPIranCluB ${NC}"
 echo ""
-echo -e "${YELLOW}______________________________________________________________${NC}"
+printf "\e[93m+-------------------------------------+\e[0m\n" 
 echo ""
 ask_reboot
