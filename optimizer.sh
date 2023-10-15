@@ -149,7 +149,7 @@ fix_dns() {
         for i in $(seq 1 30); do
             local c
             c=${SPINNER:i%${#SPINNER}:1}
-            echo -ne "${RED}${c}${NC}"
+            echo -ne "  ${YELLOW} ${c}  ${c}  ${c} ${NC}"
             sleep 0.1
             echo -ne "\b"
         done
