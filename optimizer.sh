@@ -101,12 +101,13 @@ display_fancy_progress() {
 
 set_timezone() {
     clear
-    title="Select a timezone"
+    title="Timezone Adjustment"
     logo
     echo ""
     echo -e "${BLUE}$title ${NC}"
     echo ""
-    echo -e "${YELLOW}______________________________________________________${NC}"
+    printf "\e[93m+-------------------------------------+\e[0m\n" 
+
     
     regions=("Asia/Tehran" "Europe/Istanbul" "America/Los_Angeles")
     
@@ -142,16 +143,19 @@ set_timezone() {
     fi
 }
 
+logo=$(cat << "EOF"
+    ______    _______   __      _______        __      _____  ___  
+   /    " \  |   __ "\ |" \    /"      \      /""\    (\"   \|"  \ 
+  // ____  \ (. |__) :)||  |  |:        |    /    \   |.\\   \    |
+ /  /    ) :)|:  ____/ |:  |  |_____/   )   /' /\  \  |: \.   \\  |
+(: (____/ // (|  /     |.  |   //      /   //  __'  \ |.  \    \. |
+ \        / /|__/ \    /\  |\ |:  __   \  /   /  \\  \|    \    \ |
+  \"_____/ (_______)  (__\_|_)|__|  \___)(___/    \___)\___|\____\)
+EOF
+)
+
 logo() {
-    echo -e "\n${BLUE}
-      ::::::::  ::::::::: ::::::::::: :::::::::      :::     ::::    ::: 
-    :+:    :+: :+:    :+:    :+:     :+:    :+:   :+: :+:   :+:+:   :+:  
-   +:+    +:+ +:+    +:+    +:+     +:+    +:+  +:+   +:+  :+:+:+  +:+   
-  +#+    +:+ +#++:++#+     +#+     +#++:++#:  +#++:++#++: +#+ +:+ +#+    
- +#+    +#+ +#+           +#+     +#+    +#+ +#+     +#+ +#+  +#+#+#     
-#+#    #+# #+#           #+#     #+#    #+# #+#     #+# #+#   #+#+#      
-########  ###       ########### ###    ### ###     ### ###    ####       
-    ${NC}\n"
+echo -e "\033[1;34m$logo\033[0m"
 }
 
 SYS_PATH="/etc/sysctl.conf"
@@ -162,12 +166,12 @@ DNS_PATH="/etc/resolv.conf"
 
 fix_dns() {
   clear
-  title="Optimizing System DNS Settings"
+  title="DNS replacement with Google"
     logo
     echo ""
     echo -e "${BLUE}$title ${NC}"
     echo ""
-    echo -e "${YELLOW}______________________________________________________${NC}"
+    printf "\e[93m+-------------------------------------+\e[0m\n" 
   echo ""
   display_fancy_progress 10
   sed -i '/nameserver/d' $DNS_PATH
@@ -182,12 +186,12 @@ fix_dns() {
 
 complete_update() {
     clear
-  title="Full update and upgrade server system"
+  title="update and upgrade packages"
     logo
     echo ""
     echo -e "${BLUE}$title ${NC}"
     echo ""
-    echo -e "${YELLOW}______________________________________________________${NC}"
+    printf "\e[93m+-------------------------------------+\e[0m\n" 
   echo ""
   echo ""
   echo -e "${RED}Please wait, it might couple of minutes${NC}"
@@ -208,12 +212,12 @@ complete_update() {
 
 installations() {
     clear
-  title="Install usefull and neccessary packages"
+  title="Install neccessary packages"
     logo
     echo ""
     echo -e "${BLUE}$title ${NC}"
     echo ""
-    echo -e "${YELLOW}______________________________________________________${NC}"
+    printf "\e[93m+-------------------------------------+\e[0m\n" 
   echo ""
   echo -e "${RED}Please wait, it might takes a while${NC}"
   echo ""
@@ -242,22 +246,96 @@ swap_maker() {
     echo ""
     echo -e "${BLUE}$title ${NC}"
     echo ""
-    echo -e "${YELLOW}______________________________________________________${NC}"
+    printf "\e[93m+-------------------------------------+\e[0m\n" 
+    echo ""
+    echo ""
+    swap_files=$(swapon -s | awk '{if($1!~"^Filename"){print $1}}')
+
+    if [ -n "$swap_files" ]; then
+        remove_all_swap
+    fi
+
+    echo -e "${YELLOW}Please select the swap file size: ${NC}"
+    echo ""
+    echo -e "${GREEN}1)${NC} 512M"
+    echo -e "${GREEN}2)${NC} 1GB"
+    echo -e "${GREEN}3)${NC} 2GB"
+    echo -e "${GREEN}4)${NC} 4GB"
+    echo -e "${GREEN}5)${NC} Manually enter values"
+    echo ""
+    echo -ne "${CYAN}Enter your choice [1-6]:${NC} "
+    read choice
+
+    case $choice in
+        1)
+            swap_size="512M"
+            ;;
+        2)
+            swap_size="1G"
+            ;;
+        3)
+            swap_size="2G"
+            ;;
+        4)
+            swap_size="4G"
+            ;;
+        5)
+            echo ""
+            echo -ne "${YELLOW}Please enter the virtual memory size (e.g. 300M, 1.5G): ${NC}   "
+            read swap_size_input
+            swap_size="$swap_size_input"
+            ;;
+        *)
+            echo -e "${RED}Invalid choice, No changes made.${NC}"
+            return 1
+            ;;
+    esac
+
+    case $swap_size in
+        *M)
+            swap_size_kb=$(( ${swap_size//[^0-9]/} * 1024 ))
+            ;;
+        *G)
+            swap_size_kb=$(( ${swap_size//[^0-9]/} * 1024 * 1024 ))
+            ;;
+        *)
+            echo -e "${RED}Invalid choice, No changes made.${NC}"
+            return 1
+            ;;
+    esac
+
+    dd if=/dev/zero of=/swap bs=1k count=$swap_size_kb
+
+    if [ $? -eq 0 ]; then
+        chmod 600 /swap
+        mkswap /swap
+        swapon /swap
+
+        if [ $? -eq 0 ]; then
+            echo "/swap swap swap defaults 0 0" >> /etc/fstab
+            swapon -s | grep '/swap'
+        else
+            return 1
+        fi
+    else
+        return 1
+    fi
+
+    echo -e "${BLUE}Modifying swap usage threshold... ${NC}"
+    echo ""
+    printf "\e[93m+-------------------------------------+\e[0m\n" 
+    echo ""
+    echo ""
+    swap_value=60
+    if grep -q "^vm.swappiness" /etc/sysctl.conf; then
+        sed -i "s/^vm.swappiness=.*/vm.swappiness=$swap_value/" /etc/sysctl.conf
+    else
+        echo "vm.swappiness=$swap_value" >> /etc/sysctl.conf
+    fi
+    sysctl -p
+
   echo ""
-  echo -e "${RED}Please wait, it might takes a while${NC}"
-  echo ""
-  sleep 1
-  echo ""
-  display_fancy_progress 10
-  SWAP_SIZE=2G
-  SWAP_PATH="/swapfile"
-  fallocate -l $SWAP_SIZE $SWAP_PATH
-  chmod 600 $SWAP_PATH
-  mkswap $SWAP_PATH
-  swapon $SWAP_PATH
-  echo "$SWAP_PATH   none    swap    sw    0   0" >>/etc/fstab
-  echo ""
-  echo -e "${GREEN}Swap file configured.${NC}"
+  echo -e "${GREEN}Swap file created and vm.swappiness value has been set to ${RED} $swap_value ${NC}"
   echo ""
   sleep 1
   press_enter
@@ -288,7 +366,7 @@ remove_old_sysctl() {
     echo ""
     echo -e "${BLUE}$title ${NC}"
     echo ""
-    echo -e "${YELLOW}______________________________________________________${NC}"
+    printf "\e[93m+-------------------------------------+\e[0m\n" 
   echo ""
   echo -e "${RED}Please wait, it might takes a while${NC}"
   echo ""
@@ -361,7 +439,7 @@ remove_old_ssh_conf() {
     echo ""
     echo -e "${BLUE}$title ${NC}"
     echo ""
-    echo -e "${YELLOW}______________________________________________________${NC}"
+    printf "\e[93m+-------------------------------------+\e[0m\n" 
   echo ""
   echo -e "${RED}Please wait, it might takes a while${NC}"
   echo ""
@@ -454,7 +532,7 @@ ask_bbr_version() {
     echo ""
     echo -e "${BLUE}$title ${NC}"
     echo ""
-    echo -e "${YELLOW}______________________________________________________${NC}"
+    printf "\e[93m+-------------------------------------+\e[0m\n" 
     echo ""
     echo -e "${RED}1. ${YELLOW}TCP-Tweaker${NC}"
     echo -e "${RED}2. ${YELLOW}TCP-Westwood${NC}"
