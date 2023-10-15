@@ -78,7 +78,7 @@ set_timezone() {
     title="Timezone Adjustment"
     logo
     echo ""
-    echo -e "${BLUE}$title ${NC}"
+    echo -e "${CYAN}$title ${NC}"
     echo ""
     printf "\e[93m+-------------------------------------+\e[0m\n" 
 
@@ -138,7 +138,7 @@ fix_dns() {
     title="DNS replacement with Google"
     logo
     echo ""
-    echo -e "${BLUE}$title ${NC}"
+    echo -e "${CYAN}$title ${NC}"
     echo ""
     printf "\e[93m+-------------------------------------+\e[0m\n" 
     echo ""
@@ -173,7 +173,7 @@ complete_update() {
     title="Update and upgrade packages"
     logo
     echo ""
-    echo -e "${BLUE}$title ${NC}"
+    echo -e "${CYAN}$title ${NC}"
     echo ""
     printf "\e[93m+-------------------------------------+\e[0m\n" 
     echo ""
@@ -219,7 +219,7 @@ installations() {
     title="Install necessary packages"
     logo
     echo ""
-    echo -e "${BLUE}$title ${NC}"
+    echo -e "${CYAN}$title ${NC}"
     echo ""
     printf "\e[93m+-------------------------------------+\e[0m\n"
     echo ""
@@ -268,7 +268,7 @@ swap_maker() {
     swap_partitions=$(grep -E '^\S+\s+\S+\sswap\s+' /proc/swaps | awk '{print $1}')
     logo
     echo ""
-    echo -e "${BLUE}$title ${NC}"
+    echo -e "${CYAN}$title ${NC}"
     echo ""
     printf "\e[93m+-------------------------------------+\e[0m\n" 
     echo ""
@@ -394,7 +394,7 @@ remove_old_sysctl() {
     title="Optimizing system configuration and updating sysctl configs"
     logo
     echo ""
-    echo -e "${BLUE}$title ${NC}"
+    echo -e "${CYAN}$title ${NC}"
     echo ""
     echo -e "\e[93m+-------------------------------------+\e[0m"
     echo ""
@@ -442,7 +442,7 @@ optimize_ssh_configuration() {
     SSH_PATH="/etc/ssh/sshd_config"
     title="Improve SSH conf. and optimize SSHD"
     logo
-    echo -e "${BLUE}$title ${NC}"
+    echo -e "${CYAN}$title ${NC}"
     echo ""
     echo -e "\e[93m+-------------------------------------+\e[0m"
     echo ""
@@ -534,7 +534,7 @@ ask_bbr_version() {
     title="Select a TCP congestion control"
     logo
     echo ""
-    echo -e "${BLUE}$title ${NC}"
+    echo -e "${CYAN}$title ${NC}"
     echo ""
     printf "\e[93m+-------------------------------------+\e[0m\n" 
     echo ""
