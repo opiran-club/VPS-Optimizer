@@ -50,7 +50,8 @@ apt install curl -y && bash <(curl -s https://raw.githubusercontent.com/opiran-c
 
 ##### kernel file uploaded by 👉 [superNG](https://github.com/SuperNG6/linux-setup.sh/releases)
 
-![image](https://github.com/opiran-club/VPS-Optimizer/assets/130220895/4ba8e535-5d4a-435d-8e0f-62216da06367)
+![image](https://github.com/opiran-club/VPS-Optimizer/assets/130220895/edb14f2d-7558-4808-9ee6-f69e58cd863a)
+
 
 
 ###  ‼️ INSTRUCTION ‼️
