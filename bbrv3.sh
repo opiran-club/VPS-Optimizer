@@ -71,32 +71,10 @@ cpu_level() {
         esac
     fi
 
-    # Initialize the CPU support level to 0
-    cpu_support_level=0
-
-    while read -r line; do
-        if [[ $line =~ "flags" ]]; then
-            while read -r line; do
-                case $line in
-                    *"lm"* | *"cmov"* | *"cx8"* | *"fpu"* | *"fxsr"* | *"mmx"* | *"syscall"* | *"sse2"*)
-                        cpu_support_level=1
-                        ;;
-                    *"cx16"* | *"lahf"* | *"popcnt"* | *"sse4_1"* | *"sse4_2"* | *"ssse3"*)
-                        [ $cpu_support_level -eq 1 ] && cpu_support_level=2
-                        ;;
-                    *"avx"* | *"avx2"* | *"bmi1"* | *"bmi2"* | *"f16c"* | *"fma"* | *"abm"* | *"movbe"* | *"xsave"*)
-                        [ $cpu_support_level -eq 2 ] && cpu_support_level=3
-                        ;;
-                    *"avx512f"* | *"avx512bw"* | *"avx512cd"* | *"avx512dq"* | *"avx512vl"*)
-                        [ $cpu_support_level -eq 3 ] && cpu_support_level=4
-                        ;;
-                esac
-            done
-        fi
-    done < /proc/cpuinfo
-
-    if [[ $cpu_support_level -gt 1 && $cpu_support_level -le 4 ]]; then
-        echo -e "${CYAN}Current OS: ${GREEN}$os${NC}"
+cpu_support_info=$(/usr/bin/awk -f <(wget -qO - https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/checkcpu.sh))
+    if [[ $cpu_support_info == "CPU supports x86-64-v"* ]]; then
+        cpu_support_level=${cpu_support_info#CPU supports x86-64-v}
+         echo -e "${CYAN}Current OS: ${GREEN}$os${NC}"
         echo -e "${CYAN}Current CPU Level: x86-64 Level $cpu_support_level${NC}"
         return $cpu_support_level
     else
