@@ -198,14 +198,14 @@ complete_update() {
     spin & SPIN_PID=$!
 
     apt-get update > /dev/null 2>&1
+    wait $SPIN_PID
     apt-get upgrade -y
+    spin & SPIN_PID=$!
     apt-get dist-upgrade -y > /dev/null 2>&1
     apt-get autoremove -y > /dev/null 2>&1
     apt-get autoclean -y > /dev/null 2>&1
     apt-get clean -y
-
     wait $SPIN_PID
-    
     echo ""
     echo -e "${GREEN}System update & upgrade completed.${NC}"
     echo ""
