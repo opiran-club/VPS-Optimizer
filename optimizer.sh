@@ -198,7 +198,7 @@ complete_update() {
     spin & SPIN_PID=$!
 
     apt-get update > /dev/null 2>&1
-    apt-get upgrade -y -q
+    apt-get upgrade -y
     apt-get dist-upgrade -y > /dev/null 2>&1
     apt-get autoremove -y > /dev/null 2>&1
     apt-get autoclean -y > /dev/null 2>&1
