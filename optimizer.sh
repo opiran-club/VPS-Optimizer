@@ -34,22 +34,53 @@ exit 1
 fi
 
 if [ -f /etc/os-release ]; then
-source /etc/os-release
-case $ID in
-    "ubuntu")
-    rm -rf /etc/apt/sources.list && touch /etc/apt/sources.list
-echo "deb http://archive.ubuntu.com/ubuntu/ jammy main restricted" >> /etc/apt/sources.list
-echo "deb http://archive.ubuntu.com/ubuntu/ jammy-updates main restricted" >> /etc/apt/sources.list
-echo "deb http://archive.ubuntu.com/ubuntu/ jammy universe" >> /etc/apt/sources.list
-echo "deb http://archive.ubuntu.com/ubuntu/ jammy-updates universe" >> /etc/apt/sources.list
-echo "deb http://archive.ubuntu.com/ubuntu/ jammy multiverse" >> /etc/apt/sources.list
-echo "deb http://archive.ubuntu.com/ubuntu/ jammy-updates multiverse" >> /etc/apt/sources.list
-echo "deb http://archive.ubuntu.com/ubuntu/ jammy-backports main restricted universe multiverse" >> /etc/apt/sources.list
-echo "deb http://archive.ubuntu.com/ubuntu/ jammy-security main restricted" >> /etc/apt/sources.list
-echo "deb http://archive.ubuntu.com/ubuntu/ jammy-security universe" >> /etc/apt/sources.list
-echo "deb http://archive.ubuntu.com/ubuntu/ jammy-security multiverse" >> /etc/apt/sources.list
+    source /etc/os-release
+    case $ID in
+        "ubuntu")
+        echo ""
+        
+        # Check the content of the sources.list
+        if grep -q "archive.ubuntu.com" /etc/apt/sources.list; then
+            echo -ne "${GREEN}Your sources.list is already using archive.ubuntu. Do you want to continue? [y/n]: ${NC}"
+            read continue
+            case $continue in
+                [Yy])
+                # Continue with the script
+                ;;
+                [Nn])
+                return
+                ;;
+                *)
+                return
+                ;;
+            esac
+        else
+            echo -ne "${GREEN}Do you want me to change your source list to archive.ubuntu? [y/n]: ${NC}"
+            read source
+            case $source in
+                [Yy])
+                rm -rf /etc/apt/sources.list && touch /etc/apt/sources.list
+                echo "deb http://archive.ubuntu.com/ubuntu/ jammy main restricted" >> /etc/apt/sources.list
+                echo "deb http://archive.ubuntu.com/ubuntu/ jammy-updates main restricted" >> /etc/apt/sources.list
+                echo "deb http://archive.ubuntu.com/ubuntu/ jammy universe" >> /etc/apt/sources.list
+                echo "deb http://archive.ubuntu.com/ubuntu/ jammy-updates universe" >> /etc/apt/sources.list
+                echo "deb http://archive.ubuntu.com/ubuntu/ jammy multiverse" >> /etc/apt/sources.list
+                echo "deb http://archive.ubuntu.com/ubuntu/ jammy-updates multiverse" >> /etc/apt/sources.list
+                echo "deb http://archive.ubuntu.com/ubuntu/ jammy-backports main restricted universe multiverse" >> /etc/apt/sources.list
+                echo "deb http://archive.ubuntu.com/ubuntu/ jammy-security main restricted" >> /etc/apt/sources.list
+                echo "deb http://archive.ubuntu.com/ubuntu/ jammy-security universe" >> /etc/apt/sources.list
+                echo "deb http://archive.ubuntu.com/ubuntu/ jammy-security multiverse" >> /etc/apt/sources.list
+                ;;
+                [Nn])
+                return
+                ;;
+                *)
+                return
+                ;;
+            esac
+        fi
         ;;
-esac
+    esac
 fi
 
 press_enter() {
