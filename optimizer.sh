@@ -230,25 +230,8 @@ installations() {
     echo -e "${RED}Please wait, it might take a while${NC}"
     echo ""
 
-    SPINNER="░░░░░░░░░░░░░░░░░░░░░░░░░░░░░"
-
-    spin() {
-        local i
-        for i in $(seq 1 30); do
-            local c
-            c="${SPINNER:i%${#SPINNER}:1}"
-            echo -ne "${GREEN}${SPINNER:0:i}${RED}${SPINNER:i}${NC}"
-            sleep 0.1
-            echo -ne "\r"
-        done
-    }
-
-    spin & SPIN_PID=$!
-
     apt-get purge firewalld -y > /dev/null 2>&1
-    apt-get install certbot nload nethogs autossh ssh iperf sshuttle software-properties-common apt-transport-https iptables lsb-release ca-certificates ubuntu-keyring gnupg2 apt-utils cron bash-completion curl git unzip zip ufw wget preload locales nano vim python3 jq qrencode socat busybox net-tools haveged htop curl -y > /dev/null 2>&1
-
-    wait $SPIN_PID
+    apt-get install certbot nload nethogs autossh ssh iperf sshuttle software-properties-common apt-transport-https iptables lsb-release ca-certificates ubuntu-keyring gnupg2 apt-utils cron bash-completion curl git unzip zip ufw wget preload locales nano vim python3 jq qrencode socat busybox net-tools haveged htop curl -y
     apt-get install snapd -y > /dev/null 2>&1
 
     echo ""
