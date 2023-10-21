@@ -47,24 +47,10 @@ if [ -f /etc/os-release ]; then
     case $ID in
         "ubuntu")
         echo ""
-        
-        # Check the content of the sources.list
-        if grep -q "archive.ubuntu.com" /etc/apt/sources.list; then
-            echo -ne "${GREEN}Your sources.list is already using archive.ubuntu. Do you want to continue? [y/n]: ${NC}"
-            read continue
-            case $continue in
-                [Yy])
-                # Continue with the script
-                ;;
-                [Nn])
-                return
-                ;;
-                *)
-                return
-                ;;
-            esac
+
+        if grep -q "archive.ubuntu.com" /etc/apt/sources.list; then return
         else
-            echo -ne "${GREEN}Do you want me to change your source list to archive.ubuntu? [y/n]: ${NC}"
+            echo -ne "${GREEN}Your source list is not archive.ubuntu, lets update it? [y/n]: ${NC}"
             read source
             case $source in
                 [Yy])
