@@ -47,24 +47,20 @@ if [ -f /etc/os-release ]; then
     case $ID in
         "ubuntu")
         echo ""
-
         if grep -q "archive.ubuntu.com" /etc/apt/sources.list; then return
         else
             echo -ne "${GREEN}Your source list is not archive.ubuntu, lets update it? [y/n]: ${NC}"
             read source
             case $source in
                 [Yy])
-                rm -rf /etc/apt/sources.list && touch /etc/apt/sources.list
-                echo "deb http://archive.ubuntu.com/ubuntu/ jammy main restricted" >> /etc/apt/sources.list
-                echo "deb http://archive.ubuntu.com/ubuntu/ jammy-updates main restricted" >> /etc/apt/sources.list
-                echo "deb http://archive.ubuntu.com/ubuntu/ jammy universe" >> /etc/apt/sources.list
-                echo "deb http://archive.ubuntu.com/ubuntu/ jammy-updates universe" >> /etc/apt/sources.list
-                echo "deb http://archive.ubuntu.com/ubuntu/ jammy multiverse" >> /etc/apt/sources.list
-                echo "deb http://archive.ubuntu.com/ubuntu/ jammy-updates multiverse" >> /etc/apt/sources.list
-                echo "deb http://archive.ubuntu.com/ubuntu/ jammy-backports main restricted universe multiverse" >> /etc/apt/sources.list
-                echo "deb http://archive.ubuntu.com/ubuntu/ jammy-security main restricted" >> /etc/apt/sources.list
-                echo "deb http://archive.ubuntu.com/ubuntu/ jammy-security universe" >> /etc/apt/sources.list
-                echo "deb http://archive.ubuntu.com/ubuntu/ jammy-security multiverse" >> /etc/apt/sources.list
+                cp /etc/apt/sources.list /etc/apt/sources.list.bak
+                rm -rf /etc/apt/sources.list
+                if wget -N -4 -O /etc/apt/sources.list https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/Install/ubuntu-source; then
+                    echo -e "${GREEN}Your source list was updated successfully.${NC}"
+                else
+                    echo -e "${RED}Failed to update your source list.${NC}"
+                    cp /etc/apt/sources.list.bak /etc/apt/sources.list
+                fi
                 ;;
                 [Nn])
                 return
