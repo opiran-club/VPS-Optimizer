@@ -33,6 +33,15 @@ echo -e "\n ${RED}This script must be run as root.${NC}"
 exit 1
 fi
 
+sourcelist() {
+clear
+title="Source list adjustment to officials"
+    logo
+    echo ""
+    echo -e "${CYAN}$title ${NC}"
+    echo ""
+    printf "\e[93m+-------------------------------------+\e[0m\n" 
+    echo ""
 if [ -f /etc/os-release ]; then
     source /etc/os-release
     case $ID in
@@ -82,7 +91,7 @@ if [ -f /etc/os-release ]; then
         ;;
     esac
 fi
-
+}
 press_enter() {
     echo -e "\n ${RED}Press Enter to continue... ${NC}"
     read
@@ -695,6 +704,7 @@ sysctl -p >/dev/null 2>&1
     esac
     press_enter
 }
+    sourcelist
     set_timezone
     fix_dns
     complete_update
