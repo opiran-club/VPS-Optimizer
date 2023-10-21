@@ -224,9 +224,11 @@ uninstall_xanmod() {
 
 bbrv3() {
     clear
-    echo -e "${CYAN}Are you sure you want to optimize kernel parameters for better network performance? (y/n): ${NC}"
+    echo ""
+    echo ""
+    echo -e "${YELLOW}Are you sure you want to optimize kernel parameters for better network performance? (y/n): ${NC}${GREEN}   "
     read optimize_choice
-
+    echo -e "${NC}"
     case $optimize_choice in
         y|Y)
             clear
