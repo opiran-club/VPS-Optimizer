@@ -212,31 +212,13 @@ complete_update() {
     echo -e "${RED}Please wait, it might take a couple of minutes${NC}"
     echo ""
     echo ""
-    
-    SPINNER="░░░░░░░░░░░░░░░░░░░░░░░░░░░░░"
 
-    spin() {
-        local i
-        for i in $(seq 1 30); do
-            local c
-            c="${SPINNER:i%${#SPINNER}:1}"
-            echo -ne "${GREEN}${SPINNER:0:i}${RED}${SPINNER:i}${NC}"
-            sleep 0.1
-            echo -ne "\r"
-        done
-    }
-
-    spin & SPIN_PID=$!
-
-    apt-get update > /dev/null 2>&1
-    wait $SPIN_PID
+    apt-get update
     apt-get upgrade -y
-    spin & SPIN_PID=$!
-    apt-get dist-upgrade -y > /dev/null 2>&1
-    apt-get autoremove -y > /dev/null 2>&1
-    apt-get autoclean -y > /dev/null 2>&1
+    apt-get dist-upgrade -y
+    apt-get autoremove -y
+    apt-get autoclean -y
     apt-get clean -y
-    wait $SPIN_PID
     echo ""
     echo -e "${GREEN}System update & upgrade completed.${NC}"
     echo ""
