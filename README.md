@@ -54,7 +54,7 @@ bash <(curl -s https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/
 
 #### fully automated install badvpn and udpgw with multifunctional and menu
 
-![image](https://github.com/opiran-club/VPS-Optimizer/assets/130220895/e14b7ac1-819c-4981-9ecd-01e7cbb6e640)
+![image](https://github.com/opiran-club/VPS-Optimizer/assets/130220895/9552249d-f435-4521-871c-cc5ed335744f)
 
 
 ###  ‼️ INSTRUCTION ‼️
