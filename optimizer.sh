@@ -206,9 +206,7 @@ complete_update() {
 
     apt-get update
     apt-get upgrade -y
-    apt-get dist-upgrade -y
     apt-get autoremove -y
-    apt-get autoclean -y
     apt-get clean -y
     echo ""
     echo -e "${GREEN}System update & upgrade completed.${NC}"
@@ -229,11 +227,8 @@ installations() {
     echo ""
     echo -e "${RED}Please wait, it might take a while${NC}"
     echo ""
-
-    apt-get purge firewalld -y > /dev/null 2>&1
     apt-get install certbot nload nethogs autossh ssh iperf sshuttle software-properties-common apt-transport-https iptables lsb-release ca-certificates ubuntu-keyring gnupg2 apt-utils cron bash-completion curl git unzip zip ufw wget preload locales nano vim python3 jq qrencode socat busybox net-tools haveged htop curl -y
-    apt-get install snapd -y > /dev/null 2>&1
-
+    apt-get install snapd -y
     echo ""
     echo -e "${GREEN}Install useful and necessary packages completed.${NC}"
     echo ""
