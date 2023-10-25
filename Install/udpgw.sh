@@ -81,14 +81,14 @@ change_badvpn_port() {
 }
 
 add_extra_badvpn_port() {
-    read -p "Enter the numeric identifier for the new extra UDPGW Port (e.g., 1, 2, 3, ...): " port_identifier
+    read -p "Enter the new extra UDPGW Port (e.g., 7100): " port_identifier
     
     if [[ ! "$port_identifier" =~ ^[0-9]+$ ]]; then
         echo -e "${RED}Invalid numeric identifier. Please enter a valid number.${NC}"
         return
     fi
     
-    new_port=$((7100 + port_identifier))
+    new_port=$port_identifier
 
     if systemctl is-active --quiet "videocall-extra-$port_identifier"; then
         echo -e "${RED}Port $new_port is already in use. Please choose a different identifier.${NC}"
@@ -101,7 +101,7 @@ Description=UDP forwarding for extra BadVPN UDPGW
 After=nss-lookup.target
 
 [Service]
-ExecStart=/bin/badvpn-udpgw --loglevel none --listen-addr 127.0.0.1:$new_port --max-clients 200
+ExecStart=/bin/badvpn-udpgw --loglevel none --listen-addr 127.0.0.1:$port_identifier --max-clients 200
 User=videocall
 
 [Install]
@@ -112,7 +112,7 @@ ENDOFFILE
     systemctl enable "videocall-extra-$port_identifier"
     systemctl start "videocall-extra-$port_identifier"
 
-    echo -e "${GREEN}Extra UDPGW Port $new_port (Identifier $port_identifier) added to a separate BadVPN service${NC}"
+    echo -e "${GREEN}Extra UDPGW Port $port_identifier added to BadVPN service${NC}"
 }
 
 uninstall_badvpn() {
