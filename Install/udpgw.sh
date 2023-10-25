@@ -34,25 +34,24 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 install_badvpn() {
-    udpport=7300
     echo ""
     echo ""
-    printf "Default Port is \e[33m${udpport}\e[0m, leave it blank to use this Port: "
+    printf "Default Port is \e[33m7300\e[0m,"
     echo ""
     echo -ne "${YELLOW}input UDPGW Port :${NC}"
     read udpport
 
-    apt update -y
-    wget -O /bin/badvpn-udpgw https://github.com/opiran-club/VPS-Optimizer/raw/main/Install/badvpn-udpgw &>/dev/null
+    apt-get update -y
+    wget -O /bin/badvpn-udpgw "https://github.com/opiran-club/VPS-Optimizer/raw/main/Install/badvpn-udpgw"
     chmod +x /bin/badvpn-udpgw
-
+    
     cat >  /etc/systemd/system/videocall.service << ENDOFFILE
 [Unit]
 Description=UDP forwarding for badvpn-tun2socks
 After=nss-lookup.target
 
 [Service]
-ExecStart=/bin/badvpn-udpgw --loglevel none --listen-addr 127.0.0.1:${udpport} --max-clients 200
+ExecStart=/bin/badvpn-udpgw --listen-addr 127.0.0.1:${udpport} --max-clients 200
 User=videocall
 
 [Install]
