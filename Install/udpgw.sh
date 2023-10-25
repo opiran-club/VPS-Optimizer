@@ -59,6 +59,7 @@ User=videocall
 WantedBy=multi-user.target
 ENDOFFILE
 
+systemctl daemon-reload
 systemctl enable videocall
 systemctl start videocall
 
@@ -71,10 +72,8 @@ change_badvpn_port() {
         new_port=7300  # Default port
     fi
 
-    # Update the BadVPN service configuration
     sed -i "s/--listen-addr 127.0.0.1:[0-9]*/--listen-addr 127.0.0.1:$new_port/" /etc/systemd/system/videocall.service
 
-    # Restart the BadVPN service to apply the changes
     systemctl daemon-reload
     systemctl restart videocall
 
@@ -83,18 +82,19 @@ change_badvpn_port() {
 
 add_extra_badvpn_port() {
     read -p "Enter the numeric identifier for the new extra UDPGW Port (e.g., 1, 2, 3, ...): " port_identifier
+    
     if [[ ! "$port_identifier" =~ ^[0-9]+$ ]]; then
         echo -e "${RED}Invalid numeric identifier. Please enter a valid number.${NC}"
         return
     fi
+    
     new_port=$((7100 + port_identifier))
 
-    # Check if the new port is already in use
     if systemctl is-active --quiet videocall-extra-$port_identifier; then
         echo -e "${RED}Port $new_port is already in use. Please choose a different identifier.${NC}"
         return
     fi
-    # Create a new service unit file for the extra port
+
     cat >  "/etc/systemd/system/videocall-extra-$port_identifier.service" << ENDOFFILE
 [Unit]
 Description=UDP forwarding for extra BadVPN UDPGW
@@ -108,7 +108,6 @@ User=videocall
 WantedBy=multi-user.target
     ENDOFFILE
 
-    # Reload systemd and start the new service
     systemctl daemon-reload
     systemctl enable "videocall-extra-$port_identifier"
     systemctl start "videocall-extra-$port_identifier"
@@ -130,7 +129,7 @@ uninstall_badvpn() {
 
     if [[ -f /bin/badvpn-udpgw ]]; then
         rm -f /bin/badvpn-udpgw
-    }
+    fi
 
     echo -e "${GREEN}BadVPN uninstalled successfully.${NC}"
 }
