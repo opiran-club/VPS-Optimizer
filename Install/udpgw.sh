@@ -37,9 +37,7 @@ install_badvpn() {
     clear
     echo ""
     echo ""
-    printf "Default Port is \e[33m7300\e[0m,"
-    echo ""
-    echo -ne "${YELLOW}Enter the UDPGW Port (e.g., 7100): ${NC}"
+    echo -ne "${YELLOW}Enter the UDPGW Port (e.g., 7300): ${NC}"
     read port_identifier
         
     if [[ ! "$port_identifier" =~ ^[0-9]+$ ]]; then
@@ -54,7 +52,7 @@ install_badvpn() {
         return
     fi
 
-    apt-get update -y
+    apt-get update -y 
     wget -O /bin/badvpn-udpgw "https://github.com/opiran-club/VPS-Optimizer/raw/main/Install/badvpn-udpgw"
     chmod +x /bin/badvpn-udpgw
     useradd videocall
@@ -73,8 +71,8 @@ WantedBy=multi-user.target
 ENDOFFILE
 
     systemctl daemon-reload
-    systemctl enable "videocall-$port_identifier"
-    systemctl start "videocall-$port_identifier"
+    systemctl enable videocall-$port_identifier
+    systemctl status videocall-7300
 
     echo -e "${GREEN}UDPGW Port $port_identifier added to BadVPN service${NC}"
 
@@ -159,7 +157,7 @@ Description=UDP forwarding for extra BadVPN UDPGW
 After=nss-lookup.target
 
 [Service]
-ExecStart=/bin/badvpn-udpgw --loglevel none --listen-addr 127.0.0.1:$port_identifier --max-clients 200
+ExecStart=/bin/badvpn-udpgw --listen-addr 127.0.0.1:$port_identifier --max-clients 200
 User=videocall
 
 [Install]
@@ -217,12 +215,14 @@ stop_badvpn() {
 }
 
 status() {
-    for service in $(systemctl list-units --type=service --full --all | grep 'videocall-[0-9]*.service' -o); do
-        port=$(echo $service | awk -F'-' '{print $3}')
-        if systemctl is-active --quiet $service; then
-            echo -e "${CYAN}BadVPN Service (Port $port) Status:${GREEN} Running${NC}"
-        else
-            echo -e "${CYAN}BadVPN Service Status:${RED} Not Running${NC}"
+    for service in $(systemctl list-units --type=service --full --all | grep 'videocall-.*\.service' -o); do
+        port=$(echo $service | sed -n 's/^videocall-\(.*\)\.service$/\1/p')
+        if [ -n "$port" ]; then
+            if systemctl is-active --quiet $service; then
+                echo -e "${CYAN}BadVPN Service (Port $port) Status:${GREEN} Running${NC}"
+            else
+                echo -e "${CYAN}BadVPN Service (Port $port) Status:${RED} Not Running${NC}"
+            fi
         fi
     done
     echo ""
