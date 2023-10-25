@@ -41,7 +41,7 @@ echo -ne "${YELLOW}input UDPGW Port :${NC}"
 read udpport
 
 apt update -y
-wget -O /bin/badvpn-udpgw https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/install/badvpn-udpgw &>/dev/null
+wget -O /bin/badvpn-udpgw https://github.com/opiran-club/VPS-Optimizer/raw/main/Install/badvpn-udpgw &>/dev/null
 chmod +x /bin/badvpn-udpgw
 
 cat >  /etc/systemd/system/videocall.service << ENDOFFILE
