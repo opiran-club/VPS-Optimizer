@@ -86,16 +86,14 @@ add_extra_badvpn_port() {
     if [[ ! "$port_identifier" =~ ^[0-9]+$ ]]; then
         echo -e "${RED}Invalid numeric identifier. Please enter a valid number.${NC}"
         return
-    }
-
-    new_port=$((7100 + port_identifier))  # Calculate the port based on the identifier
+    fi
+    new_port=$((7100 + port_identifier))
 
     # Check if the new port is already in use
     if systemctl is-active --quiet videocall-extra-$port_identifier; then
         echo -e "${RED}Port $new_port is already in use. Please choose a different identifier.${NC}"
         return
-    }
-
+    fi
     # Create a new service unit file for the extra port
     cat >  "/etc/systemd/system/videocall-extra-$port_identifier.service" << ENDOFFILE
 [Unit]
