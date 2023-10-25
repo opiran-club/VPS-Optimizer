@@ -1,4 +1,5 @@
 #!/bin/bash
+
 CYAN="\e[96m"
 GREEN="\e[92m"
 YELLOW="\e[93m"
@@ -31,6 +32,7 @@ if [ "$EUID" -ne 0 ]; then
     echo -e "\n ${RED}This script must be run as root.${NC}"
     exit 1
 fi
+
 install_badvpn() {
 udpport=7300
 echo ""
