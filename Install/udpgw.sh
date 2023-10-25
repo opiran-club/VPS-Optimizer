@@ -44,6 +44,7 @@ install_badvpn() {
     apt-get update -y
     wget -O /bin/badvpn-udpgw "https://github.com/opiran-club/VPS-Optimizer/raw/main/Install/badvpn-udpgw"
     chmod +x /bin/badvpn-udpgw
+    useradd videocall
     
     cat >  /etc/systemd/system/videocall.service << ENDOFFILE
 [Unit]
@@ -151,7 +152,6 @@ stop_badvpn() {
 
 status() {
     main_service="videocall"
-    port_pattern="--listen-addr 127.0.0.1:"
     
     if systemctl is-active --quiet $main_service; then
         echo -e "${CYAN}Main Service Status:${GREEN} Running${NC}"
@@ -159,8 +159,8 @@ status() {
         echo -e "${CYAN}Main Service Status:${RED} Not Running${NC}"
     fi
 
-    for service in $(systemctl list-units --type=service --full --all | grep -o 'videocall-extra-[0-9]*.service'); do
-        port=$(grep -oP "$port_pattern\K\d+" /etc/systemd/system/$service)
+    for service in $(systemctl list-units --type=service --full --all | grep 'videocall-extra-[0-9]*.service' -o); do
+        port=$(echo $service | awk -F'-' '{print $3}')
         if systemctl is-active --quiet $service; then
             echo -e "${CYAN}Extra BadVPN Service (Port $port) Status:${GREEN} Running${NC}"
         else
