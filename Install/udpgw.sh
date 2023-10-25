@@ -119,17 +119,25 @@ uninstall_badvpn() {
     if systemctl is-active --quiet videocall; then
         systemctl stop videocall
         systemctl disable videocall
+        systemctl reset-failed videocall
     fi
-    
+
     for service in $(systemctl list-units --type=service --full --all | grep -o 'videocall-extra-[0-9]*.service'); do
         systemctl stop $service
         systemctl disable $service
-        systemctl is-active --quiet $service && systemctl reset-failed $service
+        systemctl reset-failed $service
     done
 
     if [[ -f /bin/badvpn-udpgw ]]; then
         rm -f /bin/badvpn-udpgw
     fi
+
+    # Delete service files
+    for service_file in /etc/systemd/system/videocall*.service; do
+        if [[ -f "$service_file" ]]; then
+            rm -f "$service_file"
+        fi
+    done
 
     echo -e "${GREEN}BadVPN uninstalled successfully.${NC}"
 }
