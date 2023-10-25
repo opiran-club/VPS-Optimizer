@@ -55,7 +55,7 @@ bash <(curl -s https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/
 ###  ‼️ INSTRUCTION ‼️
    
 ```
-bash <(curl -s https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/install/udpgw.sh --ipv4)
+wget -N https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/Install/udpgw.sh && bash udpgw.sh
 ```
 
 ---------------------------------------------------------------------------------------------------------------------------------------
