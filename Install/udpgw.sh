@@ -178,7 +178,7 @@ while true; do
     clear
     logo
     echo -e "\e[93m╔═══════════════════════════════════════════════╗\e[0m"  
-    echo -e "\e[93m║            \e[94mBADVPN (udpgw)         \e[93m║\e[0m"   
+    echo -e "\e[93m║            \e[94mBADVPN (udpgw)                     \e[93m║\e[0m"   
     echo -e "\e[93m╠═══════════════════════════════════════════════╣\e[0m"
     echo ""
     echo -e "${BLUE}   ${tg_title}   ${NC}"
