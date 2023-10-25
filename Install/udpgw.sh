@@ -219,9 +219,9 @@ while true; do
             echo ""
             echo -e "${GREEN} 0) ${NC} Back to main menu ${NC}"
             echo -ne "${GREEN}Select an option: ${NC}  "
-            read choice
+            read choice2
         
-            case $choice in
+            case $choice2 in
                  1)
                     change_badvpn_port
                     ;;
@@ -232,6 +232,10 @@ while true; do
                     return
                     ;;
             esac
+
+                echo -e "\n${RED}Press Enter to continue... ${NC}"
+                read
+            done
         ;;
         E|e)
             echo "Exiting..."
