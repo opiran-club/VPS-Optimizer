@@ -25,7 +25,7 @@ EOF
 )
 
 logo() {
-echo -e "\033[1;34m$logo\033[0m"
+    echo -e "\033[1;34m$logo\033[0m"
 }
 
 if [ "$EUID" -ne 0 ]; then
@@ -34,19 +34,19 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 install_badvpn() {
-udpport=7300
-echo ""
-echo ""
-printf "Default Port is \e[33m${udpport}\e[0m, let it blank to use this Port: "
-echo ""
-echo -ne "${YELLOW}input UDPGW Port :${NC}"
-read udpport
+    udpport=7300
+    echo ""
+    echo ""
+    printf "Default Port is \e[33m${udpport}\e[0m, leave it blank to use this Port: "
+    echo ""
+    echo -ne "${YELLOW}input UDPGW Port :${NC}"
+    read udpport
 
-apt update -y
-wget -O /bin/badvpn-udpgw https://github.com/opiran-club/VPS-Optimizer/raw/main/Install/badvpn-udpgw &>/dev/null
-chmod +x /bin/badvpn-udpgw
+    apt update -y
+    wget -O /bin/badvpn-udpgw https://github.com/opiran-club/VPS-Optimizer/raw/main/Install/badvpn-udpgw &>/dev/null
+    chmod +x /bin/badvpn-udpgw
 
-cat >  /etc/systemd/system/videocall.service << ENDOFFILE
+    cat >  /etc/systemd/system/videocall.service << ENDOFFILE
 [Unit]
 Description=UDP forwarding for badvpn-tun2socks
 After=nss-lookup.target
@@ -59,11 +59,11 @@ User=videocall
 WantedBy=multi-user.target
 ENDOFFILE
 
-systemctl daemon-reload
-systemctl enable videocall
-systemctl start videocall
+    systemctl daemon-reload
+    systemctl enable videocall
+    systemctl start videocall
 
-echo -e "${GREEN}Badvpn installed and started successfuly on port: ${YELLOW}$udpport ${NC}"
+    echo -e "${GREEN}Badvpn installed and started successfully on port: ${YELLOW}$udpport ${NC}"
 }
 
 change_badvpn_port() {
@@ -90,7 +90,7 @@ add_extra_badvpn_port() {
     
     new_port=$((7100 + port_identifier))
 
-    if systemctl is-active --quiet videocall-extra-$port_identifier; then
+    if systemctl is-active --quiet "videocall-extra-$port_identifier"; then
         echo -e "${RED}Port $new_port is already in use. Please choose a different identifier.${NC}"
         return
     fi
@@ -101,12 +101,12 @@ Description=UDP forwarding for extra BadVPN UDPGW
 After=nss-lookup.target
 
 [Service]
-ExecStart=/bin/badvpn-udpgw --loglevel none --listen-addr 127.0.0.1:<new_port> --max-clients 200
+ExecStart=/bin/badvpn-udpgw --loglevel none --listen-addr 127.0.0.1:$new_port --max-clients 200
 User=videocall
 
 [Install]
 WantedBy=multi-user.target
-    ENDOFFILE
+ENDOFFILE
 
     systemctl daemon-reload
     systemctl enable "videocall-extra-$port_identifier"
@@ -174,7 +174,7 @@ status() {
 while true; do
     title_text="BADVPN (udpgw) "
     tg_title="https://t.me/OPIranCluB"
-    yt_title="youtube.com/@opiran-inistitute"
+    yt_title="youtube.com/@opiran-institute"
     clear
     logo
     echo -e "\e[93m╔═══════════════════════════════════════════════╗\e[0m"  
@@ -201,7 +201,6 @@ while true; do
     read choice
 
     case $choice in
- 
         1)
             install_badvpn
             ;;
@@ -212,31 +211,32 @@ while true; do
             uninstall_badvpn
             ;;
         4)
-            clear
-            echo ""
-            echo -e "${GREEN} 1) ${NC} Modify port ${NC}"
-            echo -e "${GREEN} 2) ${NC} Add extra port ${NC}"
-            echo ""
-            echo -e "${GREEN} 0) ${NC} Back to main menu ${NC}"
-            echo -ne "${GREEN}Select an option: ${NC}  "
-            read choice2
+            while true; do
+                clear
+                echo ""
+                echo -e "${GREEN} 1) ${NC} Modify port ${NC}"
+                echo -e "${GREEN} 2) ${NC} Add extra port ${NC}"
+                echo ""
+                echo -e "${GREEN} 0) ${NC} Back to the main menu ${NC}"
+                echo -ne "${GREEN}Select an option: ${NC}  "
+                read choice2
         
-            case $choice2 in
-                 1)
-                    change_badvpn_port
-                    ;;
-                2)
-                    add_extra_badvpn_port
-                    ;;
-                0)
-                    return
-                    ;;
-            esac
+                case $choice2 in
+                    1)
+                        change_badvpn_port
+                        ;;
+                    2)
+                        add_extra_badvpn_port
+                        ;;
+                    0)
+                        break
+                        ;;
+                esac
 
                 echo -e "\n${RED}Press Enter to continue... ${NC}"
                 read
             done
-        ;;
+            ;;
         E|e)
             echo "Exiting..."
             exit 0
@@ -244,7 +244,7 @@ while true; do
         *)
             echo "Invalid choice. Please enter a valid option."
             ;;
-    esac
+    done
 
     echo -e "\n${RED}Press Enter to continue... ${NC}"
     read
