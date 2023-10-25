@@ -244,7 +244,7 @@ while true; do
         *)
             echo "Invalid choice. Please enter a valid option."
             ;;
-    done
+    esac
 
     echo -e "\n${RED}Press Enter to continue... ${NC}"
     read
