@@ -27,6 +27,7 @@ RED="\e[91m"
 BLUE="\e[94m "
 MAGENTA="\e[95m"
 NC="\e[0m"
+BOLD=$(tput bold)
 
 fun_bar() {
   local title="$1"
@@ -41,7 +42,7 @@ fun_bar() {
   ) > /dev/null 2>&1 &
 
   tput civis
-  echo -ne "  ${BOLD}${YELLOW}$title...${BOLD}- ${YELLOW}["
+  echo -ne "  ${BOLD}${YELLOW} $title   ${BOLD}- ${YELLOW}["
   while true; do
     for ((i=0; i<18; i++)); do
       echo -ne "${RED}#"
