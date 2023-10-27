@@ -564,6 +564,9 @@ check_os() {
     fi
 }
 
+ask_bbr_version_1() {
+wget --no-check-certificate -O /opt/bbr.sh https://github.com/teddysun/across/raw/master/bbr.sh && chmod 755 /opt/bbr.sh && bash /opt/bbr.sh
+}
 ask_bbr_version() {
     clear
     title="Select a TCP congestion control"
@@ -769,7 +772,7 @@ clear
             fun_bar "Create swap file with 512mb" swap_maker_1
             fun_bar "Updating sysctl configuration" remove_old_sysctl
             fun_bar "Updating and Modifying SSH configuration" remove_old_ssh_conf
-            ask_bbr_version
+            fun_bar "(Press Enter) TCP BBR common script (Press Enter) " ask_bbr_version_1
             final
             ;;
         2)
