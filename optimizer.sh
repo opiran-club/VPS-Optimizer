@@ -28,6 +28,37 @@ BLUE="\e[94m "
 MAGENTA="\e[95m"
 NC="\e[0m"
 
+fun_bar() {
+  local title="$1"
+  local command1="$2"
+  local command2="$3"
+
+  (
+    [[ -e $HOME/fim ]] && rm $HOME/fim
+    $command1 -y > /dev/null 2>&1
+    $command2 -y > /dev/null 2>&1
+    touch $HOME/fim
+  ) > /dev/null 2>&1 &
+
+  tput civis
+  echo -ne "  ${BOLD}${YELLOW}$title...${BOLD}- ${YELLOW}["
+  while true; do
+    for ((i=0; i<18; i++)); do
+      echo -ne "${RED}#"
+      sleep 0.1s
+    done
+
+    [[ -e "$HOME/fim" ]] && rm "$HOME/fim" && break
+    echo -e "${YELLOW}]"
+    sleep 1s
+    tput cuu1
+    tput dl1
+    echo -ne "  ${BOLD}${YELLOW}$title...${BOLD}- ${YELLOW}["
+  done
+  echo -e "${YELLOW}]${WHITE} -${GREEN} DONE!${WHITE}"
+  tput cnorm
+}
+
 if [ "$EUID" -ne 0 ]; then
 echo -e "\n ${RED}This script must be run as root.${NC}"
 exit 1
@@ -352,6 +383,29 @@ swap_maker() {
     press_enter
 }
 
+swap_maker_1() {
+    remove_all_swap() {
+    for item in $swap_files $swap_partitions; do
+        swapoff "$item"
+        rm -f "$item"
+    done
+    }
+    remove_all_swap
+    swap_size="512M"
+    chmod 600 /swap
+    mkswap /swap
+    swapon /swap
+    echo "/swap swap swap defaults 0 0" >> /etc/fstab
+    swapon -s | grep '/swap'
+    swap_value=60
+    if grep -q "^vm.swappiness" /etc/sysctl.conf; then
+        sed -i "s/^vm.swappiness=.*/vm.swappiness=$swap_value/" /etc/sysctl.conf
+    else
+        echo "vm.swappiness=$swap_value" >> /etc/sysctl.conf
+    fi
+    sysctl -p
+}
+
 enable_ipv6_support() {
     sysctl -w net.ipv4.ip_forward=1
     sysctl -w net.ipv6.conf.all.forwarding=1
@@ -597,11 +651,8 @@ sysctl -p
             cp /etc/sysctl.conf /etc/sysctl.conf.bak
             echo -e "${YELLOW}Optimizing kernel parameters for TCP-BBR (Bottleneck Bandwidth and Round-Trip Propagation Time) ${NC}"
             echo ""
-cat <<EOL >> /etc/sysctl.conf
-net.core.default_qdisc = fq
-net.ipv4.tcp_congestion_control = bbr
-EOL
-sysctl -p
+            wget --no-check-certificate -O /opt/bbr.sh https://github.com/teddysun/across/raw/master/bbr.sh && chmod 755 /opt/bbr.sh && bash /opt/bbr.sh
+
             if [ $? -eq 0 ]; then
                 echo -e "${GREEN}Kernel parameter optimization for TCP-BBR was successful.${NC}"
             else
@@ -664,16 +715,8 @@ sysctl -p >/dev/null 2>&1
     esac
     press_enter
 }
-    sourcelist
-    set_timezone
-    fix_dns
-    complete_update
-    installations
-    enable_packages
-    swap_maker
-    remove_old_sysctl
-    remove_old_ssh_conf
-    ask_bbr_version
+
+final() {
 clear
 logo
 echo ""
@@ -688,3 +731,69 @@ echo ""
 printf "\e[93m+-------------------------------------+\e[0m\n" 
 echo ""
 ask_reboot
+}
+
+while true; do
+clear
+    tg_title="https://t.me/OPIranCluB"
+    yt_title="youtube.com/@opiran-inistitute"
+    clear
+    logo
+    echo -e "\e[93m╔═══════════════════════════════════════════════╗\e[0m"  
+    echo -e "\e[93m║            \e[94mVPS OPTIMIZER                       \e[93m║\e[0m"   
+    echo -e "\e[93m╠═══════════════════════════════════════════════╣\e[0m"     
+    echo ""
+    echo -e "${BLUE}   ${tg_title}   ${NC}"
+    echo -e "${BLUE}   ${yt_title}   ${NC}"
+    echo ""
+    printf "\e[93m+-------------------------------------+\e[0m\n" 
+    echo ""
+    echo ""
+    echo -e "${GREEN} 1) ${NC} Optimizer (1 click) ${NC}"
+    echo -e "${GREEN} 2) ${NC} Optimizer (step by step) ${NC}"
+    echo ""
+    echo -e "${GREEN} E) ${NC} Exit the menu${NC}"
+    echo ""
+    echo -ne "${GREEN}Select an option: ${NC}  "
+    read choice
+
+    case $choice in
+ 
+        1)
+        clear
+            fun_bar "Update and replace source list" sourcelist
+            fun_bar "Update and replace DNS nameserver" fix_dns
+            fun_bar "Complete update and upgrade" complete_update
+            fun_bar "Install usefull packages" installations
+            fun_bar "Enable some services" enable_packages
+            fun_bar "Create swap file with 512mb" swap_maker_1
+            fun_bar "Updating sysctl configuration" remove_old_sysctl
+            fun_bar "Updating and Modifying SSH configuration" remove_old_ssh_conf
+            ask_bbr_version
+            final
+            ;;
+        2)
+            sourcelist
+            set_timezone
+            fix_dns
+            complete_update
+            installations
+            enable_packages
+            swap_maker
+            remove_old_sysctl
+            remove_old_ssh_conf
+            ask_bbr_version
+            final
+            ;;
+        E|e)
+            echo "Exiting..."
+            exit 0
+            ;;
+        *)
+            echo "Invalid choice. Please enter a valid option."
+            ;;
+    esac
+
+    echo -e "\n${RED}Press Enter to continue... ${NC}"
+    read
+done
