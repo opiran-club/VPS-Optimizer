@@ -8,6 +8,7 @@
 Supported Debian base (Debian , Ubuntu) with X86 & Arm64 architecture 
    
 ---------------------------------------------------------------------------------------------------------------------------------------
+## Complete optimizer with BBR versions
 
 ###  ‼️ INSTRUCTION ‼️
 
@@ -19,7 +20,7 @@ apt install curl -y && bash <(curl -s https://raw.githubusercontent.com/opiran-c
 
 ---------------------------------------------------------------------------------------------------------------------------------------
 
-### Xanmod kernel and BBRv3 
+### Xanmod kernel and BBRv3 seperated script
 
 ###  ‼️ INSTRUCTION ‼️
 
