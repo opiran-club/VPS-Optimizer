@@ -78,7 +78,6 @@ sourcelist() {
                             cp /etc/apt/sources.list /etc/apt/sources.list.bak
                             rm -rf /etc/apt/sources.list
 
-                            # Provide a choice for x86 or arm64
                             echo -ne "${GREEN}Choose your architecture (x86/arm64) [x86/arm64]: ${NC}"
                             read architecture
                             case $architecture in
@@ -145,9 +144,40 @@ set_timezone() {
     echo ""
     printf "\e[93m+-------------------------------------+\e[0m\n"
 
-    # Use an IP geolocation service to get the country based on the user's IP address
-    timezone=$(curl -s https://api.country.is | jq -r .country)
-    sudo timedatectl set-timezone $timezone
+    set_timezone() {
+    echo
+    yellow_msg 'Setting TimeZone based on VPS IP address...'
+    sleep 0.5
+
+    get_public_ip() {
+        local ip_sources=("https://ipv4.icanhazip.com" "https://api.ipify.org" "https://ipv4.ident.me/")
+        local ip
+
+        for source in "${ip_sources[@]}"; do
+            ip=$(curl -s "$source")
+            if [ -n "$ip" ]; then
+                echo "$ip"
+                return 0
+            fi
+        done
+
+        echo -e "${RED}Error: Failed to fetch public IP address from known sources. ${NC}"
+        return 1
+    }
+
+    public_ip=$(get_public_ip)
+
+    if [ $? -eq 0 ]; then
+        location_info=$(curl -s "http://ip-api.com/json/$public_ip")
+        timezone=$(echo "$location_info" | jq -r '.timezone')
+
+        sudo timedatectl set-timezone "$timezone"
+
+        echo -e "${YELLOW}Timezone has been set to ${GREEN}$timezone based on your country code.${NC}"
+    else
+        echo -e "${RED}Error: Failed to fetch public IP address from known sources. ${NC}"
+    fi
+
     echo ""
     echo -e "${YELLOW}Timezone has been set to ${GREEN}$timezone based on your country code.${NC}"
     echo ""
