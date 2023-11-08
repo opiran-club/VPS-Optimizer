@@ -26,7 +26,7 @@
 
 ###  ‼️ INSTRUCTION ‼️
 
-#### 👉 Debian Base (Ubuntu & Debian) x86 & arm64
+#### 👉 Debian Base (Ubuntu & Debian) x86 & Arm64
    
 ```
 apt install curl -y && bash <(curl -s https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/optimizer.sh --ipv4)
@@ -42,7 +42,7 @@ apt install curl -y && bash <(curl -s https://raw.githubusercontent.com/opiran-c
 
 ###  ‼️ INSTRUCTION ‼️
 
-#### 👉 UBUNTU / DEBIAN
+#### 👉 UBUNTU / DEBIAN X86
    
 ```
 bash <(curl -s https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/bbrv3.sh --ipv4)
