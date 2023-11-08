@@ -66,46 +66,67 @@ exit 1
 fi
 
 sourcelist() {
-clear
-title="Source list adjustment to officials"
+    clear
+    title="Source list adjustment to officials"
     logo
     echo ""
     echo -e "${CYAN}$title ${NC}"
     echo ""
-    printf "\e[93m+-------------------------------------+\e[0m\n" 
+    printf "\e[93m+-------------------------------------+\e[0m\n"
     echo ""
-if [ -f /etc/os-release ]; then
-    source /etc/os-release
-    case $ID in
-        "ubuntu")
-        echo ""
-        if grep -q "archive.ubuntu.com" /etc/apt/sources.list; then return
-        else
-            echo -ne "${GREEN}Your source list is not archive.ubuntu, lets update it? [y/n]: ${NC}"
-            read source
-            case $source in
-                [Yy])
-                cp /etc/apt/sources.list /etc/apt/sources.list.bak
-                rm -rf /etc/apt/sources.list
-                if wget -N -4 -O /etc/apt/sources.list https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/Install/ubuntu-source; then
-                    echo -e "${GREEN}Your source list was updated successfully.${NC}"
+
+    if [ -f /etc/os-release ]; then
+        source /etc/os-release
+        case $ID in
+            "ubuntu")
+                echo ""
+                if grep -q "archive.ubuntu.com" /etc/apt/sources.list; then
+                    return
                 else
-                    echo -e "${RED}Failed to update your source list.${NC}"
-                    cp /etc/apt/sources.list.bak /etc/apt/sources.list
+                    echo -ne "${GREEN}Your source list is not archive.ubuntu, let's update it? [y/n]: ${NC}"
+                    read source
+                    case $source in
+                        [Yy])
+                            cp /etc/apt/sources.list /etc/apt/sources.list.bak
+                            rm -rf /etc/apt/sources.list
+
+                            # Provide a choice for x86 or arm64
+                            echo -ne "${GREEN}Choose your architecture (x86/arm64) [x86/arm64]: ${NC}"
+                            read architecture
+                            case $architecture in
+                                "x86")
+                                    source_url="https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/Install/ubuntu-source"
+                                    ;;
+                                "arm64")
+                                    source_url="https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/Install/arm64-ubuntu"
+                                    ;;
+                                *)
+                                    echo -e "${RED}Invalid choice. No changes made.${NC}"
+                                    return
+                                    ;;
+                            esac
+
+                            if wget -N -4 -O /etc/apt/sources.list "$source_url"; then
+                                echo -e "${GREEN}Your source list was updated successfully.${NC}"
+                            else
+                                echo -e "${RED}Failed to update your source list.${NC}"
+                                cp /etc/apt/sources.list.bak /etc/apt/sources.list
+                            fi
+                            ;;
+                        [Nn])
+                            return
+                            ;;
+                        *)
+                            return
+                            ;;
+                    esac
                 fi
                 ;;
-                [Nn])
-                return
-                ;;
-                *)
-                return
-                ;;
-            esac
-        fi
-        ;;
-    esac
-fi
+        esac
+    fi
 }
+
+
 press_enter() {
     echo -e "\n ${RED}Press Enter to continue... ${NC}"
     read
@@ -134,41 +155,15 @@ set_timezone() {
     echo ""
     echo -e "${CYAN}$title ${NC}"
     echo ""
-    printf "\e[93m+-------------------------------------+\e[0m\n" 
+    printf "\e[93m+-------------------------------------+\e[0m\n"
 
-    
-    regions=("Asia/Tehran" "Europe/Istanbul" "America/Los_Angeles")
-    
-    additional_timezones=("Asia/Tokyo" "Europe/London" "Australia/Sydney")
-    
-    timezones=("${regions[@]}" "${additional_timezones[@]}")
-    
-    for ((i = 0; i < ${#timezones[@]}; i++)); do
-        echo -e "${RED}$((i+1)). ${YELLOW}${timezones[i]}${NC}"
-    done
-
-    echo -e "${RED}$((i+1)). ${YELLOW}NO CHANGE TIMEZONE${NC}"
+    # Use an IP geolocation service to get the country based on the user's IP address
+    timezone=$(curl -s https://api.country.is | jq -r .country)
+    sudo timedatectl set-timezone $timezone
     echo ""
-    echo -ne "${CYAN}Enter your choice [1-$((i+1))]:${NC} "
-    read choice
-    
-    if [ "$choice" -ge 1 ] && [ "$choice" -le $((i+1)) ]; then
-        if [ "$choice" -eq $((i+1)) ]; then
-            echo -e "${RED}No changes made, press enter to continue optimization${NC}"
-            press_enter
-        else
-            timezone="${timezones[choice-1]}"
-            sudo timedatectl set-timezone $timezone
-            echo ""
-            echo -e "${YELLOW}Timezone has been set to ${GREEN}$timezone.${NC}"
-            echo ""
-            press_enter
-        fi
-    else
-        echo -e "${RED}Invalid choice. No changes made.${NC}"
-        press_enter
-        return 1
-    fi
+    echo -e "${YELLOW}Timezone has been set to ${GREEN}$timezone based on your country code.${NC}"
+    echo ""
+    press_enter
 }
 
 logo=$(cat << "EOF"
