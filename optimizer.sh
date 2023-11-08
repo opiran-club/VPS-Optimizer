@@ -3,18 +3,6 @@
 # VPS OPtimizer Bash Script
 # Author: github.com/opiran-club
 #
-# This script is designed to simplify the installation and configuration as a optimizer vps
-# It provides options to install required packages, configure sysctl, ssh, swap.
-# download the appropriate configuration and program.
-#
-# supported architectures: x86_64, amd64
-# Supported operating systems: Ubuntu 18.04/20.04/22.04 , Debian 10/11, CentOS 7/8.
-# Exceptions Ubuntu versions prior to 18.04 and Debian versions prior to 10 are untested.
-#
-# Usage:
-#   - Run the script with root privileges.
-#   - Follow the on-screen prompts to install, configure, or uninstall the tunnel.
-#
 # For more information and updates, visit github.com/opiran-club and @opiranclub on telegram.
 #
 # Disclaimer:
@@ -364,7 +352,7 @@ swap_maker() {
     printf "\e[93m+-------------------------------------+\e[0m\n" 
     echo ""
     echo ""
-    swap_value=60
+    swap_value=10
     if grep -q "^vm.swappiness" /etc/sysctl.conf; then
         sed -i "s/^vm.swappiness=.*/vm.swappiness=$swap_value/" /etc/sysctl.conf
     else
@@ -393,7 +381,7 @@ swap_maker_1() {
     swapon /swap
     echo "/swap swap swap defaults 0 0" >> /etc/fstab
     swapon -s | grep '/swap'
-    swap_value=60
+    swap_value=10
     if grep -q "^vm.swappiness" /etc/sysctl.conf; then
         sed -i "s/^vm.swappiness=.*/vm.swappiness=$swap_value/" /etc/sysctl.conf
     else
@@ -435,6 +423,9 @@ remove_old_sysctl() {
 # System Configuration Settings for Improved Performance and Security
 
 fs.file-max = 1000000
+net.core.default_qdisc = fq_codel
+net.core.optmem_max = 65535
+net.ipv4.tcp_rmem = 8192 1048576 16777216
 net.core.rmem_default = 1048576
 net.core.rmem_max = 2097152
 net.core.wmem_default = 1048576
@@ -442,6 +433,22 @@ net.core.wmem_max = 2097152
 net.core.netdev_max_backlog = 16384
 net.core.somaxconn = 32768
 net.ipv4.tcp_fastopen = 3
+net.ipv4.tcp_ecn = 1
+net.ipv4.tcp_fin_timeout = 25
+net.ipv4.tcp_max_orphans = 819200
+net.ipv4.tcp_max_syn_backlog = 20480
+net.ipv4.tcp_max_tw_buckets = 1440000
+net.ipv4.tcp_mem = 65536 131072 262144
+net.ipv4.tcp_mtu_probing = 1
+net.ipv4.tcp_retries2 = 8
+net.ipv4.tcp_slow_start_after_idle = 0
+net.ipv4.tcp_window_scaling = 1
+net.unix.max_dgram_qlen = 50
+vm.min_free_kbytes = 65536
+vm.vfs_cache_pressure=50
+net.ipv4.ip_forward = 1
+net.ipv4.tcp_wmem = 8192 1048576 16777216
+net.ipv4.tcp_notsent_lowat = 16384
 net.ipv4.tcp_mtu_probing = 1
 net.ipv4.tcp_retries2 = 8
 net.ipv4.tcp_slow_start_after_idle = 0
@@ -487,7 +494,6 @@ Ciphers aes256-ctr,chacha20-poly1305@openssh.com
 TCPKeepAlive yes
 ClientAliveInterval 3000
 ClientAliveCountMax 100
-PermitRootLogin yes
 AllowAgentForwarding yes
 AllowTcpForwarding yes
 GatewayPorts yes
@@ -594,14 +600,6 @@ ask_bbr_version() {
             echo -e "${YELLOW}Optimizing kernel parameters for TCP-Tweaker ${NC}"
             echo ""
 cat <<EOL >> /etc/sysctl.conf
-#PH56
-net.ipv4.tcp_window_scaling = 1
-net.core.rmem_max = 16777216
-net.core.wmem_max = 16777216
-net.ipv4.tcp_rmem = 4096 87380 16777216
-net.ipv4.tcp_wmem = 4096 16384 16777216
-net.ipv4.tcp_low_latency = 1
-net.ipv4.tcp_slow_start_after_idle = 0
 net.core.default_qdisc = fq
 net.ipv4.tcp_congestion_control = bbr
 EOL
@@ -760,7 +758,6 @@ clear
  
         1)
         clear
-            fun_bar "Update and replace source list" sourcelist
             fun_bar "Update and replace DNS nameserver" fix_dns
             fun_bar "Complete update and upgrade" complete_update
             fun_bar "Install usefull packages" installations
