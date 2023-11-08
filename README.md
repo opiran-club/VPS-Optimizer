@@ -4,23 +4,8 @@
  - Upgrade, Time setting, Install Useful Packages, Optimize the SYSCTL, Optimize SSH
  - TCP congestion control (Tweaker, Westwood, BBR, BBRv3, Hybla)
  - Swap file + vm.swapiness value 
-   
- ##### Details configuration
- - Enable Packages at Server Boot.
- - Create & Enable SWAP File. (Default is 2Gb)
- - Enable IPv6 Support.
- - Clean the Old SYSCTL Settings.
- - SWAP
- - Network
- - Back up the original sshd_config file
- - Disable DNS lookups for connecting clients
- - Enable compression for SSH connections
- - Remove less efficient encryption ciphers
- - Enable and Configure TCP keep-alive messages
- - Allow agent forwarding
- - Allow TCP forwarding
- - Enable gateway ports
- - Enable tunneling
+
+Supported Debian base (Debian , Ubuntu) with X86 & Arm64 architecture 
    
 ---------------------------------------------------------------------------------------------------------------------------------------
 
