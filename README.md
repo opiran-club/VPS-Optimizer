@@ -21,10 +21,6 @@ apt install curl -y && bash <(curl -s https://raw.githubusercontent.com/opiran-c
 
 ### Xanmod kernel and BBRv3 
 
-![image](https://github.com/opiran-club/VPS-Optimizer/assets/130220895/edb14f2d-7558-4808-9ee6-f69e58cd863a)
-
-
-
 ###  ‼️ INSTRUCTION ‼️
 
 #### 👉 UBUNTU / DEBIAN X86
@@ -32,14 +28,12 @@ apt install curl -y && bash <(curl -s https://raw.githubusercontent.com/opiran-c
 ```
 bash <(curl -s https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/bbrv3.sh --ipv4)
 ```
-
+![image](https://github.com/opiran-club/VPS-Optimizer/assets/130220895/edb14f2d-7558-4808-9ee6-f69e58cd863a)
 ---------------------------------------------------------------------------------------------------------------------------------------
 
 ### Badvpn (UDPGW)
 
 #### fully automated install badvpn and udpgw with multifunctional and menu
-
-![image](https://github.com/opiran-club/VPS-Optimizer/assets/130220895/9552249d-f435-4521-871c-cc5ed335744f)
 
 
 ###  ‼️ INSTRUCTION ‼️
@@ -47,7 +41,7 @@ bash <(curl -s https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/
 ```
 wget -N https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/Install/udpgw.sh && bash udpgw.sh
 ```
-
+![image](https://github.com/opiran-club/VPS-Optimizer/assets/130220895/9552249d-f435-4521-871c-cc5ed335744f)
 ---------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------
 ### Credits
