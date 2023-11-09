@@ -78,17 +78,20 @@ sourcelist() {
                             cp /etc/apt/sources.list /etc/apt/sources.list.bak
                             rm -rf /etc/apt/sources.list
 
-                            echo -ne "${GREEN}Choose your architecture (x86/arm64) [x86/arm64]: ${NC}"
-                            read architecture
-                            case $architecture in
-                                "x86")
+                            arch=$(uname -m)
+
+                            case $arch in
+                                i?86)
                                     source_url="https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/Install/ubuntu-source"
                                     ;;
-                                "arm64")
+                                x86_64)
+                                    source_url="https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/Install/ubuntu-source"
+                                    ;;
+                                arm*)
                                     source_url="https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/Install/arm64-ubuntu"
                                     ;;
                                 *)
-                                    echo -e "${RED}Invalid choice. No changes made.${NC}"
+                                    echo -e "${RED}Unsupported architecture. No changes made.${NC}"
                                     return
                                     ;;
                             esac
