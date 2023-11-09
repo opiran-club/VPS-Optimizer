@@ -166,7 +166,7 @@ sourcelist() {
                                     ;;
                             esac
 
-                            if wget -N -4 -O /etc/apt/sources.list "$source_url"; then
+                            if wget -N -4 /etc/apt/sources.list "$source_url"; then
                                 echo -e "${GREEN}Your source list was updated successfully.${NC}"
                             else
                                 echo -e "${RED}Failed to update your source list.${NC}"
