@@ -804,8 +804,8 @@ clear
     clear
     logo
     echo -e "\e[93m╔═══════════════════════════════════════════════╗\e[0m"  
-    echo -e "\e[93m║            \e[94mVPS OPTIMIZER                       \e[93m║\e[0m"   
-    echo -e "\e[93m╠═══════════════════════════════════════════════╣\e[0m"     
+    echo -e "\e[93m║            \e[94mVPS OPTIMIZER                      \e[93m║\e[0m"   
+    echo -e "\e[93m╠═══════════════════════════════════════════════╣\e[0m"
     echo ""
     echo -e "${BLUE}   ${tg_title}   ${NC}"
     echo -e "${BLUE}   ${yt_title}   ${NC}"
@@ -813,10 +813,12 @@ clear
     printf "\e[93m+-------------------------------------+\e[0m\n" 
     echo ""
     echo ""
-    echo -e "${GREEN} 1) ${NC} Optimizer (1 click) ${NC}"
-    echo -e "${GREEN} 2) ${NC} Optimizer (step by step) ${NC}"
+    printf "${GREEN} 1) ${NC} Optimizer (1-click) ${NC}\n"
+    printf "${GREEN} 2) ${NC} Optimizer (step by step) ${NC}\n"
     echo ""
-    echo -e "${GREEN} E) ${NC} Exit the menu${NC}"
+    printf "${GREEN} 3) ${NC} Swap Menu ${NC}\n"
+    printf "${GREEN} 4) ${NC} BBR Menu ${NC}\n"
+    printf "${GREEN} E) ${NC} Exit the menu${NC}\n"
     echo ""
     echo -ne "${GREEN}Select an option: ${NC}  "
     read choice
@@ -847,6 +849,12 @@ clear
             remove_old_ssh_conf
             ask_bbr_version
             final
+            ;;
+        3)
+            swap_maker
+            ;;
+        4)
+            ask_bbr_version
             ;;
         E|e)
             echo "Exiting..."
