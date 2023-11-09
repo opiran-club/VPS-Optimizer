@@ -165,8 +165,8 @@ sourcelist() {
                                     return
                                     ;;
                             esac
-                            wget -q "$source_url" -O /etc/apt/sources.list
-                            if wget -q "$source_url" -O /etc/apt/sources.list; then
+                            wget -q /etc/apt/sources.list "$source_url"
+                            if wget -q /etc/apt/sources.list "$source_url"; then
                                  printf "${GREEN}Your source list was updated successfully, for $architecture ${NC}\n"
                             else
                                 printf "${RED}Error: Failed to update your source list.${NC}\n"
