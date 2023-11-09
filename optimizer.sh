@@ -217,11 +217,6 @@ set_timezone() {
     echo ""
     printf "\e[93m+-------------------------------------+\e[0m\n"
 
-    set_timezone() {
-    echo
-    yellow_msg 'Setting TimeZone based on VPS IP address...'
-    sleep 0.5
-
     get_public_ip() {
         local ip_sources=("https://ipv4.icanhazip.com" "https://api.ipify.org" "https://ipv4.ident.me/")
         local ip
@@ -756,39 +751,39 @@ sysctl -p >/dev/null 2>&1
             fi
             ;;
         6)
-    clear
-    echo ""
-    printf "${YELLOW}Optimizing kernel parameters for Open-vz ${NC}\n"
-    echo ""
-    # Check the virtualization method and the kernel support
-    if [ -n "${virt}" -a "${virt}" = "openvz" ] || [ -d "/proc/vz" ]; then
-        if [ -e /sys/class/net/venet0 ]; then
-            # Use the backup function
-            backup /etc/sysctl.conf
-            # Delete any existing lines related to qdisc and congestion control
-            sed -i '/net.core.default_qdisc/d' /etc/sysctl.conf
-            sed -i '/net.ipv4.tcp_congestion_control/d' /etc/sysctl.conf
-            # Set the qdisc to fq_codel for venet0
-            tc qdisc add dev venet0 root fq_codel
-            # Set the congestion control to bbr for venet0
-            sysctl -w net.ipv4.tcp_congestion_control=bbr
-            # Reload the sysctl file
-            sysctl -p
-            # Check the return value
-            if [ $? -eq 0 ]; then
-                printf "${GREEN}Kernel parameter optimization for Open-vz was successful.${NC}\n"
+            clear
+            echo ""
+            printf "${YELLOW}Optimizing kernel parameters for Open-vz ${NC}\n"
+            echo ""
+            # Check the virtualization method and the kernel support
+            if [ -n "${virt}" -a "${virt}" = "openvz" ] || [ -d "/proc/vz" ]; then
+                if [ -e /sys/class/net/venet0 ]; then
+                    # Use the backup function
+                    backup /etc/sysctl.conf
+                    # Delete any existing lines related to qdisc and congestion control
+                    sed -i '/net.core.default_qdisc/d' /etc/sysctl.conf
+                    sed -i '/net.ipv4.tcp_congestion_control/d' /etc/sysctl.conf
+                    # Set the qdisc to fq_codel for venet0
+                    tc qdisc add dev venet0 root fq_codel
+                    # Set the congestion control to bbr for venet0
+                    sysctl -w net.ipv4.tcp_congestion_control=bbr
+                    # Reload the sysctl file
+                    sysctl -p
+                    # Check the return value
+                    if [ $? -eq 0 ]; then
+                        printf "${GREEN}Kernel parameter optimization for Open-vz was successful.${NC}\n"
+                    else
+                        printf "${RED}Kernel parameter optimization failed. Restoring the original configuration...${NC}\n"
+                        # Use the backup function
+                        backup /etc/sysctl.conf.bak
+                    fi
+                else
+                    printf "${RED}Your kernel does not support the venet0 interface. No changes made.${NC}\n"
+                fi
             else
-                printf "${RED}Kernel parameter optimization failed. Restoring the original configuration...${NC}\n"
-                # Use the backup function
-                backup /etc/sysctl.conf.bak
+                printf "${RED}Your virtualization method is not Open-vz. No changes made.${NC}\n"
             fi
-        else
-            printf "${RED}Your kernel does not support the venet0 interface. No changes made.${NC}\n"
-        fi
-    else
-        printf "${RED}Your virtualization method is not Open-vz. No changes made.${NC}\n"
-    fi
-    ;;
+            ;;  
 
         7)
             clear
