@@ -5,7 +5,7 @@
  - TCP congestion control (Tweaker, Westwood, BBR, BBRv3, Hybla)
  - Swap file + vm.swapiness value 
 
-Supported Debian base (Debian , Ubuntu) with X86 & Arm64 architecture 
+Supported Debian base (Debian , Ubuntu) with X86 & Arm64 & OpenVZ architecture 
    
 ---------------------------------------------------------------------------------------------------------------------------------------
 ## Complete optimizer with BBR versions
