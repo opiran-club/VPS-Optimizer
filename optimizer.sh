@@ -141,16 +141,16 @@ sourcelist() {
                 if grep -q "archive.ubuntu.com" /etc/apt/sources.list; then
                     return
                 else
-                    echo -ne "${GREEN}Your source list is not archive.ubuntu, let's update it? [y/n]: ${NC}"
+                    echo -ne "${GREEN}Your source list need to update, let's update it? [y/n]: ${NC}"
                     read source
                     case $source in
                         [Yy])
                             cp /etc/apt/sources.list /etc/apt/sources.list.bak
-                            rm -rf /etc/apt/sources.list
+                            rm -r /etc/apt/sources.list
 
-                            arch=$(uname -m)
-
-                            case $arch in
+                            architecture=$(dpkg --print-architecture)
+                            
+                            case $architecture in
                                 i?86)
                                     source_url="https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/Install/ubuntu-source"
                                     ;;
@@ -167,9 +167,9 @@ sourcelist() {
                             esac
 
                             if wget -N -4 /etc/apt/sources.list "$source_url"; then
-                                echo -e "${GREEN}Your source list was updated successfully.${NC}"
+                                 printf "${GREEN}Your source list was updated successfully, for $architecture ${NC}\n"
                             else
-                                echo -e "${RED}Failed to update your source list.${NC}"
+                                printf "${RED}Error: Failed to update your source list.${NC}\n"
                                 cp /etc/apt/sources.list.bak /etc/apt/sources.list
                             fi
                             ;;
