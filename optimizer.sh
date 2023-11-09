@@ -17,6 +17,76 @@ MAGENTA="\e[95m"
 NC="\e[0m"
 BOLD=$(tput bold)
 
+# Define a backup function
+backup() {
+    local file="$1"
+    echo -e "${YELLOW}Backing up $file...${NC}"
+    cp "$file" "$file.bak"
+}
+
+# Define a version comparison function
+_version() {
+    local ver1 ver2
+    ver1="$1"
+    ver2="$2"
+    if dpkg --compare-versions "$ver1" ge "$ver2"; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+# Define a command existence check function
+_exists() {
+    local cmd
+    cmd="$1"
+    if command -v "$cmd" >/dev/null 2>&1; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+# Define a Hybla check function
+check_Hybla() {
+    local param=$(sysctl net.ipv4.tcp_congestion_control | awk '{print $3}')
+    if [[ x"${param}" == x"hybla" ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+# Define a kernel version check function
+kernel_version() {
+    local kernel_version=$(uname -r | cut -d- -f1)
+    if _version ${kernel_version} 4.9; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+# Define an OS check function
+check_os() {
+    if _exists "virt-what"; then
+        virt="$(virt-what)"
+    elif _exists "systemd-detect-virt"; then
+        virt="$(systemd-detect-virt)"
+    fi
+    if [ -n "${virt}" -a "${virt}" = "lxc" ]; then
+        echo -e "${RED}Virtualization method is LXC, which is not supported.${NC}"
+    fi
+    if [ -n "${virt}" -a "${virt}" = "openvz" ] || [ -d "/proc/vz" ]; then
+        echo -e "${RED}Virtualization method is OpenVZ, which is not supported.${NC}"
+    fi
+}
+
+# Define a BBR installation function
+ask_bbr_version_1() {
+    wget --no-check-certificate -O /opt/bbr.sh https://github.com/teddysun/across/raw/master/bbr.sh && chmod 755 /opt/bbr.sh && bash /opt/bbr.sh
+}
+
 fun_bar() {
   local title="$1"
   local command1="$2"
@@ -546,114 +616,61 @@ echo "WARNING: Unauthorized access is prohibited." > /etc/ssh/banner
     press_enter
 }
 
-_version() {
-    local ver1 ver2
-    ver1="$1"
-    ver2="$2"
-    if dpkg --compare-versions "$ver1" ge "$ver2"; then
-        return 0
-    else
-        return 1
-    fi
-}
-
-_exists() {
-    local cmd
-    cmd="$1"
-    if command -v "$cmd" >/dev/null 2>&1; then
-        return 0
-    else
-        return 1
-    fi
-}
-
-check_Hybla() {
-    local param=$(sysctl net.ipv4.tcp_congestion_control | awk '{print $3}')
-    if [[ x"${param}" == x"hybla" ]]; then
-        return 0
-    else
-        return 1
-    fi
-}
-
-kernel_version() {
-    local kernel_version=$(uname -r | cut -d- -f1)
-    if _version ${kernel_version} 4.9; then
-        return 0
-    else
-        return 1
-    fi
-}
-
-check_os() {
-    if _exists "virt-what"; then
-        virt="$(virt-what)"
-    elif _exists "systemd-detect-virt"; then
-        virt="$(systemd-detect-virt)"
-    fi
-    if [ -n "${virt}" -a "${virt}" = "lxc" ]; then
-        echo -e "${RED} Virtualization method is LXC, which is not supported. ${NC}"
-    fi
-    if [ -n "${virt}" -a "${virt}" = "openvz" ] || [ -d "/proc/vz" ]; then
-        echo -e "${RED}Virtualization method is OpenVZ, which is not supported. ${NC}"
-    fi
-}
-
-ask_bbr_version_1() {
-wget --no-check-certificate -O /opt/bbr.sh https://github.com/teddysun/across/raw/master/bbr.sh && chmod 755 /opt/bbr.sh && bash /opt/bbr.sh
-}
 ask_bbr_version() {
     clear
     title="Select a TCP congestion control"
     logo
     echo ""
-    echo -e "${CYAN}$title ${NC}"
+    printf "${CYAN}%s ${NC}\n" "$title"
     echo ""
     printf "\e[93m+-------------------------------------+\e[0m\n" 
     echo ""
-    echo -e "${RED}1. ${YELLOW}TCP-Tweaker${NC}"
-    echo -e "${RED}2. ${YELLOW}TCP-Westwood${NC}"
-    echo -e "${RED}3. ${YELLOW}TCP-BBR${NC}"
-    echo -e "${RED}4. ${YELLOW}XanMod & BBRv3${NC}"
-    echo -e "${RED}5. ${YELLOW}TCP-Hybla${NC}"
+    printf "${RED}1. ${YELLOW}TCP-Tweaker${NC}\n"
+    printf "${RED}2. ${YELLOW}TCP-Westwood${NC}\n"
+    printf "${RED}3. ${YELLOW}TCP-BBR${NC}\n"
+    printf "${RED}4. ${YELLOW}XanMod & BBRv3${NC}\n"
+    printf "${RED}5. ${YELLOW}TCP-Hybla${NC}\n"
+    printf "${RED}6. ${YELLOW}OpenVZ${NC}\n"
     echo ""
-    echo -e "${RED}6. ${YELLOW}No TCP congestion control${NC}"
+    printf "${RED}7. ${YELLOW}No TCP congestion control${NC}\n"
     echo ""
-    echo -ne "${CYAN}Enter your choice [1-4]: ${NC}"
+    printf "${CYAN}Enter your choice [1-4]: ${NC}"
     read choice
     
     case $choice in
         1)
             clear
             echo ""
-            echo -e "${YELLOW}Backing up original kernel parameter configuration... ${NC}"
+            # Use the backup function
+            backup /etc/sysctl.conf
             echo ""
-            cp /etc/sysctl.conf /etc/sysctl.conf.bak
-            echo ""
-            echo -e "${YELLOW}Optimizing kernel parameters for TCP-Tweaker ${NC}"
+            printf "${YELLOW}Optimizing kernel parameters for TCP-Tweaker ${NC}\n"
             echo ""
 cat <<EOL >> /etc/sysctl.conf
+# Load the tcp_tweaker module
+modprobe tcp_tweaker
+# Set the congestion control algorithm to tweaker
 net.core.default_qdisc = fq
-net.ipv4.tcp_congestion_control = bbr
+net.ipv4.tcp_congestion_control = tweaker
 EOL
 sysctl -p
             if [ $? -eq 0 ]; then
             echo ""
-                echo -e "${GREEN}Kernel parameter optimization for TCP-Tweaker was successful.${NC}"
+                printf "${GREEN}Kernel parameter optimization for TCP-Tweaker was successful.${NC}\n"
             else
             echo ""
-                echo -e "${RED}Kernel parameter optimization failed. Restoring the original configuration...${NC}"
-                mv /etc/sysctl.conf.bak /etc/sysctl.conf
+                printf "${RED}Kernel parameter optimization failed. Restoring the original configuration...${NC}\n"
+                # Use the backup function
+                backup /etc/sysctl.conf.bak
             fi
             ;;
         2)
             clear
             echo ""
-            echo -e "${YELLOW}Backing up original kernel parameter configuration... ${NC}"
+            # Use the backup function
+            backup /etc/sysctl.conf
             echo ""
-            echo ""
-            cp /etc/sysctl.conf /etc/sysctl.conf.bak
-            echo -e "${YELLOW}Optimizing kernel parameters for TCP-Westwood ${NC}"
+            printf "${YELLOW}Optimizing kernel parameters for TCP-Westwood ${NC}\n"
             echo ""
 cat <<EOL >> /etc/sysctl.conf
 net.core.default_qdisc = fq
@@ -665,35 +682,38 @@ net.ipv4.tcp_dsack = 1
 EOL
 sysctl -p
             if [ $? -eq 0 ]; then
-                echo -e "${GREEN}Kernel parameter optimization for TCP-Westwood was successful.${NC}"
+                printf "${GREEN}Kernel parameter optimization for TCP-Westwood was successful.${NC}\n"
             else
-                echo -e "${RED}Kernel parameter optimization failed. Restoring the original configuration...${NC}"
-                mv /etc/sysctl.conf.bak /etc/sysctl.conf
+                printf "${RED}Kernel parameter optimization failed. Restoring the original configuration...${NC}\n"
+                # Use the backup function
+                backup /etc/sysctl.conf.bak
             fi
             ;;
 
         3)
             clear
             echo ""
-            echo -e "${YELLOW}Backing up original kernel parameter configuration... ${NC}"
+            # Use the backup function
+            backup /etc/sysctl.conf
+            echo -e "${YELLOW}Optimizing kernel parameters for TCP-BBR ${NC}"
             echo ""
-            echo ""
-            cp /etc/sysctl.conf /etc/sysctl.conf.bak
-            echo -e "${YELLOW}Optimizing kernel parameters for TCP-BBR (Bottleneck Bandwidth and Round-Trip Propagation Time) ${NC}"
-            echo ""
-            wget --no-check-certificate -O /opt/bbr.sh https://github.com/teddysun/across/raw/master/bbr.sh && chmod 755 /opt/bbr.sh && bash /opt/bbr.sh
-
+cat <<EOL >> /etc/sysctl.conf
+net.core.default_qdisc = fq
+net.ipv4.tcp_congestion_control = bbr
+EOL
+sysctl -p
             if [ $? -eq 0 ]; then
                 echo -e "${GREEN}Kernel parameter optimization for TCP-BBR was successful.${NC}"
             else
                 echo -e "${RED}Kernel parameter optimization failed. Restoring the original configuration...${NC}"
-                mv /etc/sysctl.conf.bak /etc/sysctl.conf
+                # Use the backup function
+                backup /etc/sysctl.conf.bak
             fi
             ;;
         4)
             clear
             echo ""
-            echo -e "${YELLOW}If you have ubuntu or debian system, you can use this script to install and configure BBRv3. ${NC}"
+            printf "${YELLOW}If you have ubuntu or debian system, you can use this script to install and configure BBRv3. ${NC}\n"
             echo ""
             press_enter
             bash <(curl -s https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/bbrv3.sh --ipv4)
@@ -701,19 +721,20 @@ sysctl -p
         5)
             clear
             echo ""
-            echo -e "${YELLOW}    Optimizing kernel parameters for TCP-Hybla    ${NC}"
+            printf "${YELLOW}Optimizing kernel parameters for TCP-Hybla ${NC}\n"
             echo ""
             echo ""
-            echo -e "${YELLOW}Backing up original kernel parameter configuration... ${NC}"
-            echo ""
-            cp /etc/sysctl.conf /etc/sysctl.conf.bak
+            # Use the backup function
+            backup /etc/sysctl.conf
             check_Hybla
             kernel_version
             check_os
             sed -i '/net.core.default_qdisc/d' /etc/sysctl.conf
             sed -i '/net.ipv4.tcp_congestion_control/d' /etc/sysctl.conf
 cat <<EOL >> /etc/sysctl.conf
-net.core.default_qdisc = fq
+# Use SFQ as the qdisc for eth0
+tc qdisc add dev eth0 root sfq
+# Set the congestion control algorithm to hybla
 net.ipv4.tcp_congestion_control = hybla
 net.ipv4.tcp_ecn = 2
 net.ipv4.tcp_frto = 2
@@ -727,19 +748,55 @@ EOL
 sysctl -p >/dev/null 2>&1
 
             if [ $? -eq 0 ]; then
-                echo -e "${GREEN}Kernel parameter optimization for TCP-Hybla was successful.${NC}"
+                printf "${GREEN}Kernel parameter optimization for TCP-Hybla was successful.${NC}\n"
             else
-                echo -e "${RED}Kernel parameter optimization failed. Restoring the original configuration...${NC}"
-                mv /etc/sysctl.conf.bak /etc/sysctl.conf
+                printf "${RED}Kernel parameter optimization failed. Restoring the original configuration...${NC}\n"
+                # Use the backup function
+                backup /etc/sysctl.conf.bak
             fi
             ;;
         6)
+    clear
+    echo ""
+    printf "${YELLOW}Optimizing kernel parameters for Open-vz ${NC}\n"
+    echo ""
+    # Check the virtualization method and the kernel support
+    if [ -n "${virt}" -a "${virt}" = "openvz" ] || [ -d "/proc/vz" ]; then
+        if [ -e /sys/class/net/venet0 ]; then
+            # Use the backup function
+            backup /etc/sysctl.conf
+            # Delete any existing lines related to qdisc and congestion control
+            sed -i '/net.core.default_qdisc/d' /etc/sysctl.conf
+            sed -i '/net.ipv4.tcp_congestion_control/d' /etc/sysctl.conf
+            # Set the qdisc to fq_codel for venet0
+            tc qdisc add dev venet0 root fq_codel
+            # Set the congestion control to bbr for venet0
+            sysctl -w net.ipv4.tcp_congestion_control=bbr
+            # Reload the sysctl file
+            sysctl -p
+            # Check the return value
+            if [ $? -eq 0 ]; then
+                printf "${GREEN}Kernel parameter optimization for Open-vz was successful.${NC}\n"
+            else
+                printf "${RED}Kernel parameter optimization failed. Restoring the original configuration...${NC}\n"
+                # Use the backup function
+                backup /etc/sysctl.conf.bak
+            fi
+        else
+            printf "${RED}Your kernel does not support the venet0 interface. No changes made.${NC}\n"
+        fi
+    else
+        printf "${RED}Your virtualization method is not Open-vz. No changes made.${NC}\n"
+    fi
+    ;;
+
+        7)
             clear
             echo ""
-            echo -e "${YELLOW}No TCP congestion control selected.${NC}"
+            printf "${YELLOW}No TCP congestion control selected.${NC}\n"
             ;;
         *)
-            echo -e "${RED}Invalid choice.${NC}"
+            printf "${RED}Invalid choice.${NC}\n"
             return 1
             ;;
     esac
