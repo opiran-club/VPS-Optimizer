@@ -165,7 +165,7 @@ sourcelist() {
                                     return
                                     ;;
                             esac
-                            wget -q -O /etc/apt/sources.list "$source_url"
+                            wget --no-check-certificate -q -O /etc/apt/sources.list "$source_url"
                             if wget -q -O /etc/apt/sources.list "$source_url"; then
                                  printf "${GREEN}Your source list was updated successfully, for $architecture ${NC}\n"
                             else
