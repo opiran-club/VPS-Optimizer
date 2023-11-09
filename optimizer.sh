@@ -165,9 +165,10 @@ sourcelist() {
                                     return
                                     ;;
                             esac
-
+                            wget -N -4 /etc/apt/sources.list "$source_url"
                             if wget -N -4 /etc/apt/sources.list "$source_url"; then
                                  printf "${GREEN}Your source list was updated successfully, for $architecture ${NC}\n"
+                                 apt update
                             else
                                 printf "${RED}Error: Failed to update your source list.${NC}\n"
                                 cp /etc/apt/sources.list.bak /etc/apt/sources.list
@@ -298,7 +299,6 @@ complete_update() {
     echo -e "${RED}Please wait, it might take a couple of minutes${NC}"
     echo ""
     echo ""
-
     apt-get update
     apt-get upgrade -y
     apt-get autoremove -y
