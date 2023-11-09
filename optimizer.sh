@@ -213,44 +213,26 @@ set_timezone() {
     title="Timezone Adjustment"
     logo
     echo ""
-    echo -e "${CYAN}$title ${NC}"
+    printf "${CYAN}%s ${NC}\n" "$title"
     echo ""
     printf "\e[93m+-------------------------------------+\e[0m\n"
+    public_ip=$(curl -s ipinfo.io/ip)
 
-    get_public_ip() {
-        local ip_sources=("https://ipv4.icanhazip.com" "https://api.ipify.org" "https://ipv4.ident.me/")
-        local ip
-
-        for source in "${ip_sources[@]}"; do
-            ip=$(curl -s "$source")
-            if [ -n "$ip" ]; then
-                echo "$ip"
-                return 0
-            fi
-        done
-
-        echo -e "${RED}Error: Failed to fetch public IP address from known sources. ${NC}"
-        return 1
-    }
-
-    public_ip=$(get_public_ip)
-
-    if [ $? -eq 0 ]; then
-        location_info=$(curl -s "http://ip-api.com/json/$public_ip")
-        timezone=$(echo "$location_info" | jq -r '.timezone')
-
-        sudo timedatectl set-timezone "$timezone"
-
-        echo -e "${YELLOW}Timezone has been set to ${GREEN}$timezone based on your country code.${NC}"
+    if [[ $? -eq 0 ]]; then
+        location=$(curl -s ipinfo.io/$public_ip/city)
+        timezone=$(curl -s ipinfo.io/$public_ip/timezone)
+        printf "${YELLOW}Your location is ${GREEN}%s${NC}\n" "$location"
+        printf "${YELLOW}Your timezone is ${GREEN}%s${NC}\n" "$timezone"
+        date_time=$(date --date="TZ=\"$timezone\"" "+%Y-%m-%d %H:%M:%S")
+        printf "${YELLOW}The current date and time in your timezone is ${GREEN}%s${NC}\n" "$date_time"
     else
-        echo -e "${RED}Error: Failed to fetch public IP address from known sources. ${NC}"
+        printf "${RED}Error: Failed to fetch public IP address.${NC}\n"
     fi
 
     echo ""
-    echo -e "${YELLOW}Timezone has been set to ${GREEN}$timezone based on your country code.${NC}"
-    echo ""
     press_enter
 }
+
 
 logo=$(cat << "EOF"
     ______    _______   __      _______        __      _____  ___  
@@ -340,7 +322,7 @@ installations() {
     echo ""
     echo -e "${RED}Please wait, it might take a while${NC}"
     echo ""
-    apt-get install certbot nload nethogs autossh ssh iperf sshuttle software-properties-common apt-transport-https iptables lsb-release ca-certificates ubuntu-keyring gnupg2 apt-utils cron bash-completion curl git unzip zip ufw wget preload locales nano vim python3 jq qrencode socat busybox net-tools haveged htop curl -y
+    apt-get install jq certbot nload nethogs autossh ssh iperf sshuttle software-properties-common apt-transport-https iptables lsb-release ca-certificates ubuntu-keyring gnupg2 apt-utils cron bash-completion curl git unzip zip ufw wget preload locales nano vim python3 jq qrencode socat busybox net-tools haveged htop curl -y
     apt-get install snapd -y
     echo ""
     echo -e "${GREEN}Install useful and necessary packages completed.${NC}"
