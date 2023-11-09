@@ -132,7 +132,7 @@ sourcelist() {
     echo ""
     printf "\e[93m+-------------------------------------+\e[0m\n"
     echo ""
-
+    cp /etc/apt/sources.list /etc/apt/sources.list.bak
     if [ -f /etc/os-release ]; then
         source /etc/os-release
         case $ID in
@@ -145,16 +145,15 @@ sourcelist() {
                     read source
                     case $source in
                         [Yy])
-                            cp /etc/apt/sources.list /etc/apt/sources.list.bak
-                            rm -r /etc/apt/sources.list
+                            rm /etc/apt/sources.list
 
                             architecture=$(dpkg --print-architecture)
                             
                             case $architecture in
-                                i?86)
+                                amd*)
                                     source_url="https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/Install/ubuntu-source"
                                     ;;
-                                x86_64)
+                                x86*)
                                     source_url="https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/Install/ubuntu-source"
                                     ;;
                                 arm*)
@@ -166,8 +165,8 @@ sourcelist() {
                                     ;;
                             esac
                             wget --no-check-certificate -q -O /etc/apt/sources.list "$source_url"
-                            if wget -q -O /etc/apt/sources.list "$source_url"; then
-                                 printf "${GREEN}Your source list was updated successfully, for $architecture ${NC}\n"
+                            if [ $? -eq 0 ]; then
+                                printf "${GREEN}Your source list was updated successfully, for $architecture ${NC}\n"
                             else
                                 printf "${RED}Error: Failed to update your source list.${NC}\n"
                                 cp /etc/apt/sources.list.bak /etc/apt/sources.list
