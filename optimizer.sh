@@ -138,7 +138,7 @@ sourcelist() {
         case $ID in
             "ubuntu")
                 echo ""
-                if grep -q "archive.ubuntu.com" /etc/apt/sources.list; then
+                if grep -q "deb http://archive.ubuntu.com" /etc/apt/sources.list; then
                     return
                 else
                     echo -ne "${GREEN}Your source list need to update, let's update it? [y/n]: ${NC}"
