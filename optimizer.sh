@@ -739,7 +739,7 @@ clear
             fun_bar "Create swap file with 512mb" swap_maker_1
             fun_bar "Updating sysctl configuration" remove_old_sysctl
             fun_bar "Updating and Modifying SSH configuration" remove_old_ssh_conf
-            fun_bar "(Press Enter) TCP BBR common script (Press Enter) " ask_bbr_version_1
+            ask_bbr_version_1
             final
             ;;
         2)
