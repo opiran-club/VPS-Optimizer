@@ -600,72 +600,18 @@ ask_bbr_version() {
     echo ""
     printf "\e[93m+-------------------------------------+\e[0m\n" 
     echo ""
-    printf "${RED}1. ${YELLOW}TCP-Tweaker${NC}\n"
-    printf "${RED}2. ${YELLOW}TCP-Westwood${NC}\n"
-    printf "${RED}3. ${YELLOW}TCP-BBR${NC}\n"
-    printf "${RED}4. ${YELLOW}XanMod & BBRv3${NC}\n"
-    printf "${RED}5. ${YELLOW}TCP-Hybla${NC}\n"
-    printf "${RED}6. ${YELLOW}OpenVZ${NC}\n"
+    printf "${RED}1. ${YELLOW}TCP-BBR${NC}\n"
+    printf "${RED}2. ${YELLOW}XanMod & BBRv3${NC}\n"
+    printf "${RED}3. ${YELLOW}OpenVZ${NC}\n"
     echo ""
-    printf "${RED}7. ${YELLOW}No TCP congestion control${NC}\n"
+    printf "${RED}0. ${YELLOW}No TCP congestion control${NC}\n"
     echo ""
     printf "${CYAN}Enter your choice [1-4]: ${NC}"
     read choice
     
     case $choice in
-        1)
-            clear
-            echo ""
-            # Use the backup function
-            backup /etc/sysctl.conf
-            echo ""
-            printf "${YELLOW}Optimizing kernel parameters for TCP-Tweaker ${NC}\n"
-            echo ""
-cat <<EOL >> /etc/sysctl.conf
-# Load the tcp_tweaker module
-modprobe tcp_tweaker
-# Set the congestion control algorithm to tweaker
-net.core.default_qdisc = fq
-net.ipv4.tcp_congestion_control = tweaker
-EOL
-sysctl -p
-            if [ $? -eq 0 ]; then
-            echo ""
-                printf "${GREEN}Kernel parameter optimization for TCP-Tweaker was successful.${NC}\n"
-            else
-            echo ""
-                printf "${RED}Kernel parameter optimization failed. Restoring the original configuration...${NC}\n"
-                # Use the backup function
-                backup /etc/sysctl.conf.bak
-            fi
-            ;;
-        2)
-            clear
-            echo ""
-            # Use the backup function
-            backup /etc/sysctl.conf
-            echo ""
-            printf "${YELLOW}Optimizing kernel parameters for TCP-Westwood ${NC}\n"
-            echo ""
-cat <<EOL >> /etc/sysctl.conf
-net.core.default_qdisc = fq
-net.ipv4.tcp_congestion_control = westwood
-net.ipv4.tcp_moderate_rcvbuf = 0
-net.ipv4.tcp_ecn = 0
-net.ipv4.tcp_sack = 1
-net.ipv4.tcp_dsack = 1
-EOL
-sysctl -p
-            if [ $? -eq 0 ]; then
-                printf "${GREEN}Kernel parameter optimization for TCP-Westwood was successful.${NC}\n"
-            else
-                printf "${RED}Kernel parameter optimization failed. Restoring the original configuration...${NC}\n"
-                # Use the backup function
-                backup /etc/sysctl.conf.bak
-            fi
-            ;;
 
-        3)
+        1)
             clear
             echo ""
             # Use the backup function
@@ -677,15 +623,10 @@ net.core.default_qdisc = fq
 net.ipv4.tcp_congestion_control = bbr
 EOL
 sysctl -p
-            if [ $? -eq 0 ]; then
-                echo -e "${GREEN}Kernel parameter optimization for TCP-BBR was successful.${NC}"
-            else
-                echo -e "${RED}Kernel parameter optimization failed. Restoring the original configuration...${NC}"
-                # Use the backup function
-                backup /etc/sysctl.conf.bak
-            fi
+            
+            echo -e "${GREEN}Kernel parameter optimization for TCP-BBR was successful.${NC}"
             ;;
-        4)
+        2)
             clear
             echo ""
             printf "${YELLOW}If you have ubuntu or debian system, you can use this script to install and configure BBRv3. ${NC}\n"
@@ -693,44 +634,7 @@ sysctl -p
             press_enter
             bash <(curl -s https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/bbrv3.sh --ipv4)
             ;;
-        5)
-            clear
-            echo ""
-            printf "${YELLOW}Optimizing kernel parameters for TCP-Hybla ${NC}\n"
-            echo ""
-            echo ""
-            # Use the backup function
-            backup /etc/sysctl.conf
-            check_Hybla
-            kernel_version
-            check_os
-            sed -i '/net.core.default_qdisc/d' /etc/sysctl.conf
-            sed -i '/net.ipv4.tcp_congestion_control/d' /etc/sysctl.conf
-cat <<EOL >> /etc/sysctl.conf
-# Use SFQ as the qdisc for eth0
-tc qdisc add dev eth0 root sfq
-# Set the congestion control algorithm to hybla
-net.ipv4.tcp_congestion_control = hybla
-net.ipv4.tcp_ecn = 2
-net.ipv4.tcp_frto = 2
-net.ipv4.tcp_low_latency = 1
-net.ipv4.tcp_mtu_probing = 1
-net.ipv4.tcp_no_metrics_save = 1
-net.ipv4.tcp_window_scaling = 1
-net.ipv4.tcp_sack = 1
-net.ipv4.tcp_timestamps = 1
-EOL
-sysctl -p >/dev/null 2>&1
-
-            if [ $? -eq 0 ]; then
-                printf "${GREEN}Kernel parameter optimization for TCP-Hybla was successful.${NC}\n"
-            else
-                printf "${RED}Kernel parameter optimization failed. Restoring the original configuration...${NC}\n"
-                # Use the backup function
-                backup /etc/sysctl.conf.bak
-            fi
-            ;;
-        6)
+        3)
             clear
             echo ""
             printf "${YELLOW}Optimizing kernel parameters for Open-vz ${NC}\n"
@@ -765,7 +669,7 @@ sysctl -p >/dev/null 2>&1
             fi
             ;;  
 
-        7)
+        0)
             clear
             echo ""
             printf "${YELLOW}No TCP congestion control selected.${NC}\n"
