@@ -602,7 +602,8 @@ ask_bbr_version() {
     echo ""
     printf "${RED}1. ${YELLOW}TCP-BBR${NC}\n"
     printf "${RED}2. ${YELLOW}XanMod & BBRv3${NC}\n"
-    printf "${RED}3. ${YELLOW}OpenVZ${NC}\n"
+    printf "${RED}3. ${YELLOW}Tcp brutal${NC}\n"
+    printf "${RED}4. ${YELLOW}OpenVZ${NC}\n"
     echo ""
     printf "${RED}0. ${YELLOW}No TCP congestion control${NC}\n"
     echo ""
@@ -612,17 +613,7 @@ ask_bbr_version() {
     case $choice in
 
         1)
-            clear
-            echo ""
-            # Use the backup function
-            backup /etc/sysctl.conf
-            echo -e "${YELLOW}Optimizing kernel parameters for TCP-BBR ${NC}"
-            echo ""
-cat <<EOL >> /etc/sysctl.conf
-net.core.default_qdisc = fq
-net.ipv4.tcp_congestion_control = bbr
-EOL
-sysctl -p
+            wget --no-check-certificate https://github.com/teddysun/across/raw/master/bbr.sh && chmod +x bbr.sh && ./bbr.sh
             
             echo -e "${GREEN}Kernel parameter optimization for TCP-BBR was successful.${NC}"
             ;;
@@ -635,6 +626,9 @@ sysctl -p
             bash <(curl -s https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/bbrv3.sh --ipv4)
             ;;
         3)
+            bash <(curl -fsSL https://tcp.hy2.sh/)
+            ;;
+        4)
             clear
             echo ""
             printf "${YELLOW}Optimizing kernel parameters for Open-vz ${NC}\n"
@@ -668,7 +662,6 @@ sysctl -p
                 printf "${RED}Your virtualization method is not Open-vz. No changes made.${NC}\n"
             fi
             ;;  
-
         0)
             clear
             echo ""
