@@ -1,8 +1,8 @@
-### VPS Optimizer One-click (V.1.1) with optional TCP congestion control (Tweaker, Westwood, BBR, BBRv3, Hybla)
+### VPS Optimizer One-click (V.1.1) with optional TCP congestion control (Tcp-brutal, Tcp-BBR, XanMod and BBRv3)
 https://opiran-club.github.io/VPS-Optimizer/
 ##### Summurize configuration
  - Upgrade, Time setting, Install Useful Packages, Optimize the SYSCTL, Optimize SSH
- - TCP congestion control (Tweaker, Westwood, BBR, BBRv3, Hybla)
+ - TCP congestion control (Tcp-brutal, Tcp-BBR, XanMod-BBRv3)
  - Swap file + vm.swapiness value 
 
 Supported Debian base (Debian , Ubuntu) with X86 & Arm64 & OpenVZ architecture 
