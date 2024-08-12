@@ -1,3 +1,4 @@
+
 #!/bin/bash
 #
 # VPS OPtimizer Bash Script
@@ -12,8 +13,9 @@ CYAN="\e[96m"
 GREEN="\e[92m"
 YELLOW="\e[93m"
 RED="\e[91m"
-BLUE="\e[94m "
+BLUE="\e[94m"
 MAGENTA="\e[95m"
+WHITE="\e[97m"
 NC="\e[0m"
 BOLD=$(tput bold)
 
@@ -88,35 +90,40 @@ ask_bbr_version_1() {
 }
 
 fun_bar() {
-  local title="$1"
-  local command1="$2"
-  local command2="$3"
+    local title="$1"
+    local command1="$2"
+    local command2="$3"
 
-  (
-    [[ -e $HOME/fim ]] && rm $HOME/fim
-    $command1 -y > /dev/null 2>&1
-    $command2 -y > /dev/null 2>&1
-    touch $HOME/fim
-  ) > /dev/null 2>&1 &
+    (
+        [[ -e $HOME/fim ]] && rm $HOME/fim
+        $command1 -y > /dev/null 2>&1
+        $command2 -y > /dev/null 2>&1
+        touch $HOME/fim
+    ) &
 
-  tput civis
-  echo -ne "  ${BOLD}${YELLOW} $title   ${BOLD}- ${YELLOW}["
-  while true; do
-    for ((i=0; i<18; i++)); do
-      echo -ne "${RED}#"
-      sleep 0.1s
+    tput civis  # Hide cursor
+    echo -ne "  ${BOLD}${YELLOW}$title${BOLD} - ${YELLOW}["
+    while true; do
+        for ((i = 0; i < 18; i++)); do
+            echo -ne "${RED}#"
+            sleep 0.1
+        done
+
+        if [[ -e "$HOME/fim" ]]; then
+            rm "$HOME/fim"
+            break
+        fi
+
+        echo -e "${YELLOW}]"
+        sleep 0.5  # Reduced sleep time for smoother progress bar experience
+        tput cuu1  # Move cursor up one line
+        tput el    # Clear to the end of the line
+        echo -ne "  ${BOLD}${YELLOW}$title${BOLD} - ${YELLOW}["
     done
-
-    [[ -e "$HOME/fim" ]] && rm "$HOME/fim" && break
-    echo -e "${YELLOW}]"
-    sleep 1s
-    tput cuu1
-    tput dl1
-    echo -ne "  ${BOLD}${YELLOW}$title...${BOLD}- ${YELLOW}["
-  done
-  echo -e "${YELLOW}]${WHITE} -${GREEN} DONE!${WHITE}"
-  tput cnorm
+    echo -e "${YELLOW}]${WHITE} -${GREEN} DONE!${WHITE}"
+    tput cnorm  # Restore cursor
 }
+
 
 if [ "$EUID" -ne 0 ]; then
 echo -e "\n ${RED}This script must be run as root.${NC}"
@@ -125,63 +132,118 @@ fi
 
 sourcelist() {
     clear
-    title="Source list adjustment to officials"
+    title="Source List Adjustment to Official Repositories"
     logo
     echo ""
-    echo -e "${CYAN}$title ${NC}"
+    echo -e "${CYAN}$title${NC}"
     echo ""
-    printf "\e[93m+-------------------------------------+\e[0m\n"
+    echo -e "\e[93m+-------------------------------------+\e[0m"
     echo ""
+
+    # Backup existing sources.list
     cp /etc/apt/sources.list /etc/apt/sources.list.bak
+
+    # Function to get the release codename
+    get_release_codename() {
+        if [ -f /etc/os-release ]; then
+            source /etc/os-release
+            case $ID in
+                "ubuntu")
+                    release=$(lsb_release -cs)
+                    ;;
+                "debian")
+                    release=$(lsb_release -cs)
+                    ;;
+                *)
+                    echo -e "${RED}Unsupported OS. Cannot determine release codename.${NC}"
+                    return 1
+                    ;;
+            esac
+            echo "$release"
+        else
+            echo -e "${RED}Unable to detect OS. No changes made.${NC}"
+            return 1
+        fi
+    }
+
+    release=$(get_release_codename)
+    if [ $? -ne 0 ]; then
+        return 1
+    fi
+
+    # Function to set sources list for Ubuntu
+    update_ubuntu_sources() {
+        local mirror_url
+        if [ "$1" = "iran" ]; then
+            mirror_url="http://mirror.arvancloud.ir/ubuntu"
+        else
+            mirror_url="http://archive.ubuntu.com/ubuntu"
+        fi
+
+        echo "deb $mirror_url $release universe" > /etc/apt/sources.list
+    }
+
+    # Function to set sources list for Debian
+    update_debian_sources() {
+        local mirror_url
+        local security_mirror_url
+        if [ "$1" = "iran" ]; then
+            mirror_url="http://mirror.arvancloud.ir/debian"
+            security_mirror_url="http://mirror.arvancloud.ir/debian-security"
+        else
+            mirror_url="http://deb.debian.org/debian"
+            security_mirror_url="http://deb.debian.org/debian-security"
+        fi
+
+        cat <<EOL > /etc/apt/sources.list
+deb $mirror_url $release main
+deb $security_mirror_url $release-security main
+EOL
+    }
+
+    # Detect the OS and set the correct sources
     if [ -f /etc/os-release ]; then
         source /etc/os-release
-        case $ID in
-            "ubuntu")
-                echo ""
-                if grep -q "deb http://archive.ubuntu.com" /etc/apt/sources.list; then
-                    return
-                else
-                    echo -ne "${GREEN}Your source list need to update, let's update it? [y/n]: ${NC}"
-                    read source
-                    case $source in
-                        [Yy])
-                            rm /etc/apt/sources.list
 
-                            architecture=$(dpkg --print-architecture)
-                            
-                            case $architecture in
-                                amd*)
-                                    source_url="https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/Install/ubuntu-source"
-                                    ;;
-                                x86*)
-                                    source_url="https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/Install/ubuntu-source"
-                                    ;;
-                                arm*)
-                                    source_url="https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/Install/arm64-ubuntu"
-                                    ;;
-                                *)
-                                    echo -e "${RED}Unsupported architecture. No changes made.${NC}"
-                                    return
-                                    ;;
-                            esac
-                            wget --no-check-certificate -q -O /etc/apt/sources.list "$source_url"
-                            if [ $? -eq 0 ]; then
-                                printf "${GREEN}Your source list was updated successfully, for $architecture ${NC}\n"
-                            else
-                                printf "${RED}Error: Failed to update your source list.${NC}\n"
-                                cp /etc/apt/sources.list.bak /etc/apt/sources.list
-                            fi
-                            ;;
-                        [Nn])
-                            return
-                            ;;
-                        *)
-                            return
-                            ;;
-                    esac
-                fi
+        # Use a location detection service to determine if the server is in Iran
+        location_info=$(curl -s "http://ipwho.is")
+        public_ip=$(echo "$location_info" | jq -r .ip)
+        location=$(echo "$location_info" | jq -r .country)
+
+        # Check if the location is Iran
+        if [[ "$location" == "Iran" ]]; then
+            echo -ne "${GREEN}Location detected as ${RED}Iran${GREEN}. Update sources list to Iranian mirrors? ${YELLOW}[SUGGESTED Y] ${GREEN}[y/n]: ${NC}"
+        else
+            echo -ne "${GREEN}Location detected as ${RED}$location${GREEN}. Update sources list to default mirrors?${YELLOW}[SUGGESTED Y] ${GREEN}[y/n]: ${NC}"
+        fi
+
+        read -r update_choice
+
+        case $update_choice in
+            [Yy]*)
+                case $ID in
+                    "ubuntu")
+                        update_ubuntu_sources "$([[ "$location" == "Iran" ]] && echo "iran" || echo "non-iran")"
+                        echo -e "${GREEN}Ubuntu sources list updated.${NC}"
+                        ;;
+                    "debian")
+                        update_debian_sources "$([[ "$location" == "iRAN" ]] && echo "iran" || echo "non-iran")"
+                        echo -e "${GREEN}Debian sources list updated.${NC}"
+                        ;;
+                    *)
+                        echo -e "${RED}Unsupported OS detected. No changes made.${NC}"
+                        ;;
+                esac
+                ;;
+            [Nn]*)
+                echo -e "${YELLOW}Skipping sources list update.${NC}"
+                ;;
+            *)
+                echo -e "${RED}Invalid input. No changes made.${NC}"
                 ;;
         esac
+    else
+        echo -e "${RED}Unable to detect OS. No changes made.${NC}"
     fi
 }
 
@@ -215,49 +277,100 @@ set_timezone() {
     printf "${CYAN}%s ${NC}\n" "$title"
     echo ""
     printf "\e[93m+-------------------------------------+\e[0m\n"
-    public_ip=$(curl -s ipinfo.io/ip)
+    echo ""
 
-    if [[ $? -eq 0 ]]; then
-        location=$(curl -s ipinfo.io/$public_ip/city)
-        timezone=$(curl -s ipinfo.io/$public_ip/timezone)
-        printf "${YELLOW}Your location is ${GREEN}%s${NC}\n" "$location"
-        printf "${YELLOW}Your timezone is ${GREEN}%s${NC}\n" "$timezone"
-        date_time=$(date --date="TZ=\"$timezone\"" "+%Y-%m-%d %H:%M:%S")
-        printf "${YELLOW}The current date and time in your timezone is ${GREEN}%s${NC}\n" "$date_time"
-    else
-        printf "${RED}Error: Failed to fetch public IP address.${NC}\n"
+    # Get the current timezone
+    current_timezone=$(timedatectl | grep "Time zone" | awk '{print $3}')
+    printf "${YELLOW}Your current timezone is ${GREEN}%s${NC}\n" "$current_timezone"
+    echo ""
+
+    # Check if curl is available
+    if ! command -v curl &> /dev/null; then
+        printf "${RED}Error: curl is not installed. Please install curl to proceed.${NC}\n"
+        return 1
     fi
 
-    echo ""
-    press_enter
+    # Define an array of sources
+    sources=(
+        "http://ipwho.is"
+        "http://ip-api.com/json"
+    )
+
+    # Initialize variables
+    location=""
+    timezone=""
+    public_ip=""
+
+    # Try each source in turn
+    for source in "${sources[@]}"; do
+        content=$(curl -s "$source" || true)
+        
+        case $source in
+            "http://ipwho.is")
+                public_ip=$(echo "$content" | jq -r .ip)
+                location=$(echo "$content" | jq -r .city)
+                timezone=$(echo "$content" | jq -r '.timezone.id' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+                ;;
+            "http://ip-api.com/json")
+                public_ip=$(echo "$content" | jq -r .ip)
+                location=$(echo "$content" | jq -r .city)
+                timezone=$(echo "$content" | jq -r '.timezone' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+                ;;
+        esac
+
+        # Break the loop if successful
+        if [[ -n "$location" && -n "$timezone" ]]; then
+            break
+        fi
+    done
+
+    # Check if we found a valid location and timezone
+    if [[ -n "$location" && -n "$timezone" ]]; then
+        printf "${YELLOW}Your public IP is ${GREEN}%s${NC}\n" "$public_ip"
+        printf "${YELLOW}Your location is ${GREEN}%s${NC}\n" "$location"
+        printf "${YELLOW}Your timezone is ${GREEN}%s${NC}\n" "$timezone"
+
+        # Set the timezone and get the current date and time
+        date_time=$(TZ="$timezone" date "+%Y-%m-%d %H:%M:%S")
+        printf "${YELLOW}The current date and time in your timezone is ${GREEN}%s${NC}\n" "$date_time"
+    else
+        printf "${RED}Error: Failed to fetch location and timezone information from all sources.${NC}\n"
+    fi
+
+        press_enter
 }
 
 
-logo=$(cat << "EOF"
-    ______    _______   __      _______        __      _____  ___  
-   /    " \  |   __ "\ |" \    /"      \      /""\    (\"   \|"  \ 
-  // ____  \ (. |__) :)||  |  |:        |    /    \   |.\\   \    |
- /  /    ) :)|:  ____/ |:  |  |_____/   )   /' /\  \  |: \.   \\  |
-(: (____/ // (|  /     |.  |   //      /   //  __'  \ |.  \    \. |
- \        / /|__/ \    /\  |\ |:  __   \  /   /  \\  \|    \    \ |
-  \"_____/ (_______)  (__\_|_)|__|  \___)(___/    \___)\___|\____\)
-EOF
-)
+
+# Define logo segments
+logo1="     ______    _______    __      _______        __      _____  ___   "
+logo2="    /      \  |   __  \  |  \    /       \      /  \     \    \|   \  "
+logo3="   /  ____  \ (  |__)  ) |   |  |         |    /    \    |.\   \    | "
+logo4="  /  /    )  )|   ____/  |   |  |_____/   )   /' /\  \   |: \   \   | "
+logo5=" (  (____/  / (   /      |.  |   //      /   //  __'  \  |.  \    \.| "
+logo6="  \        / /    \      /\  |\ |:  __   \  /   /  \\   \ |    \    \| "
+logo7="   \_____/ (_______)    (__\_|_)|__|  \___)(___/    \___)\___|\____\) "
 
 logo() {
-echo -e "\033[1;34m$logo\033[0m"
+echo -e "${BLUE}${logo1:0:24}${RED}${logo1:24:19}${WHITE}${logo1:43:14}${GREEN}${logo1:57}${NC}"
+echo -e "${BLUE}${logo2:0:24}${RED}${logo2:24:19}${WHITE}${logo2:43:14}${GREEN}${logo2:57}${NC}"
+echo -e "${BLUE}${logo3:0:24}${RED}${logo3:24:19}${WHITE}${logo3:43:14}${GREEN}${logo3:57}${NC}"
+echo -e "${BLUE}${logo4:0:24}${RED}${logo4:24:19}${WHITE}${logo4:43:14}${GREEN}${logo4:57}${NC}"
+echo -e "${BLUE}${logo5:0:24}${RED}${logo5:24:19}${WHITE}${logo5:43:14}${GREEN}${logo5:57}${NC}"
+echo -e "${BLUE}${logo6:0:24}${RED}${logo6:24:19}${WHITE}${logo6:43:14}${GREEN}${logo6:57}${NC}"
+echo -e "${BLUE}${logo7:0:24}${RED}${logo7:24:19}${WHITE}${logo7:43:14}${GREEN}${logo7:57}${NC}"
 }
 
 fix_dns() {
     clear
-    DNS_PATH="/etc/resolv.conf"
-    title="DNS replacement with Google"
+    title="DNS Replacement with Google"
     logo
     echo ""
-    echo -e "${CYAN}$title ${NC}"
+    echo -e "${CYAN}$title${NC}"
     echo ""
-    printf "\e[93m+-------------------------------------+\e[0m\n" 
+    printf "\e[93m+-------------------------------------+\e[0m\n"
     echo ""
+    
     SPINNER="⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
 
     spin() {
@@ -271,18 +384,31 @@ fix_dns() {
         done
     }
 
-    sed -i '/nameserver/d' $DNS_PATH
-    echo 'nameserver 8.8.8.8' >>$DNS_PATH
-    echo 'nameserver 8.8.4.4' >>$DNS_PATH
-    spin & SPIN_PID=$!
+    if ! command -v resolvconf >/dev/null 2>&1; then
+        echo -e "${YELLOW}resolvconf not found, attempting to install...${NC}"
+        apt-get install -y resolvconf
+    fi
 
+    if command -v resolvconf >/dev/null 2>&1; then
+        echo -e "${YELLOW}Using resolvconf to configure DNS...${NC}"
+        echo -e "nameserver 8.8.8.8\nnameserver 8.8.4.4" | resolvconf -a "$(ip -o -4 route show to default | awk '{print $5}')"
+    else
+        echo -e "${YELLOW}resolvconf installation failed or not found, falling back to direct /etc/resolv.conf modification...${NC}"
+        sed -i '/nameserver/d' /etc/resolv.conf
+        echo 'nameserver 8.8.8.8' >>/etc/resolv.conf
+        echo 'nameserver 8.8.4.4' >>/etc/resolv.conf
+    fi
+
+    spin & SPIN_PID=$!
     wait $SPIN_PID
+
     echo ""
     echo -e "${GREEN}System DNS Optimized.${NC}"
     echo ""
     sleep 1
     press_enter
 }
+
 
 complete_update() {
     clear
@@ -320,116 +446,106 @@ installations() {
     echo ""
     echo -e "${RED}Please wait, it might take a while${NC}"
     echo ""
-    apt-get install jq certbot nload nethogs autossh ssh iperf sshuttle software-properties-common apt-transport-https iptables lsb-release ca-certificates ubuntu-keyring gnupg2 apt-utils cron bash-completion curl git unzip zip ufw wget preload locales nano vim python3 jq qrencode socat busybox net-tools haveged htop curl -y
-    apt-get install snapd -y
+    apt-get install jq nload nethogs autossh ssh iperf software-properties-common apt-transport-https \
+                    lsb-release ca-certificates ubuntu-keyring gnupg2 bash-completion curl git unzip \
+                    zip wget locales nano python3 net-tools haveged htop dnsutils iputils-ping -y
+
     echo ""
-    echo -e "${GREEN}Install useful and necessary packages completed.${NC}"
+    echo -e "${GREEN}Installation of useful and necessary packages completed.${NC}"
     echo ""
     sleep 1
     press_enter
 }
 
-enable_packages() {
-    echo -e "${GREEN}Enable snap and cron service as well.${NC}"
-    systemctl enable preload haveged snapd cron
-    press_enter
-}
 
 swap_maker() {
     clear
-    title="Setup and Configure swap file to boost performance"
+    title="Setup and Configure Swap File to Boost Performance"
     swap_files=$(swapon -s | awk '{if($1!~"^Filename"){print $1}}')
-    swap_partitions=$(grep -E '^\S+\s+\S+\sswap\s+' /proc/swaps | awk '{print $1}')
     logo
     echo ""
-    echo -e "${CYAN}$title ${NC}"
+    echo -e "${CYAN}$title${NC}"
     echo ""
-    printf "\e[93m+-------------------------------------+\e[0m\n" 
+    printf "\e[93m+-------------------------------------+\e[0m\n"
     echo ""
-    echo ""
-
+    
+    # Function to remove all existing swap files
     remove_all_swap() {
-    for item in $swap_files $swap_partitions; do
-        swapoff "$item"
-        rm -f "$item"
-    done
+        for item in $swap_files; do
+            swapoff "$item"
+            rm -f "$item"
+        done
     }
 
+    # Check and remove existing swap files if any
     if [ -n "$swap_files" ]; then
+        echo -e "${YELLOW}Removing existing swap files...${NC}"
         remove_all_swap
     fi
 
-    echo -e "${YELLOW}Please select the swap file size: ${NC}"
+    echo -e "${YELLOW}Please select the swap file size (depends on your disk space and RAM):${NC}"
     echo ""
-    echo -e "${GREEN}1)${NC} 512M"
+    echo -e "${GREEN}1)${NC} 512MB"
     echo -e "${GREEN}2)${NC} 1GB"
     echo -e "${GREEN}3)${NC} 2GB"
     echo -e "${GREEN}4)${NC} 4GB"
-    echo -e "${GREEN}5)${NC} Manually enter values"
+    echo -e "${GREEN}5)${NC} Manually enter value"
+    echo -e "${GREEN}6)${NC} No Swap"
     echo ""
-    echo -ne "${CYAN}Enter your choice [1-6]:${NC} "
+    echo -ne "${CYAN}Enter your choice [1-6]: ${NC}"
     read choice
 
     case $choice in
-        1)
-            swap_size="512M"
-            ;;
-        2)
-            swap_size="1G"
-            ;;
-        3)
-            swap_size="2G"
-            ;;
-        4)
-            swap_size="4G"
-            ;;
+        1) swap_size="512M";;
+        2) swap_size="1G";;
+        3) swap_size="2G";;
+        4) swap_size="4G";;
         5)
             echo ""
-            echo -ne "${YELLOW}Please enter the virtual memory size (e.g. 300M, 1.5G): ${NC}   "
-            read swap_size_input
-            swap_size="$swap_size_input"
+            echo -ne "${YELLOW}Please enter the swap file size (e.g., 300M, 1.5G): ${NC}"
+            read swap_size
+            ;;
+        6)
+            echo -e "${RED}No swap file will be created. Exiting...${NC}"
+            return 0
             ;;
         *)
-            echo -e "${RED}Invalid choice, No changes made.${NC}"
+            echo -e "${RED}Invalid choice. Exiting without changes.${NC}"
             return 1
             ;;
     esac
 
-    case $swap_size in
-        *M)
-            swap_size_kb=$(( ${swap_size//[^0-9]/} * 1024 ))
-            ;;
-        *G)
-            swap_size_kb=$(( ${swap_size//[^0-9]/} * 1024 * 1024 ))
-            ;;
-        *)
-            echo -e "${RED}Invalid choice, No changes made.${NC}"
-            return 1
-            ;;
-    esac
+    # Create the swap file
+    swap_file="/swapfile"
+    dd if=/dev/zero of=$swap_file bs=1M count=$(echo $swap_size | grep -oP '^\d+') status=progress
 
-    dd if=/dev/zero of=/swap bs=1k count=$swap_size_kb
-
-    if [ $? -eq 0 ]; then
-        chmod 600 /swap
-        mkswap /swap
-        swapon /swap
-
-        if [ $? -eq 0 ]; then
-            echo "/swap swap swap defaults 0 0" >> /etc/fstab
-            swapon -s | grep '/swap'
-        else
-            return 1
-        fi
-    else
+    if [ $? -ne 0 ]; then
+        echo -e "${RED}Error creating swap file. Exiting...${NC}"
         return 1
     fi
 
-    echo -e "${BLUE}Modifying swap usage threshold... ${NC}"
+    chmod 600 $swap_file
+    mkswap $swap_file
+
+    if [ $? -ne 0 ]; then
+        echo -e "${RED}Error setting up swap space. Exiting...${NC}"
+        return 1
+    fi
+
+    swapon $swap_file
+
+    if [ $? -ne 0 ]; then
+        echo -e "${RED}Error enabling swap file. Exiting...${NC}"
+        return 1
+    fi
+
+    echo "$swap_file swap swap defaults 0 0" >> /etc/fstab
+
+    echo -e "${BLUE}Modifying swap usage threshold (vm.swappiness)...${NC}"
     echo ""
-    printf "\e[93m+-------------------------------------+\e[0m\n" 
+    printf "\e[93m+-------------------------------------+\e[0m\n"
     echo ""
-    echo ""
+
     swap_value=10
     if grep -q "^vm.swappiness" /etc/sysctl.conf; then
         sed -i "s/^vm.swappiness=.*/vm.swappiness=$swap_value/" /etc/sysctl.conf
@@ -439,11 +555,12 @@ swap_maker() {
     sysctl -p
 
     echo ""
-    echo -e "${GREEN}Swap file created and vm.swappiness value has been set to ${RED} $swap_value ${NC}"
+    echo -e "${GREEN}Swap file created and vm.swappiness set to ${RED}$swap_value${NC}."
     echo ""
     sleep 1
     press_enter
 }
+
 
 swap_maker_1() {
     remove_all_swap() {
@@ -469,35 +586,51 @@ swap_maker_1() {
 }
 
 enable_ipv6_support() {
+    # Enable IP forwarding for both IPv4 and IPv6
     sysctl -w net.ipv4.ip_forward=1
     sysctl -w net.ipv6.conf.all.forwarding=1
     sysctl -w net.ipv6.conf.default.forwarding=1
-    echo "net.ipv4.ip_forward = 1" > /etc/sysctl.d/ip_forward.conf
-    echo "net.ipv6.conf.all.forwarding = 1" >> /etc/sysctl.d/ip_forward.conf
-    echo "net.ipv6.conf.default.forwarding = 1" >> /etc/sysctl.d/ip_forward.conf
+
+    # Write settings to persistent sysctl configuration
+    cat <<EOL > /etc/sysctl.d/ip_forward.conf
+net.ipv4.ip_forward = 1
+net.ipv6.conf.all.forwarding = 1
+net.ipv6.conf.default.forwarding = 1
+EOL
+
+    # Apply sysctl settings
     sysctl -p /etc/sysctl.d/ip_forward.conf
-    if [[ $(sysctl -a | grep 'disable_ipv6.*=.*1') || $(cat /etc/sysctl.{conf,d/*} | grep 'disable_ipv6.*=.*1') ]]; then
-    sed -i '/disable_ipv6/d' /etc/sysctl.{conf,d/*}
-    echo 'net.ipv6.conf.all.disable_ipv6 = 0' >/etc/sysctl.d/ipv6.conf
-    sysctl -w net.ipv6.conf.all.disable_ipv6=0
+
+    # Enable IPv6 if it's disabled
+    if sysctl -a | grep -q 'disable_ipv6.*=.*1' || grep -q 'disable_ipv6.*=.*1' /etc/sysctl.{conf,d/*}; then
+        sed -i '/disable_ipv6/d' /etc/sysctl.{conf,d/*}
+        echo 'net.ipv6.conf.all.disable_ipv6 = 0' > /etc/sysctl.d/ipv6.conf
+        sysctl -w net.ipv6.conf.all.disable_ipv6=0
     fi
+
     echo ""
-    echo -e "${GREEN}IPV6 enabled.${NC}"
+    echo -e "${GREEN}IPv6 support enabled.${NC}"
     echo ""
 }
 
 remove_old_sysctl() {
     clear
-    title="Optimizing system configuration and updating sysctl configs"
+    title="Optimizing System Configuration and Updating sysctl Configs"
     logo
     echo ""
-    echo -e "${CYAN}$title ${NC}"
+    echo -e "${CYAN}$title${NC}"
     echo ""
     echo -e "\e[93m+-------------------------------------+\e[0m"
     echo ""
+
+    # Enable IPv6 support and IP forwarding
     enable_ipv6_support
+
+    # Remove specific old configurations
     sed -i '/1000000/d' /etc/profile
-    cat <<EOL > "/etc/sysctl.conf"
+
+    # Write new sysctl configuration
+    cat <<EOL > /etc/sysctl.conf
 # System Configuration Settings for Improved Performance and Security
 
 fs.file-max = 1000000
@@ -534,21 +667,83 @@ net.ipv6.conf.all.disable_ipv6 = 0
 net.ipv6.conf.default.disable_ipv6 = 0
 net.ipv6.conf.all.forwarding = 1
 EOL
-  
-    cat <<EOL >"/etc/security/limits.conf"
+
+    # Update security limits
+    cat <<EOL > /etc/security/limits.conf
 * soft     nproc          655350
 * hard     nproc          655350
 * soft     nofile         655350
 * hard     nofile         655350
-root soft     nproc          655350
-root hard     nproc          655350
-root soft     nofile         655350
-root hard     nofile         655350
+root soft  nproc          655350
+root hard  nproc          655350
+root soft  nofile         655350
+root hard  nofile         655350
 EOL
 
+    # Apply new sysctl settings
     sysctl -p
 
-    echo -e "${GREEN}Sysctl configuration and optimization complete${NC}"
+    echo ""
+    echo -e "${GREEN}Sysctl configuration and optimization complete.${NC}"
+    echo ""
+    press_enter
+}
+
+grub_tuning() {
+    clear
+    title="GRUB Configuration and System Tuning"
+    logo
+    echo ""
+    echo -e "${CYAN}$title${NC}"
+    echo ""
+    echo -e "\e[93m+-------------------------------------+\e[0m\n"
+    echo ""
+    
+    echo -e "${YELLOW}Please select the profile for GRUB configuration:${NC}"
+    echo ""
+    echo -e "${GREEN}1)${NC} Gaming Profile"
+    echo -e "${GREEN}2)${NC} Virtualization Profile"
+    echo -e "${GREEN}3)${NC} Audio Production Profile"
+    echo -e "${GREEN}4)${NC} Mobile Profile"
+    echo -e "${GREEN}5)${NC} No Changes"
+    echo ""
+    echo -ne "${CYAN}Enter your choice [1-5]:${NC} "
+    read choice
+
+    case $choice in
+        1)
+            grub_cmdline="quiet splash preempt=full"
+            ;;
+        2)
+            grub_cmdline="quiet splash preempt=full nohz_full=all"
+            ;;
+        3)
+            grub_cmdline="quiet splash preempt=full nohz_full=all threadirqs"
+            ;;
+        4)
+            grub_cmdline="quiet splash preempt=full rcu_nocbs=all rcutree.enable_rcu_lazy=1"
+            ;;
+        5)
+            echo -e "${RED}No changes made to GRUB configuration.${NC}"
+            return 0
+            ;;
+        *)
+            echo -e "${RED}Invalid choice. No changes made.${NC}"
+            return 1
+            ;;
+    esac
+
+    # Backup the original grub file
+    cp /etc/default/grub /etc/default/grub.bak
+
+    # Update the GRUB_CMDLINE_LINUX_DEFAULT line
+    sed -i "s/^GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT=\"$grub_cmdline\"/" /etc/default/grub
+
+    echo -e "${YELLOW}Updating GRUB configuration...${NC}"
+    update-grub
+
+    echo -e "${GREEN}GRUB configuration updated successfully!${NC}"
+    echo -e "${YELLOW}Reboot your system to apply the changes.${NC}"
     echo ""
     press_enter
 }
@@ -556,124 +751,161 @@ EOL
 optimize_ssh_configuration() {
     clear
     SSH_PATH="/etc/ssh/sshd_config"
-    title="Improve SSH conf. and optimize SSHD"
+    title="Improve SSH Configuration and Optimize SSHD"
     logo
-    echo -e "${CYAN}$title ${NC}"
+    echo -e "${CYAN}$title${NC}"
     echo ""
     echo -e "\e[93m+-------------------------------------+\e[0m"
     echo ""
-    cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
-    cat <<EOL > "/etc/ssh/sshd_config"
-# SSH configuration settings for improved security and performance
+    
+    # Backup existing SSH configuration
+    if [ -f "$SSH_PATH" ]; then
+        cp "$SSH_PATH" "${SSH_PATH}.bak"
+        echo -e "${YELLOW}Backup of the original SSH configuration created at ${SSH_PATH}.bak${NC}"
+    else
+        echo -e "${RED}Error: SSH configuration file not found at ${SSH_PATH}.${NC}"
+        return 1
+    fi
 
+    # Apply optimized SSH configuration
+    cat <<EOL > "$SSH_PATH"
+# Optimized SSH configuration for improved security and performance
+
+# Disable DNS lookups to speed up SSH logins
 UseDNS no
+
+# Enable compression for faster data transfer
 Compression yes
+
+# Strong encryption ciphers
 Ciphers aes256-ctr,chacha20-poly1305@openssh.com
+
+# Keep connections alive, preventing idle disconnects
 TCPKeepAlive yes
-ClientAliveInterval 3000
-ClientAliveCountMax 100
+ClientAliveInterval 300
+ClientAliveCountMax 3
+
+# Allow forwarding and tunneling (modify as needed for security)
 AllowAgentForwarding yes
 AllowTcpForwarding yes
-GatewayPorts yes
+GatewayPorts no
 PermitTunnel yes
+
+# Disable root login for security (Uncomment to enable)
+# PermitRootLogin no
+
+# Custom banner for unauthorized access warning
 Banner /etc/ssh/banner
-X11Forwarding yes
+
+# Disable X11 forwarding if not required
+X11Forwarding no
+
+# Disable printing of MOTD (Message of the Day) to reduce login clutter
 PrintMotd no
+
+# Log the last login for auditing purposes
 PrintLastLog yes
+
+# Limit the maximum number of authentication attempts (Uncomment to enable)
+# MaxAuthTries 3
+
+# Limit login grace time (Uncomment to enable)
+# LoginGraceTime 1m
+
 EOL
 
-echo "WARNING: Unauthorized access is prohibited." > /etc/ssh/banner
+    # Create SSH banner
+    echo "WARNING: Unauthorized access to this system is prohibited." > /etc/ssh/banner
 
-    service ssh restart
-    echo ""
-    echo -e "${GREEN}SSH and SSHD Configuration and optimization complete${NC}"
+    # Restart SSH service to apply changes
+    if service ssh restart; then
+        echo -e "${GREEN}SSH and SSHD configuration and optimization complete.${NC}"
+    else
+        echo -e "${RED}Failed to restart SSH service. Please check the configuration.${NC}"
+        return 1
+    fi
+
     echo ""
     press_enter
 }
 
+
 ask_bbr_version() {
     clear
-    title="Select a TCP congestion control"
+    title="Select a TCP Congestion Control"
     logo
     echo ""
-    printf "${CYAN}%s ${NC}\n" "$title"
+    echo -e "${CYAN}${title}${NC}"
     echo ""
-    printf "\e[93m+-------------------------------------+\e[0m\n" 
+    echo -e "\e[93m+-------------------------------------+\e[0m"
     echo ""
-    printf "${RED}1. ${YELLOW}TCP-BBR${NC}\n"
-    printf "${RED}2. ${YELLOW}XanMod & BBRv3${NC}\n"
-    printf "${RED}3. ${YELLOW}Tcp brutal${NC}\n"
-    printf "${RED}4. ${YELLOW}OpenVZ${NC}\n"
+    echo -e "${RED}1. ${YELLOW}TCP-BBR (Basic BBR)${NC}"
+    echo -e "${RED}2. ${YELLOW}XanMod & BBRv3${NC}"
+    echo -e "${RED}3. ${YELLOW}OpenVZ BBR${NC}"
     echo ""
-    printf "${RED}0. ${YELLOW}No TCP congestion control${NC}\n"
+    echo -e "${RED}0. ${YELLOW}No TCP Congestion Control${NC}"
     echo ""
-    printf "${CYAN}Enter your choice [1-4]: ${NC}"
-    read choice
-    
-    case $choice in
+    echo -ne "${CYAN}Enter your choice [0-3]: ${NC}"
+    read -r choice
 
+    case $choice in
         1)
+            echo -e "${YELLOW}Installing and configuring TCP-BBR...${NC}"
             wget --no-check-certificate https://github.com/teddysun/across/raw/master/bbr.sh && chmod +x bbr.sh && ./bbr.sh
-            
-            echo -e "${GREEN}Kernel parameter optimization for TCP-BBR was successful.${NC}"
+            if [ $? -eq 0 ]; then
+                echo -e "${GREEN}Kernel parameter optimization for TCP-BBR was successful.${NC}"
+            else
+                echo -e "${RED}TCP-BBR installation failed. Please check the script or try again.${NC}"
+            fi
             ;;
         2)
-            clear
-            echo ""
-            printf "${YELLOW}If you have ubuntu or debian system, you can use this script to install and configure BBRv3. ${NC}\n"
-            echo ""
-            press_enter
-            bash <(curl -s https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/bbrv3.sh --ipv4)
-            ;;
-        3)
-            bash <(curl -fsSL https://tcp.hy2.sh/)
-            ;;
-        4)
-            clear
-            echo ""
-            printf "${YELLOW}Optimizing kernel parameters for Open-vz ${NC}\n"
-            echo ""
-            # Check the virtualization method and the kernel support
-            if [ -n "${virt}" -a "${virt}" = "openvz" ] || [ -d "/proc/vz" ]; then
-                if [ -e /sys/class/net/venet0 ]; then
-                    # Use the backup function
-                    backup /etc/sysctl.conf
-                    # Delete any existing lines related to qdisc and congestion control
-                    sed -i '/net.core.default_qdisc/d' /etc/sysctl.conf
-                    sed -i '/net.ipv4.tcp_congestion_control/d' /etc/sysctl.conf
-                    # Set the qdisc to fq_codel for venet0
-                    tc qdisc add dev venet0 root fq_codel
-                    # Set the congestion control to bbr for venet0
-                    sysctl -w net.ipv4.tcp_congestion_control=bbr
-                    # Reload the sysctl file
-                    sysctl -p
-                    # Check the return value
-                    if [ $? -eq 0 ]; then
-                        printf "${GREEN}Kernel parameter optimization for Open-vz was successful.${NC}\n"
-                    else
-                        printf "${RED}Kernel parameter optimization failed. Restoring the original configuration...${NC}\n"
-                        # Use the backup function
-                        backup /etc/sysctl.conf.bak
-                    fi
+            echo -e "${YELLOW}Installing and configuring XanMod & BBRv3...${NC}"
+            if [[ -f /etc/os-release && $(grep -Ei 'ubuntu|debian' /etc/os-release) ]]; then
+                bash <(curl -s https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/bbrv3.sh --ipv4)
+                if [ $? -eq 0 ]; then
+                    echo -e "${GREEN}XanMod & BBRv3 installation was successful.${NC}"
                 else
-                    printf "${RED}Your kernel does not support the venet0 interface. No changes made.${NC}\n"
+                    echo -e "${RED}XanMod & BBRv3 installation failed. Please check the script or try again.${NC}"
                 fi
             else
-                printf "${RED}Your virtualization method is not Open-vz. No changes made.${NC}\n"
+                echo -e "${RED}This script is intended for Ubuntu or Debian systems only.${NC}"
             fi
-            ;;  
+            ;;
+        3)
+            echo -e "${YELLOW}Optimizing kernel parameters for OpenVZ BBR...${NC}"
+            # Check for OpenVZ and venet0 interface
+            if [ -d "/proc/vz" ] && [ -e /sys/class/net/venet0 ]; then
+                # Backup existing sysctl.conf
+                cp /etc/sysctl.conf /etc/sysctl.conf.bak
+                # Remove existing qdisc and congestion control settings
+                sed -i '/net.core.default_qdisc/d' /etc/sysctl.conf
+                sed -i '/net.ipv4.tcp_congestion_control/d' /etc/sysctl.conf
+                # Set qdisc and congestion control for venet0
+                tc qdisc add dev venet0 root fq_codel
+                sysctl -w net.ipv4.tcp_congestion_control=bbr
+                # Apply sysctl settings
+                sysctl -p
+                if [ $? -eq 0 ]; then
+                    echo -e "${GREEN}Kernel parameter optimization for OpenVZ was successful.${NC}"
+                else
+                    echo -e "${RED}Optimization failed. Restoring original sysctl configuration.${NC}"
+                    mv /etc/sysctl.conf.bak /etc/sysctl.conf
+                fi
+            else
+                echo -e "${RED}This system is not OpenVZ or lacks venet0 support. No changes were made.${NC}"
+            fi
+            ;;
         0)
-            clear
-            echo ""
-            printf "${YELLOW}No TCP congestion control selected.${NC}\n"
+            echo -e "${YELLOW}No TCP congestion control selected.${NC}"
             ;;
         *)
-            printf "${RED}Invalid choice.${NC}\n"
+            echo -e "${RED}Invalid choice. Please enter a number between 0 and 3.${NC}"
             return 1
             ;;
     esac
     press_enter
 }
+
 
 final() {
 clear
@@ -693,9 +925,9 @@ ask_reboot
 }
 
 while true; do
-clear
+    clear
     tg_title="https://t.me/OPIranCluB"
-    yt_title="youtube.com/@opiran-inistitute"
+    yt_title="youtube.com/@opiran-institute"
     clear
     logo
     echo -e "\e[93m╔═══════════════════════════════════════════════╗\e[0m"  
@@ -705,45 +937,44 @@ clear
     echo -e "${BLUE}   ${tg_title}   ${NC}"
     echo -e "${BLUE}   ${yt_title}   ${NC}"
     echo ""
-    printf "\e[93m+-----------------------------------------------+\e[0m\n" 
+    echo -e "\e[93m+-----------------------------------------------+\e[0m" 
     echo ""
+    printf "${GREEN} 1) ${NC} Optimizer (1-click)${NC}\n"
+    printf "${GREEN} 2) ${NC} Optimizer (step by step)${NC}\n"
     echo ""
-    printf "${GREEN} 1) ${NC} Optimizer (1-click) ${NC}\n"
-    printf "${GREEN} 2) ${NC} Optimizer (step by step) ${NC}\n"
+    printf "${GREEN} 3) ${NC} Swap Menu${NC}\n"
+    printf "${GREEN} 4) ${NC} BBR Menu${NC}\n"
     echo ""
-    printf "${GREEN} 3) ${NC} Swap Menu ${NC}\n"
-    printf "${GREEN} 4) ${NC} BBR Menu ${NC}\n"
+    printf "${GREEN} 5) ${NC} GRUB Optimization Menu${NC}\n"
     echo ""
-    printf "\e[93m+-----------------------------------------------+\e[0m\n" 
+    echo -e "\e[93m+-----------------------------------------------+\e[0m" 
     echo ""
     printf "${GREEN} E) ${NC} Exit the menu${NC}\n"
     echo ""
-    echo -ne "${GREEN}Select an option: ${NC}  "
-    read choice
+    echo -ne "${GREEN}Select an option: ${NC}"
+    read -r choice
 
     case $choice in
- 
         1)
-        clear
-            fun_bar "Update and replace DNS nameserver" fix_dns
-            fun_bar "Complete update and upgrade" complete_update
-            fun_bar "Install usefull packages" installations
-            fun_bar "Enable some services" enable_packages
-            fun_bar "Create swap file with 512mb" swap_maker_1
+            clear
+            fun_bar "Updating and replacing DNS nameserver" fix_dns
+            fun_bar "Complete system update and upgrade" complete_update
+            fun_bar "Installing useful packages" installations
+            fun_bar "Creating swap file with 512MB" swap_maker_1
             fun_bar "Updating sysctl configuration" remove_old_sysctl
-            fun_bar "Updating and Modifying SSH configuration" remove_old_ssh_conf
-            ask_bbr_version_1
+            fun_bar "Updating and modifying SSH configuration" remove_old_ssh_conf
+            ask_bbr_version
             final
             ;;
         2)
             sourcelist
-            set_timezone
-            fix_dns
             complete_update
             installations
-            enable_packages
+            fix_dns
+            set_timezone
             swap_maker
             remove_old_sysctl
+            grub_tuning
             remove_old_ssh_conf
             ask_bbr_version
             final
@@ -754,15 +985,20 @@ clear
         4)
             ask_bbr_version
             ;;
+        5)
+            grub_tuning
+            ;;
         E|e)
             echo "Exiting..."
             exit 0
             ;;
         *)
-            echo "Invalid choice. Please enter a valid option."
+            echo -e "${RED}Invalid choice. Please enter a valid option.${NC}"
             ;;
     esac
 
-    echo -e "\n${RED}Press Enter to continue... ${NC}"
-    read
+    echo -e "\n${RED}Press Enter to continue...${NC}"
+    read -r
+done
+
 done
