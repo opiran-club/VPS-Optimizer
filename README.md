@@ -1,4 +1,5 @@
-### VPS Optimizer One-click (V.1.1) with optional TCP congestion control (Tcp-brutal, Tcp-BBR, XanMod and BBRv3, Openvz-BBR)
+### VPS Optimizer One-click (V.2) with optional Swap , TCP congestion control , Grub tuning , Sourcelist for iranian servers (Debian based)
+
 https://opiran-club.github.io/VPS-Optimizer/
 ##### Summurize configuration
  - Upgrade, Time setting, Install Useful Packages, Optimize the SYSCTL, Optimize SSH
