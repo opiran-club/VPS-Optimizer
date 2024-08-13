@@ -895,9 +895,6 @@ speedtest() {
         elif command -v apt-get &>/dev/null; then
             pkg_manager="apt-get"
             speedtest_install_script="https://packagecloud.io/install/repositories/ookla/speedtest-cli/script.deb.sh"
-        elif command -v apt &>/dev/null; then
-            pkg_manager="apt"
-            speedtest_install_script="https://packagecloud.io/install/repositories/ookla/speedtest-cli/script.deb.sh"
         else
             echo "Error: Supported package manager not found. You may need to install Speedtest manually."
             return 1
@@ -910,12 +907,7 @@ speedtest() {
             return 1
         fi
 
-        if $pkg_manager install -y speedtest; then
-            echo "Speedtest installed successfully."
-        else
-            echo "Error: Failed to install Speedtest."
-            return 1
-        fi
+        $pkg_manager install -y speedtest
     fi
 
     if command -v speedtest &>/dev/null; then
@@ -923,8 +915,6 @@ speedtest() {
     else
         echo "Error: Speedtest is not installed."
     fi
-
-    press_enter
 }
 
 benchmark() {
