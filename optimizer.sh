@@ -143,16 +143,12 @@ sourcelist() {
     # Backup existing sources.list
     cp /etc/apt/sources.list /etc/apt/sources.list.bak
     apt-get install jq -y
-
     # Function to get the release codename
     get_release_codename() {
         if [ -f /etc/os-release ]; then
             source /etc/os-release
             case $ID in
-                "ubuntu")
-                    release=$(lsb_release -cs)
-                    ;;
-                "debian")
+                "ubuntu" | "debian")
                     release=$(lsb_release -cs)
                     ;;
                 *)
@@ -181,7 +177,18 @@ sourcelist() {
             mirror_url="http://archive.ubuntu.com/ubuntu"
         fi
 
-        echo "deb $mirror_url $release universe" > /etc/apt/sources.list
+        cat <<EOL > /etc/apt/sources.list
+deb $mirror_url $release main restricted
+deb $mirror_url $release-updates main restricted
+deb $mirror_url $release universe
+deb $mirror_url $release-updates universe
+deb $mirror_url $release multiverse
+deb $mirror_url $release-updates multiverse
+deb $mirror_url $release-backports main restricted universe multiverse
+deb $mirror_url $release-security main restricted
+deb $mirror_url $release-security universe
+deb $mirror_url $release-security multiverse
+EOL
     }
 
     # Function to set sources list for Debian
@@ -198,6 +205,8 @@ sourcelist() {
 
         cat <<EOL > /etc/apt/sources.list
 deb $mirror_url $release main
+deb $mirror_url $release-updates main
+deb $mirror_url $release-backports main
 deb $security_mirror_url $release-security main
 EOL
     }
@@ -215,7 +224,7 @@ EOL
         if [[ "$location" == "Iran" ]]; then
             echo -ne "${GREEN}Location detected as ${RED}Iran${GREEN}. Update sources list to Iranian mirrors? ${YELLOW}[SUGGESTED Y] ${GREEN}[y/n]: ${NC}"
         else
-            echo -ne "${GREEN}Location detected as ${RED}$location${GREEN}. Update sources list to default mirrors?${YELLOW}[SUGGESTED Y] ${GREEN}[y/n]: ${NC}"
+            echo -ne "${GREEN}Location detected as ${RED}$location${GREEN}. Update sources list to default mirrors? ${YELLOW}[SUGGESTED Y] ${GREEN}[y/n]: ${NC}"
         fi
 
         read -r update_choice
@@ -228,7 +237,7 @@ EOL
                         echo -e "${GREEN}Ubuntu sources list updated.${NC}"
                         ;;
                     "debian")
-                        update_debian_sources "$([[ "$location" == "iRAN" ]] && echo "iran" || echo "non-iran")"
+                        update_debian_sources "$([[ "$location" == "Iran" ]] && echo "iran" || echo "non-iran")"
                         echo -e "${GREEN}Debian sources list updated.${NC}"
                         ;;
                     *)
@@ -247,7 +256,6 @@ EOL
         echo -e "${RED}Unable to detect OS. No changes made.${NC}"
     fi
 }
-
 
 press_enter() {
     echo -e "\n ${RED}Press Enter to continue... ${NC}"
