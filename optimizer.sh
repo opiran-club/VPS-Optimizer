@@ -949,12 +949,10 @@ speedtest() {
             return 1
         else
             curl -s $speedtest_install_script | bash
-            $pkg_manager install -y speedtest
+            $pkg_manager install -y speedtest && speedtest
         fi
     fi
 
-    # Run Speedtest
-    speedtest
         press_enter
 }
 
