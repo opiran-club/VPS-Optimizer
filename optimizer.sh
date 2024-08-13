@@ -19,14 +19,12 @@ WHITE="\e[97m"
 NC="\e[0m"
 BOLD=$(tput bold)
 
-# Define a backup function
 backup() {
     local file="$1"
     echo -e "${YELLOW}Backing up $file...${NC}"
     cp "$file" "$file.bak"
 }
 
-# Define a version comparison function
 _version() {
     local ver1 ver2
     ver1="$1"
@@ -38,7 +36,6 @@ _version() {
     fi
 }
 
-# Define a command existence check function
 _exists() {
     local cmd
     cmd="$1"
@@ -49,7 +46,6 @@ _exists() {
     fi
 }
 
-# Define a Hybla check function
 check_Hybla() {
     local param=$(sysctl net.ipv4.tcp_congestion_control | awk '{print $3}')
     if [[ x"${param}" == x"hybla" ]]; then
@@ -59,7 +55,6 @@ check_Hybla() {
     fi
 }
 
-# Define a kernel version check function
 kernel_version() {
     local kernel_version=$(uname -r | cut -d- -f1)
     if _version ${kernel_version} 4.9; then
@@ -69,7 +64,6 @@ kernel_version() {
     fi
 }
 
-# Define an OS check function
 check_os() {
     if _exists "virt-what"; then
         virt="$(virt-what)"
@@ -140,10 +134,9 @@ sourcelist() {
     echo -e "\e[93m+-------------------------------------+\e[0m"
     echo ""
 
-    # Backup existing sources.list
     cp /etc/apt/sources.list /etc/apt/sources.list.bak
     apt-get install jq -y
-    # Function to get the release codename
+
     clear
     title="Source List Adjustment to Official Repositories"
     logo
@@ -176,7 +169,6 @@ sourcelist() {
         return 1
     fi
 
-    # Function to set sources list for Ubuntu
     update_ubuntu_sources() {
         local mirror_url
         if [ "$1" = "iran" ]; then
@@ -199,7 +191,6 @@ deb $mirror_url $release-security multiverse
 EOL
     }
 
-    # Function to set sources list for Debian
     update_debian_sources() {
         local mirror_url
         local security_mirror_url
@@ -219,16 +210,13 @@ deb $security_mirror_url $release-security main
 EOL
     }
 
-    # Detect the OS and set the correct sources
     if [ -f /etc/os-release ]; then
         source /etc/os-release
 
-        # Use a location detection service to determine if the server is in Iran
         location_info=$(curl -s "http://ipwho.is")
         public_ip=$(echo "$location_info" | jq -r .ip)
         location=$(echo "$location_info" | jq -r .country)
 
-        # Check if the location is Iran
         if [[ "$location" == "Iran" ]]; then
             echo -ne "${GREEN}Location detected as ${RED}Iran${GREEN}. Update sources list to Iranian mirrors? ${YELLOW}[SUGGESTED Y] ${GREEN}[y/n]: ${NC}"
         else
@@ -296,29 +284,24 @@ set_timezone() {
     printf "\e[93m+-------------------------------------+\e[0m\n"
     echo ""
 
-    # Get the current timezone
     current_timezone=$(timedatectl | grep "Time zone" | awk '{print $3}')
     printf "${YELLOW}Your current timezone is ${GREEN}%s${NC}\n" "$current_timezone"
     echo ""
 
-    # Check if curl is available
     if ! command -v curl &> /dev/null; then
         printf "${RED}Error: curl is not installed. Please install curl to proceed.${NC}\n"
         return 1
     fi
 
-    # Define an array of sources
     sources=(
         "http://ipwho.is"
         "http://ip-api.com/json"
     )
 
-    # Initialize variables
     location=""
     timezone=""
     public_ip=""
 
-    # Try each source in turn
     for source in "${sources[@]}"; do
         content=$(curl -s "$source" || true)
         
@@ -335,19 +318,16 @@ set_timezone() {
                 ;;
         esac
 
-        # Break the loop if successful
         if [[ -n "$location" && -n "$timezone" ]]; then
             break
         fi
     done
 
-    # Check if we found a valid location and timezone
     if [[ -n "$location" && -n "$timezone" ]]; then
         printf "${YELLOW}Your public IP is ${GREEN}%s${NC}\n" "$public_ip"
         printf "${YELLOW}Your location is ${GREEN}%s${NC}\n" "$location"
         printf "${YELLOW}Your timezone is ${GREEN}%s${NC}\n" "$timezone"
 
-        # Set the timezone and get the current date and time
         date_time=$(TZ="$timezone" date "+%Y-%m-%d %H:%M:%S")
         printf "${YELLOW}The current date and time in your timezone is ${GREEN}%s${NC}\n" "$date_time"
     else
@@ -486,7 +466,6 @@ swap_maker() {
     printf "\e[93m+-------------------------------------+\e[0m\n"
     echo ""
     
-    # Function to remove all existing swap files
     remove_all_swap() {
         for item in $swap_files; do
             swapoff "$item"
@@ -494,7 +473,6 @@ swap_maker() {
         done
     }
 
-    # Check and remove existing swap files if any
     if [ -n "$swap_files" ]; then
         echo -e "${YELLOW}Removing existing swap files...${NC}"
         remove_all_swap
@@ -532,7 +510,6 @@ swap_maker() {
             ;;
     esac
 
-    # Create the swap file
     swap_file="/swapfile"
     dd if=/dev/zero of=$swap_file bs=1M count=$(echo $swap_size | grep -oP '^\d+') status=progress
 
@@ -603,22 +580,18 @@ swap_maker_1() {
 }
 
 enable_ipv6_support() {
-    # Enable IP forwarding for both IPv4 and IPv6
     sysctl -w net.ipv4.ip_forward=1
     sysctl -w net.ipv6.conf.all.forwarding=1
     sysctl -w net.ipv6.conf.default.forwarding=1
 
-    # Write settings to persistent sysctl configuration
     cat <<EOL > /etc/sysctl.d/ip_forward.conf
 net.ipv4.ip_forward = 1
 net.ipv6.conf.all.forwarding = 1
 net.ipv6.conf.default.forwarding = 1
 EOL
 
-    # Apply sysctl settings
     sysctl -p /etc/sysctl.d/ip_forward.conf
 
-    # Enable IPv6 if it's disabled
     if sysctl -a | grep -q 'disable_ipv6.*=.*1' || grep -q 'disable_ipv6.*=.*1' /etc/sysctl.{conf,d/*}; then
         sed -i '/disable_ipv6/d' /etc/sysctl.{conf,d/*}
         echo 'net.ipv6.conf.all.disable_ipv6 = 0' > /etc/sysctl.d/ipv6.conf
@@ -640,13 +613,10 @@ remove_old_sysctl() {
     echo -e "\e[93m+-------------------------------------+\e[0m"
     echo ""
 
-    # Enable IPv6 support and IP forwarding
     enable_ipv6_support
 
-    # Remove specific old configurations
     sed -i '/1000000/d' /etc/profile
 
-    # Write new sysctl configuration
     cat <<EOL > /etc/sysctl.conf
 # System Configuration Settings for Improved Performance and Security
 
@@ -685,7 +655,6 @@ net.ipv6.conf.default.disable_ipv6 = 0
 net.ipv6.conf.all.forwarding = 1
 EOL
 
-    # Update security limits
     cat <<EOL > /etc/security/limits.conf
 * soft     nproc          655350
 * hard     nproc          655350
@@ -697,7 +666,6 @@ root soft  nofile         655350
 root hard  nofile         655350
 EOL
 
-    # Apply new sysctl settings
     sysctl -p
 
     echo ""
@@ -750,10 +718,8 @@ grub_tuning() {
             ;;
     esac
 
-    # Backup the original grub file
     cp /etc/default/grub /etc/default/grub.bak
 
-    # Update the GRUB_CMDLINE_LINUX_DEFAULT line
     sed -i "s/^GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT=\"$grub_cmdline\"/" /etc/default/grub
 
     echo -e "${YELLOW}Updating GRUB configuration...${NC}"
@@ -775,7 +741,6 @@ optimize_ssh_configuration() {
     echo -e "\e[93m+-------------------------------------+\e[0m"
     echo ""
     
-    # Backup existing SSH configuration
     if [ -f "$SSH_PATH" ]; then
         cp "$SSH_PATH" "${SSH_PATH}.bak"
         echo -e "${YELLOW}Backup of the original SSH configuration created at ${SSH_PATH}.bak${NC}"
@@ -784,7 +749,6 @@ optimize_ssh_configuration() {
         return 1
     fi
 
-    # Apply optimized SSH configuration
     cat <<EOL > "$SSH_PATH"
 # Optimized SSH configuration for improved security and performance
 
@@ -831,10 +795,8 @@ PrintLastLog yes
 
 EOL
 
-    # Create SSH banner
     echo "WARNING: Unauthorized access to this system is prohibited." > /etc/ssh/banner
 
-    # Restart SSH service to apply changes
     if service ssh restart; then
         echo -e "${GREEN}SSH and SSHD configuration and optimization complete.${NC}"
     else
@@ -890,17 +852,12 @@ ask_bbr_version() {
             ;;
         3)
             echo -e "${YELLOW}Optimizing kernel parameters for OpenVZ BBR...${NC}"
-            # Check for OpenVZ and venet0 interface
             if [ -d "/proc/vz" ] && [ -e /sys/class/net/venet0 ]; then
-                # Backup existing sysctl.conf
                 cp /etc/sysctl.conf /etc/sysctl.conf.bak
-                # Remove existing qdisc and congestion control settings
                 sed -i '/net.core.default_qdisc/d' /etc/sysctl.conf
                 sed -i '/net.ipv4.tcp_congestion_control/d' /etc/sysctl.conf
-                # Set qdisc and congestion control for venet0
                 tc qdisc add dev venet0 root fq_codel
                 sysctl -w net.ipv4.tcp_congestion_control=bbr
-                # Apply sysctl settings
                 sysctl -p
                 if [ $? -eq 0 ]; then
                     echo -e "${GREEN}Kernel parameter optimization for OpenVZ was successful.${NC}"
@@ -924,9 +881,16 @@ ask_bbr_version() {
 }
 
 speedtest() {
-    # Check if Speedtest is already installed
+    clear
+    title="Speed Test"
+    logo
+    echo ""
+    echo -e "${CYAN}${title}${NC}"
+    echo ""
+    echo -e "\e[93m+-------------------------------------+\e[0m"
+    echo ""
+    
     if ! command -v speedtest &>/dev/null; then
-        # If not installed, determine the package manager and installation script
         local pkg_manager=""
         local speedtest_install_script=""
 
@@ -947,7 +911,6 @@ speedtest() {
             return 1
         fi
 
-        # Download and execute the installation script
         if curl -s $speedtest_install_script | bash; then
             echo "Speedtest repository added successfully."
         else
@@ -955,7 +918,6 @@ speedtest() {
             return 1
         fi
 
-        # Install Speedtest using the identified package manager
         if $pkg_manager install -y speedtest; then
             echo "Speedtest installed successfully."
         else
@@ -964,7 +926,6 @@ speedtest() {
         fi
     fi
 
-    # Run Speedtest
     if command -v speedtest &>/dev/null; then
         speedtest
     else
@@ -973,6 +934,41 @@ speedtest() {
 
     press_enter
 }
+
+benchmark() {
+    clear
+    title="Benchmark (iperf test)"
+    logo
+    echo ""
+    echo -e "${CYAN}${title}${NC}"
+    echo ""
+    echo -e "\e[93m+-------------------------------------+\e[0m"
+    echo ""
+
+    if ! command -v wget &>/dev/null; then
+        apt-get install wget -y
+    fi
+
+    echo ""
+    echo -e "${MAGENTA} TIP! ${NC}"
+    echo -e "${YELLOW} THIS TEST TAKES A LONG TIME, SO PLEASE BE PATIENT ${NC}"
+    echo ""
+
+    echo -ne "Please type the destination: "
+    read -r location
+
+    echo -e "${GREEN}Valid Regions: ${YELLOW} na, sa, eu, au, asia, africa, middle-east, india, china, iran${NC}"
+    echo ""
+
+    if wget -qO- network-speed.xyz | bash -s -- -r "$location"; then
+        echo -e "${GREEN}Benchmark test completed successfully.${NC}"
+    else
+        echo -e "${RED}Error: Failed to run the benchmark test.${NC}"
+    fi
+
+    press_enter
+}
+
 
 final() {
 clear
@@ -1013,7 +1009,9 @@ while true; do
     printf "${GREEN} 4) ${NC} BBR Menu${NC}\n"
     echo ""
     printf "${GREEN} 5) ${NC} GRUB Optimization Menu${NC}\n"
+    echo ""
     printf "${GREEN} 6) ${NC} Speedtest${NC}\n"
+    printf "${GREEN} 7) ${NC} Benchmark VPS${NC}\n"
     echo ""
     echo -e "\e[93m+-----------------------------------------------+\e[0m" 
     echo ""
@@ -1059,6 +1057,9 @@ while true; do
         6)
             speedtest
             ;;
+        7)
+            benchmark
+            ;;        
         E|e)
             echo "Exiting..."
             exit 0
