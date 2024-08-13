@@ -28,9 +28,9 @@ apt install curl -y && bash <(curl -s https://raw.githubusercontent.com/opiran-c
 
 ---------------------------------------------------------------------------------------------------------------------------------------
 
-[Xanmod BBRv.3 page](https://github.com/opiran-club/VPS-Optimizer/blob/main/Xanmod/readme.md)
+[Xanmod BBRv.3 page](https://opiran-club.github.io/VPS-Optimizer/Xanmod/)
 
-[BadVPN page](https://github.com/opiran-club/VPS-Optimizer/blob/main/badvpn/readme.md)
+[BadVPN page](https://opiran-club.github.io/VPS-Optimizer/badvpn/)
 
 ---------------------------------------------------------------------------------------------------------------------------------------
 
