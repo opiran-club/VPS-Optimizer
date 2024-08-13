@@ -880,7 +880,7 @@ ask_bbr_version() {
     press_enter
 }
 
-speedtest() {
+speedtestcli() {
     
     if ! command -v speedtest &>/dev/null; then
         local pkg_manager=""
@@ -1036,7 +1036,7 @@ while true; do
             grub_tuning
             ;;
         6)
-            speedtest
+            speedtestcli
             ;;
         7)
             benchmark
