@@ -923,6 +923,40 @@ ask_bbr_version() {
     press_enter
 }
 
+speedtest() {
+    # Check if Speedtest is already installed
+    if ! command -v speedtest &>/dev/null; then
+        # If not installed, install it
+        local pkg_manager=""
+        local speedtest_install_script=""
+
+        if command -v dnf &>/dev/null; then
+            pkg_manager="dnf"
+            speedtest_install_script="https://packagecloud.io/install/repositories/ookla/speedtest-cli/script.rpm.sh"
+        elif command -v yum &>/dev/null; then
+            pkg_manager="yum"
+            speedtest_install_script="https://packagecloud.io/install/repositories/ookla/speedtest-cli/script.rpm.sh"
+        elif command -v apt-get &>/dev/null; then
+            pkg_manager="apt-get"
+            speedtest_install_script="https://packagecloud.io/install/repositories/ookla/speedtest-cli/script.deb.sh"
+        elif command -v apt &>/dev/null; then
+            pkg_manager="apt"
+            speedtest_install_script="https://packagecloud.io/install/repositories/ookla/speedtest-cli/script.deb.sh"
+        fi
+
+        if [[ -z $pkg_manager ]]; then
+            echo "Error: Package manager not found. You may need to install Speedtest manually."
+            return 1
+        else
+            curl -s $speedtest_install_script | bash
+            $pkg_manager install -y speedtest
+        fi
+    fi
+
+    # Run Speedtest
+    speedtest
+        press_enter
+}
 
 final() {
 clear
@@ -963,6 +997,7 @@ while true; do
     printf "${GREEN} 4) ${NC} BBR Menu${NC}\n"
     echo ""
     printf "${GREEN} 5) ${NC} GRUB Optimization Menu${NC}\n"
+    printf "${GREEN} 6) ${NC} Speedtest${NC}\n"
     echo ""
     echo -e "\e[93m+-----------------------------------------------+\e[0m" 
     echo ""
@@ -1004,6 +1039,9 @@ while true; do
             ;;
         5)
             grub_tuning
+            ;;
+        6)
+            speedtest
             ;;
         E|e)
             echo "Exiting..."
