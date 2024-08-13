@@ -881,14 +881,6 @@ ask_bbr_version() {
 }
 
 speedtest() {
-    clear
-    title="Speed Test"
-    logo
-    echo ""
-    echo -e "${CYAN}${title}${NC}"
-    echo ""
-    echo -e "\e[93m+-------------------------------------+\e[0m"
-    echo ""
     
     if ! command -v speedtest &>/dev/null; then
         local pkg_manager=""
@@ -953,11 +945,10 @@ benchmark() {
     echo -e "${MAGENTA} TIP! ${NC}"
     echo -e "${YELLOW} THIS TEST TAKES A LONG TIME, SO PLEASE BE PATIENT ${NC}"
     echo ""
-
+    echo -e "${GREEN}Valid Regions: ${YELLOW} na, sa, eu, au, asia, africa, middle-east, india, china, iran${NC}"
     echo -ne "Please type the destination: "
     read -r location
 
-    echo -e "${GREEN}Valid Regions: ${YELLOW} na, sa, eu, au, asia, africa, middle-east, india, china, iran${NC}"
     echo ""
 
     if wget -qO- network-speed.xyz | bash -s -- -r "$location"; then
