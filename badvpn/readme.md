@@ -16,3 +16,11 @@ wget -N https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/Install
 ------------------------------------------------------------------------------------------------------------------------
 
 [Source page and simple view](https://github.com/opiran-club/VPS-Optimizer/blob/main/badvpn/readme.md)
+
+---------------------------------------------------------------------------------------------------------------------------------------
+
+### Credits
+ - credited by [OPIran](https://github.com/opiran-club)
+
+### Contacts
+ - Visit Me at [OPIran-Gap](https://t.me/opiranclub)
