@@ -142,6 +142,7 @@ sourcelist() {
 
     # Backup existing sources.list
     cp /etc/apt/sources.list /etc/apt/sources.list.bak
+    apt-get install jq -y
 
     # Function to get the release codename
     get_release_codename() {
