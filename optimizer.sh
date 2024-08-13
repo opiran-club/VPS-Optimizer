@@ -1,6 +1,6 @@
 
 #!/bin/bash
-#
+# 
 # VPS OPtimizer Bash Script
 # Author: github.com/opiran-club
 #
