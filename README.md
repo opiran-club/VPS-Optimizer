@@ -9,7 +9,9 @@ https://opiran-club.github.io/VPS-Optimizer/
  - update mirrorlist for iranian servers to arvan
  - update timesetting to support iranian servers
  - Grub tuning (Mobile Profile, Audio Production Profile, Virtualization Profile, Gaming Profile)
- - Swap file + vm.swapiness value 
+ - Swap file + vm.swapiness value
+ - SPEEDTEST
+ - Benchmark VPS
 
 Supported Debian base (Debian , Ubuntu) with X86 & Arm64 & OpenVZ architecture 
    
