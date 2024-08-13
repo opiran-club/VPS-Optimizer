@@ -144,6 +144,14 @@ sourcelist() {
     cp /etc/apt/sources.list /etc/apt/sources.list.bak
     apt-get install jq -y
     # Function to get the release codename
+    clear
+    title="Source List Adjustment to Official Repositories"
+    logo
+    echo ""
+    echo -e "${CYAN}$title${NC}"
+    echo ""
+    echo -e "\e[93m+-------------------------------------+\e[0m"
+    echo ""
     get_release_codename() {
         if [ -f /etc/os-release ]; then
             source /etc/os-release
