@@ -14,3 +14,11 @@ bash <(curl -s https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/
 ------------------------------------------------------------------------------------------------------------------------
 
 [Source page and simple view](https://github.com/opiran-club/VPS-Optimizer/blob/main/Xanmod/readme.md)
+
+---------------------------------------------------------------------------------------------------------------------------------------
+
+### Credits
+ - credited by [OPIran](https://github.com/opiran-club)
+
+### Contacts
+ - Visit Me at [OPIran-Gap](https://t.me/opiranclub)
