@@ -926,7 +926,7 @@ ask_bbr_version() {
 speedtest() {
     # Check if Speedtest is already installed
     if ! command -v speedtest &>/dev/null; then
-        # If not installed, install it
+        # If not installed, determine the package manager and installation script
         local pkg_manager=""
         local speedtest_install_script=""
 
@@ -942,18 +942,36 @@ speedtest() {
         elif command -v apt &>/dev/null; then
             pkg_manager="apt"
             speedtest_install_script="https://packagecloud.io/install/repositories/ookla/speedtest-cli/script.deb.sh"
+        else
+            echo "Error: Supported package manager not found. You may need to install Speedtest manually."
+            return 1
         fi
 
-        if [[ -z $pkg_manager ]]; then
-            echo "Error: Package manager not found. You may need to install Speedtest manually."
-            return 1
+        # Download and execute the installation script
+        if curl -s $speedtest_install_script | bash; then
+            echo "Speedtest repository added successfully."
         else
-            curl -s $speedtest_install_script | bash
-            $pkg_manager install -y speedtest && speedtest
+            echo "Error: Failed to add the Speedtest repository."
+            return 1
+        fi
+
+        # Install Speedtest using the identified package manager
+        if $pkg_manager install -y speedtest; then
+            echo "Speedtest installed successfully."
+        else
+            echo "Error: Failed to install Speedtest."
+            return 1
         fi
     fi
 
-        press_enter
+    # Run Speedtest
+    if command -v speedtest &>/dev/null; then
+        speedtest
+    else
+        echo "Error: Speedtest is not installed."
+    fi
+
+    press_enter
 }
 
 final() {
