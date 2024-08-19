@@ -432,6 +432,8 @@ complete_update() {
     apt-get upgrade -y
     apt-get autoremove -y
     apt-get clean -y
+    echo "140.82.114.4 github.com" | sudo tee -a /etc/hosts
+    echo "185.199.108.133 raw.githubusercontent.com" | sudo tee -a /etc/hosts
     echo ""
     echo -e "${GREEN}System update & upgrade completed.${NC}"
     echo ""
