@@ -12,6 +12,7 @@
  - Swap file + vm.swapiness value
  - SPEEDTEST
  - Benchmark VPS
+ - add "185.199.108.133 raw.githubusercontent.com" in hosts for iranian servers
 
 Supported Debian base (Debian , Ubuntu) with X86 & Arm64 & OpenVZ architecture 
    
