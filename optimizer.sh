@@ -381,6 +381,7 @@ fix_dns() {
         done
     }
 
+    # Install resolvconf if not found
     if ! command -v resolvconf >/dev/null 2>&1; then
         echo -e "${YELLOW}resolvconf not found, attempting to install...${NC}"
         apt-get install -y resolvconf
@@ -388,7 +389,15 @@ fix_dns() {
 
     if command -v resolvconf >/dev/null 2>&1; then
         echo -e "${YELLOW}Using resolvconf to configure DNS...${NC}"
-        echo -e "nameserver 8.8.8.8\nnameserver 8.8.4.4" | resolvconf -a "$(ip -o -4 route show to default | awk '{print $5}')"
+        # Corrected interface name retrieval
+        interface_name=$(ip route get 8.8.8.8 | awk '{print $5; exit}')
+        if [ -n "$interface_name" ]; then
+            echo -e "nameserver 8.8.8.8\nnameserver 8.8.4.4" | resolvconf -a "$interface_name"
+        else
+            echo -e "${RED}Failed to determine network interface. Falling back to direct /etc/resolv.conf modification...${NC}"
+            echo 'nameserver 8.8.8.8' >>/etc/resolv.conf
+            echo 'nameserver 8.8.4.4' >>/etc/resolv.conf
+        fi
     else
         echo -e "${YELLOW}resolvconf installation failed or not found, falling back to direct /etc/resolv.conf modification...${NC}"
         sed -i '/nameserver/d' /etc/resolv.conf
@@ -405,7 +414,6 @@ fix_dns() {
     sleep 1
     press_enter
 }
-
 
 complete_update() {
     clear
