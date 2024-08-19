@@ -274,7 +274,7 @@ EOL
 while true; do
     linux_version=$(awk -F= '/^PRETTY_NAME=/{gsub(/"/, "", $2); print $2}' /etc/os-release)
     kernel_version=$(uname -r)
-    tg_title="https://t.me/OPIranCluB"
+    tg_title="https://t.me/OPIran-Official"
     yt_title="youtube.com/@opiran-inistitute"
     clear
     logo
