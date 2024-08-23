@@ -398,12 +398,12 @@ fix_dns() {
             echo 'nameserver 8.8.8.8' >>/etc/resolv.conf
             echo 'nameserver 8.8.4.4' >>/etc/resolv.conf
         fi
-    else
-        echo -e "${YELLOW}resolvconf installation failed or not found, falling back to direct /etc/resolv.conf modification...${NC}"
+     fi
+
         sed -i '/nameserver/d' /etc/resolv.conf
         echo 'nameserver 8.8.8.8' >>/etc/resolv.conf
         echo 'nameserver 8.8.4.4' >>/etc/resolv.conf
-    fi
+
 
     spin & SPIN_PID=$!
     wait $SPIN_PID
