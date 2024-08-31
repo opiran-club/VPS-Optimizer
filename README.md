@@ -14,7 +14,7 @@
  - Benchmark VPS
  - add "185.199.108.133 raw.githubusercontent.com" in hosts for iranian servers
 
-#### Incoming update
+#### ‼️ Incoming update ‼️
  - add xanmod 6.2
  - kernel update
  - fixing google captua and install warp
