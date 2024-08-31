@@ -18,6 +18,7 @@
  - add xanmod 6.2
  - kernel update
  - fixing google captua and install warp
+ - support centos and rahel
 
 Supported Debian base (Debian , Ubuntu) with X86 & Arm64 & OpenVZ architecture 
    
