@@ -619,7 +619,8 @@ remove_old_sysctl() {
     echo ""
     echo -e "\e[93m+-------------------------------------+\e[0m"
     echo ""
-
+echo -e "$MAGENTA THIS PART MODIFIED BY AI TO IMPROVE VPN SERVER ${NC}"
+echo && echo
     enable_ipv6_support
 
     sed -i '/1000000/d' /etc/profile
@@ -627,39 +628,78 @@ remove_old_sysctl() {
     cat <<EOL > /etc/sysctl.conf
 # System Configuration Settings for Improved Performance and Security
 
-fs.file-max = 1000000
+# File limits
+fs.file-max = 67108864
+
+# Network core settings
 net.core.default_qdisc = fq_codel
-net.core.optmem_max = 65535
-net.ipv4.tcp_rmem = 8192 1048576 16777216
+net.core.netdev_max_backlog = 32768
+net.core.optmem_max = 262144
+net.core.somaxconn = 65536
+net.core.rmem_max = 33554432
 net.core.rmem_default = 1048576
-net.core.rmem_max = 2097152
+net.core.wmem_max = 33554432
 net.core.wmem_default = 1048576
-net.core.wmem_max = 2097152
-net.core.netdev_max_backlog = 16384
-net.core.somaxconn = 32768
-net.ipv4.tcp_fastopen = 3
-net.ipv4.tcp_ecn = 1
+
+# TCP settings
+net.ipv4.tcp_rmem = 16384 1048576 33554432
+net.ipv4.tcp_wmem = 16384 1048576 33554432
+net.ipv4.tcp_congestion_control = bbr
 net.ipv4.tcp_fin_timeout = 25
+net.ipv4.tcp_keepalive_time = 1200
+net.ipv4.tcp_keepalive_probes = 7
+net.ipv4.tcp_keepalive_intvl = 30
 net.ipv4.tcp_max_orphans = 819200
 net.ipv4.tcp_max_syn_backlog = 20480
 net.ipv4.tcp_max_tw_buckets = 1440000
-net.ipv4.tcp_mem = 65536 131072 262144
+net.ipv4.tcp_mem = 65536 1048576 33554432
 net.ipv4.tcp_mtu_probing = 1
+net.ipv4.tcp_notsent_lowat = 32768
 net.ipv4.tcp_retries2 = 8
+net.ipv4.tcp_sack = 1
+net.ipv4.tcp_dsack = 1
 net.ipv4.tcp_slow_start_after_idle = 0
 net.ipv4.tcp_window_scaling = 1
-net.unix.max_dgram_qlen = 50
-vm.min_free_kbytes = 65536
-vm.vfs_cache_pressure=50
-net.ipv4.ip_forward = 1
-net.ipv4.tcp_wmem = 8192 1048576 16777216
-net.ipv4.tcp_notsent_lowat = 16384
-net.ipv4.tcp_mtu_probing = 1
-net.ipv4.tcp_retries2 = 8
-net.ipv4.tcp_slow_start_after_idle = 0
+net.ipv4.tcp_adv_win_scale = -2  # Consider using 0
+net.ipv4.tcp_ecn = 1
+net.ipv4.tcp_ecn_fallback = 1
+net.ipv4.tcp_syncookies = 1
+
+# UDP settings
+net.ipv4.udp_mem = 65536 1048576 33554432
+
+# IPv6 settings
 net.ipv6.conf.all.disable_ipv6 = 0
 net.ipv6.conf.default.disable_ipv6 = 0
-net.ipv6.conf.all.forwarding = 1
+net.ipv6.conf.lo.disable_ipv6 = 0
+
+# Unix domain sockets
+net.unix.max_dgram_qlen = 256
+
+# VM settings
+vm.min_free_kbytes = 65536
+vm.swappiness = 10
+vm.vfs_cache_pressure = 250
+
+# Packet filtering
+net.ipv4.conf.default.rp_filter = 2
+net.ipv4.conf.all.rp_filter = 2
+net.ipv4.conf.all.accept_source_route = 0
+net.ipv4.conf.default.accept_source_route = 0
+
+# ARP settings
+net.ipv4.neigh.default.gc_thresh1 = 512
+net.ipv4.neigh.default.gc_thresh2 = 2048
+net.ipv4.neigh.default.gc_thresh3 = 16384
+net.ipv4.neigh.default.gc_stale_time = 60
+net.ipv4.conf.default.arp_announce = 2
+net.ipv4.conf.lo.arp_announce = 2
+net.ipv4.conf.all.arp_announce = 2
+
+# Kernel settings
+kernel.panic = 1
+vm.dirty_ratio = 20
+
 EOL
 
     cat <<EOL > /etc/security/limits.conf
