@@ -694,21 +694,58 @@ ask_bbr_version() {
             echo -e "${RED}Virtualization method is OpenVZ, which is not supported.${NC}"
         fi
     }
+    queuing() {
+
+    echo -e "${CYAN}Queuing algorithm${NC}"
+    echo ""
+    echo -e "\e[93m+-------------------------------------+\e[0m"
+    echo ""
+    echo -e "${RED}1. ${CYAN} FQ codel ${NC}"
+    echo -e "${RED}2. ${CYAN} FQ ${NC}"
+    echo -e "${RED}3. ${CYAN} Cake   ${NC}"
+    echo ""
+    echo -e "${RED}0. ${CYAN} Back${NC}"
+    echo ""
+    echo -ne "${YELLOW}Enter your choice [0-3]: ${NC}"
+    read -r choice
+
+    case $choice in
+        1)
+        algorithm="FQ codel"
+        ;;
+        2)
+        algorithm="FQ"
+        ;;
+        3)
+        algorithm="cake"
+        ;;
+        0) return 0;;
+        *)
+        echo -e "${RED}Invalid choice. Please enter a number between 0 and 3.${NC}"
+        return 1
+        ;;
+    esac
+
+    }
     clear
     title="TCP Congestion Control Optimization"
     logo
     echo ""
-    echo -e "${CYAN}${title}${NC}"
+    echo -e "${MAGENTA}${title}${NC}"
     echo ""
     echo -e "\e[93m+-------------------------------------+\e[0m"
     echo ""
-    echo -e "${RED}1. ${CYAN} BBR + FQ ${NC}"
-    echo -e "${RED}2. ${CYAN} BBR + CAKE  ${NC}"
+    echo -e "${RED} TIP ! $NC
+    $GREEN FQ (Fair Queuing): $NC Provides fair bandwidth distribution among flows; ideal for reducing latency by smoothing out packet delivery.
+    $GREEN FQ-CoDel: $NC Combines fair queuing with CoDel (Controlled Delay) to manage buffer bloat and reduce latency effectively. It’s suitable for most VPN and general-purpose networking cases.
+    $GREEN CAKE: $NC An advanced queuing discipline that manages both bufferbloat and fair queueing . It’s effective for WAN connections but consumes more CPU."
+    echo
+    echo -e "${RED}1. ${CYAN} BBR + FQ codel / FQ / cake ${NC}"
     echo -e "${RED}3. ${CYAN} BBRv3 [XanMod kernel]${NC}"
-    echo -e "${RED}4. ${CYAN} HYBLA + FQ   ${NC}"
+    echo -e "${RED}4. ${CYAN} HYBLA + FQ codel / FQ / cake   ${NC}"
     echo ""
     echo -e "${RED}5. ${CYAN} BBR [OpenVZ] ${NC}"
-    echo -e "${RED}0. ${CYAN} No TCP Congestion Control${NC}"
+    echo -e "${RED}0. ${CYAN} Without BBR ${NC}"
     echo ""
     echo -ne "${YELLOW}Enter your choice [0-3]: ${NC}"
     read -r choice
@@ -716,14 +753,17 @@ ask_bbr_version() {
     case $choice in
         1)
             cp /etc/sysctl.conf /etc/sysctl.conf.bak
-            echo -e "${YELLOW}Installing and configuring BBRv1 + FQ...${NC}"
+
+            echo -e "${YELLOW}Installing and configuring BBR ${NC}"
+            echo && echo
+            queuing
             sed -i '/^net.core.default_qdisc/d' /etc/sysctl.conf
             sed -i '/^net.ipv4.tcp_congestion_control/d' /etc/sysctl.conf
-            echo "net.core.default_qdisc=fq" >> /etc/sysctl.conf
+            echo "net.core.default_qdisc=$algorithm" >> /etc/sysctl.conf
             echo "net.ipv4.tcp_congestion_control=bbr" >> /etc/sysctl.conf
             sysctl -p
                 if [ $? -eq 0 ]; then
-                    echo -e "${GREEN}Kernel parameter optimization for OpenVZ was successful.${NC}"
+                    echo -e "${GREEN}Kernel parameter tuning for BBR with $algorithm was successful.${NC}"
                 else
                     echo -e "${RED}Optimization failed. Restoring original sysctl configuration.${NC}"
                     mv /etc/sysctl.conf.bak /etc/sysctl.conf
@@ -744,7 +784,7 @@ ask_bbr_version() {
             ;;
         2)
             cp /etc/sysctl.conf /etc/sysctl.conf.bak
-        
+            queueing
             # Remove existing settings
             sed -i '/^net.core.default_qdisc/d' /etc/sysctl.conf
             sed -i '/^net.ipv4.tcp_congestion_control/d' /etc/sysctl.conf
@@ -764,7 +804,7 @@ ask_bbr_version() {
             sed -i '/^net.ipv4.tcp_retries2/d' /etc/sysctl.conf
         
             # Append new settings
-            echo "net.core.default_qdisc=cake" >> /etc/sysctl.conf
+            echo "net.core.default_qdisc=$algorithm" >> /etc/sysctl.conf
             echo "net.ipv4.tcp_congestion_control=bbr" >> /etc/sysctl.conf
             echo "net.ipv4.tcp_rmem=4096 87380 67108864" >> /etc/sysctl.conf
             echo "net.ipv4.tcp_wmem=4096 65536 67108864" >> /etc/sysctl.conf
@@ -784,7 +824,7 @@ ask_bbr_version() {
             # Apply the new settings
             sysctl -p
             if [ $? -eq 0 ]; then
-                echo -e "${GREEN}Kernel parameter optimization for OBBRv2 with FQ was successful.${NC}"
+                echo -e "${GREEN}Kernel parameter optimization for BBR with $algorithm was successful.${NC}"
             else
                 echo -e "${RED}Optimization failed. Restoring original sysctl configuration.${NC}"
                 mv /etc/sysctl.conf.bak /etc/sysctl.conf
@@ -794,8 +834,10 @@ ask_bbr_version() {
             # Backup the original sysctl configuration
             cp /etc/sysctl.conf /etc/sysctl.conf.bak
             check_Hybla
+            queueing
 
-            sed -i '/^net.core.default_qdisc=/c\net.core.default_qdisc=fq' /etc/sysctl.conf
+            sed -i '/^net.core.default_qdisc/d' /etc/sysctl.conf
+            echo "net.core.default_qdisc=$algorithm" >> /etc/sysctl.conf
             sed -i '/^net.ipv4.tcp_congestion_control=/c\net.ipv4.tcp_congestion_control=hybla' /etc/sysctl.conf
             sed -i '/^net.ipv4.tcp_rmem=/c\net.ipv4.tcp_rmem=32768 87380 67108864' /etc/sysctl.conf
             sed -i '/^net.ipv4.tcp_wmem=/c\net.ipv4.tcp_wmem=32768 65536 67108864' /etc/sysctl.conf
