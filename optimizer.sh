@@ -612,7 +612,7 @@ EOL
 
 remove_old_sysctl() {
     clear
-    title="Optimizing System Configuration and Updating sysctl Configs"
+    title=" Network Optimizing "
     logo
     echo ""
     echo -e "${CYAN}$title${NC}"
