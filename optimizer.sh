@@ -849,13 +849,13 @@ check_os() {
                 sed -i '/net.ipv4.tcp_congestion_control/d' /etc/sysctl.conf
                 tc qdisc add dev venet0 root fq_codel
                 sysctl -w net.ipv4.tcp_congestion_control=bbr
-                sysctl -p
-                if [ $? -eq 0 ]; then
-                    echo -e "${GREEN}Kernel parameter optimization for OpenVZ was successful.${NC}"
-                else
-                    echo -e "${RED}Optimization failed. Restoring original sysctl configuration.${NC}"
-                    mv /etc/sysctl.conf.bak /etc/sysctl.conf
-                fi
+                    sysctl -p
+                    if [ $? -eq 0 ]; then
+                        echo -e "${GREEN}Kernel parameter optimization for OpenVZ was successful.${NC}"
+                    else
+                        echo -e "${RED}Optimization failed. Restoring original sysctl configuration.${NC}"
+                        mv /etc/sysctl.conf.bak /etc/sysctl.conf
+                    fi
             else
                 echo -e "${RED}This system is not OpenVZ or lacks venet0 support. No changes were made.${NC}"
             fi
