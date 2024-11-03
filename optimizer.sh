@@ -703,8 +703,8 @@ ask_bbr_version() {
     echo -e "\e[93m+-------------------------------------+\e[0m"
     echo ""
     echo -e "${RED}1. ${CYAN} BBRv1 + FQ ${NC}"
-    echo -e "${RED}2. ${CYAN} BBRv3 [XanMod kernel]${NC}"
-    echo -e "${RED}3. ${CYAN} BBRv2 + FQ  ${NC}"
+    echo -e "${RED}2. ${CYAN} BBRv2 + FQ  ${NC}"
+    echo -e "${RED}3. ${CYAN} BBRv3 [XanMod kernel]${NC}"
     echo -e "${RED}4. ${CYAN} HYBLA + FQ   ${NC}"
     echo ""
     echo -e "${RED}5. ${CYAN} BBR [OpenVZ] ${NC}"
@@ -729,7 +729,7 @@ ask_bbr_version() {
                     mv /etc/sysctl.conf.bak /etc/sysctl.conf
                 fi
             ;;
-        2)
+        3)
             echo -e "${YELLOW}Installing and configuring XanMod & BBRv3...${NC}"
             if [[ -f /etc/os-release && $(grep -Ei 'ubuntu|debian' /etc/os-release) ]]; then
                 bash <(curl -s https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/bbrv3.sh --ipv4)
@@ -742,10 +742,8 @@ ask_bbr_version() {
                 echo -e "${RED}This script is intended for Ubuntu or Debian systems only.${NC}"
             fi
             ;;
-        3)
+        2)
             cp /etc/sysctl.conf /etc/sysctl.conf.bak
-            echo -e "\n# Set up BBRv2 with FQ suitable for VPN servers" >> /etc/sysctl.conf
-            echo "# BBRv2 + fq  optimization" >> /etc/sysctl.conf
         
             # Remove existing settings
             sed -i '/^net.core.default_qdisc/d' /etc/sysctl.conf
@@ -774,8 +772,8 @@ ask_bbr_version() {
             echo "net.core.wmem_max=67108864" >> /etc/sysctl.conf
             echo "net.core.netdev_max_backlog=250000" >> /etc/sysctl.conf
             echo "net.core.somaxconn=65535" >> /etc/sysctl.conf
-            echo "net.ipv4.tcp_notsent_lowat=16384              # Minimizes queueing of unsent packets" >> /etc/sysctl.conf
-            echo "net.ipv4.tcp_mtu_probing=1                    # Enables MTU probing for more efficient packet sizes" >> /etc/sysctl.conf
+            echo "net.ipv4.tcp_notsent_lowat=16384" >> /etc/sysctl.conf
+            echo "net.ipv4.tcp_mtu_probing=1" >> /etc/sysctl.conf
             echo "net.ipv4.tcp_window_scaling=1" >> /etc/sysctl.conf
             echo "net.ipv4.tcp_adv_win_scale=1" >> /etc/sysctl.conf
             echo "net.ipv4.tcp_keepalive_time=1200" >> /etc/sysctl.conf
@@ -796,7 +794,7 @@ ask_bbr_version() {
             # Backup the original sysctl configuration
             cp /etc/sysctl.conf /etc/sysctl.conf.bak
             check_Hybla
-            echo -e "\n# Set up HYBLA with FQ suitable for packetloss reduction, high latency and VPN servers" >> /etc/sysctl.conf
+
             sed -i '/^net.core.default_qdisc=/c\net.core.default_qdisc=fq' /etc/sysctl.conf
             sed -i '/^net.ipv4.tcp_congestion_control=/c\net.ipv4.tcp_congestion_control=hybla' /etc/sysctl.conf
             sed -i '/^net.ipv4.tcp_rmem=/c\net.ipv4.tcp_rmem=32768 87380 67108864' /etc/sysctl.conf
