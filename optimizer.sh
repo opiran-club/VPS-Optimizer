@@ -500,7 +500,8 @@ echo -e "$MAGENTA THIS PART MODIFIED BY AI TO IMPROVE VPN SERVER ${NC}"
 echo && echo
     enable_ipv6_support
     sed -i '/1000000/d' /etc/profile
-    cat <<EOL > /etc/sysctl.conf
+
+cat <<EOL > /etc/sysctl.conf
 # System Configuration Settings for Improved Performance and Security
 
 # File limits
@@ -576,6 +577,7 @@ kernel.panic = 1
 vm.dirty_ratio = 20
 
 EOL
+    
     cat <<EOL > /etc/security/limits.conf
 * soft     nproc          655350
 * hard     nproc          655350
@@ -586,38 +588,23 @@ root hard  nproc          655350
 root soft  nofile         655350
 root hard  nofile         655350
 EOL
+
     sysctl -p
     echo ""
     echo -e "${GREEN}Sysctl configuration and optimization complete.${NC}"
     echo ""
     press_enter
 }
-grub_tuning() {
-    clear
-    title="CPU Optimizing and Tuning
-    echo -e "${CYAN}$title${NC}"
-    echo ""
-    echo -e "\e[93m+-------------------------------------+\e[0m\n"
-    echo ""
-cp /etc/default/grub /etc/default/grub.bak
-echo -e "${YELLOW}Backup of the original grub configuration is here $GREEN "/etc/default/grub.bak" ${NC}" && echo
-GRUB_CMDLINE_LINUX_DEFAULT="quiet splash preempt=full nohz_full=all rcu_nocbs=all rcutree.enable_rcu_lazy=1 net.core.rmem_max=16777216 net.core.wmem_max=16777216 net.ipv4.tcp_rmem=4096 87380 16777216 net.ipv4.tcp_wmem=4096 65536 16777216"
-sed -i "s/^GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT=\"$GRUB_CMDLINE_LINUX_DEFAULT\"/" /etc/default/grub
-echo -e "${YELLOW}Updating GRUB configuration...${NC}"
-update-grub
-echo -e "${GREEN}GRUB configuration updated successfully!${NC}"
-echo -e "${YELLOW}Reboot your system to apply the changes.${NC}"
-press_enter
-}
+
+
 optimize_ssh_configuration() {
     clear
     SSH_PATH="/etc/ssh/sshd_config"
     title="Improve SSH Configuration and Optimize SSHD"
     logo
-    echo -e "${CYAN}$title${NC}"
-    echo ""
-    echo -e "\e[93m+-------------------------------------+\e[0m"
-    echo ""
+    echo -e "${CYAN}$title${NC}\n"
+    echo -e "\e[93m+-------------------------------------+\e[0m\n"
+
     if [ -f "$SSH_PATH" ]; then
         cp "$SSH_PATH" "${SSH_PATH}.bak"
         echo -e "${YELLOW}Backup of the original SSH configuration created at ${SSH_PATH}.bak${NC}"
@@ -625,86 +612,88 @@ optimize_ssh_configuration() {
         echo -e "${RED}Error: SSH configuration file not found at ${SSH_PATH}.${NC}"
         return 1
     fi
+
     cat <<EOL > "$SSH_PATH"
 # Optimized SSH configuration for improved security and performance
 
-# Disable DNS lookups to speed up SSH logins
 UseDNS no
-
-# Enable compression for faster data transfer
 Compression yes
-
-# Strong encryption ciphers
 Ciphers aes256-ctr,chacha20-poly1305@openssh.com
 MACs hmac-sha2-256,hmac-sha2-512
-
-# Keep connections alive, preventing idle disconnects
 TCPKeepAlive yes
 ClientAliveInterval 300
 ClientAliveCountMax 3
-
-# Allow forwarding and tunneling (modify as needed for security)
-AllowAgentForwarding no  # Set to 'no' unless explicitly needed
-AllowTcpForwarding no      # Set to 'no' unless explicitly needed
+AllowAgentForwarding no
+AllowTcpForwarding no
 GatewayPorts no
-PermitTunnel no            # Set to 'no' unless explicitly needed
-
-# Disable root login for security
-PermitRootLogin no         # Uncomment to enforce root login prohibition
-
-# Custom banner for unauthorized access warning
+PermitTunnel no
+PermitRootLogin no
 Banner /etc/ssh/banner
-
-# Disable X11 forwarding if not required
 X11Forwarding no
-
-# Disable printing of MOTD (Message of the Day) to reduce login clutter
 PrintMotd no
-
-# Log the last login for auditing purposes
 PrintLastLog yes
-
-# Limit the maximum number of authentication attempts
-MaxAuthTries 3             # Uncomment to enforce limit
-
-# Limit login grace time
-LoginGraceTime 1m          # Uncomment to enforce grace period
-
-# Set maximum authentication retries for a single connection
-MaxStartups 10:30:60       # Controls concurrent unauthenticated connections
+MaxAuthTries 3
+LoginGraceTime 1m
+MaxStartups 10:30:60
 EOL
-echo "WARNING: Unauthorized access to this system is prohibited." > /etc/ssh/banner
-if service ssh restart; then
-    echo -e "${GREEN}SSH and SSHD configuration and optimization complete.${NC}"
-else
-    echo -e "${RED}Failed to restart SSH service. Please check the configuration.${NC}"
-    return 1
-fi
-echo
-press_enter
-}
-ask_bbr_version() {
-check_Hybla() {
-    local param=$(sysctl net.ipv4.tcp_congestion_control | awk '{print $3}')
-    if [[ x"${param}" == x"hybla" ]]; then
-        return 0
+
+    echo "WARNING: Unauthorized access to this system is prohibited." > /etc/ssh/banner
+
+    if service ssh restart; then
+        echo -e "${GREEN}SSH and SSHD configuration and optimization complete.${NC}"
     else
+        echo -e "${RED}Failed to restart SSH service. Please check the configuration.${NC}"
         return 1
     fi
+    echo
+    press_enter
 }
-check_os() {
-    if _exists "virt-what"; then
-        virt="$(virt-what)"
-    elif _exists "systemd-detect-virt"; then
-        virt="$(systemd-detect-virt)"
-    fi
-    if [ -n "${virt}" -a "${virt}" = "lxc" ]; then
-        echo -e "${RED}Virtualization method is LXC, which is not supported.${NC}"
-    fi
-    if [ -n "${virt}" -a "${virt}" = "openvz" ] || [ -d "/proc/vz" ]; then
-        echo -e "${RED}Virtualization method is OpenVZ, which is not supported.${NC}"
-    fi
+
+grub_tuning() {
+    clear
+    title="CPU Optimizing and Tuning"
+    echo -e "${CYAN}$title${NC}"
+    echo ""
+    echo -e "\e[93m+-------------------------------------+\e[0m\n"
+    echo ""
+    cp /etc/default/grub /etc/default/grub.bak
+
+    echo -e "${YELLOW}Backup of the original grub configuration is here $GREEN /etc/default/grub.bak ${NC}" && echo
+
+    GRUB_CMDLINE_LINUX_DEFAULT="quiet splash preempt=full nohz_full=all rcu_nocbs=all rcutree.enable_rcu_lazy=1 net.core.rmem_max=16777216 net.core.wmem_max=16777216 net.ipv4.tcp_rmem=4096 87380 16777216 net.ipv4.tcp_wmem=4096 65536 16777216"
+    
+    sed -i "s/^GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT=\"$GRUB_CMDLINE_LINUX_DEFAULT\"/" /etc/default/grub
+
+    echo -e "${YELLOW}Updating GRUB configuration...${NC}"
+
+    update-grub
+    echo -e "${GREEN}GRUB configuration updated successfully!${NC}"
+    echo -e "${YELLOW}Reboot your system to apply the changes.${NC}"
+    press_enter
+
 }
+ask_bbr_version() {
+    check_Hybla() {
+        local param=$(sysctl net.ipv4.tcp_congestion_control | awk '{print $3}')
+        if [[ x"${param}" == x"hybla" ]]; then
+            return 0
+        else
+            return 1
+        fi
+    }
+    check_os() {
+        if _exists "virt-what"; then
+            virt="$(virt-what)"
+        elif _exists "systemd-detect-virt"; then
+            virt="$(systemd-detect-virt)"
+        fi
+        if [ -n "${virt}" -a "${virt}" = "lxc" ]; then
+            echo -e "${RED}Virtualization method is LXC, which is not supported.${NC}"
+        fi
+        if [ -n "${virt}" -a "${virt}" = "openvz" ] || [ -d "/proc/vz" ]; then
+            echo -e "${RED}Virtualization method is OpenVZ, which is not supported.${NC}"
+        fi
+    }
     clear
     title="TCP Congestion Control Optimization"
     logo
@@ -782,7 +771,7 @@ check_os() {
             # Append new settings
             echo "net.core.default_qdisc=fq" >> /etc/sysctl.conf
             echo "net.ipv4.tcp_congestion_control=bbr2" >> /etc/sysctl.conf
-            echo "net.ipv4.tcp_hystart=1                        # Enables HyStart++" >> /etc/sysctl.conf
+            echo "net.ipv4.tcp_hystart=1                        # Enables HyStart++ " >> /etc/sysctl.conf
             echo "net.ipv4.tcp_hystart_detect=1                 # Conservative startup for smoother bandwidth ramp-up" >> /etc/sysctl.conf
             echo "net.ipv4.tcp_hystart_plus=1                   # Uses the HyStart++ mechanism" >> /etc/sysctl.conf
             echo "net.ipv4.tcp_rmem=4096 87380 67108864" >> /etc/sysctl.conf
