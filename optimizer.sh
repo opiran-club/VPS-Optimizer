@@ -702,8 +702,8 @@ ask_bbr_version() {
     echo ""
     echo -e "\e[93m+-------------------------------------+\e[0m"
     echo ""
-    echo -e "${RED}1. ${CYAN} BBRv1 + FQ ${NC}"
-    echo -e "${RED}2. ${CYAN} BBRv2 + FQ  ${NC}"
+    echo -e "${RED}1. ${CYAN} BBR + FQ ${NC}"
+    echo -e "${RED}2. ${CYAN} BBR + CAKE  ${NC}"
     echo -e "${RED}3. ${CYAN} BBRv3 [XanMod kernel]${NC}"
     echo -e "${RED}4. ${CYAN} HYBLA + FQ   ${NC}"
     echo ""
@@ -764,8 +764,8 @@ ask_bbr_version() {
             sed -i '/^net.ipv4.tcp_retries2/d' /etc/sysctl.conf
         
             # Append new settings
-            echo "net.core.default_qdisc=fq" >> /etc/sysctl.conf
-            echo "net.ipv4.tcp_congestion_control=bbr2" >> /etc/sysctl.conf
+            echo "net.core.default_qdisc=cake" >> /etc/sysctl.conf
+            echo "net.ipv4.tcp_congestion_control=bbr" >> /etc/sysctl.conf
             echo "net.ipv4.tcp_rmem=4096 87380 67108864" >> /etc/sysctl.conf
             echo "net.ipv4.tcp_wmem=4096 65536 67108864" >> /etc/sysctl.conf
             echo "net.core.rmem_max=67108864" >> /etc/sysctl.conf
