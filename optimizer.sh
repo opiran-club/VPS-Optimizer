@@ -702,15 +702,15 @@ ask_bbr_version() {
     echo ""
     echo -e "\e[93m+-------------------------------------+\e[0m"
     echo ""
-    echo -e "${RED}1. ${YELLOW} BBRv1 + FQ ${NC}"
-    echo -e "${RED}2. ${YELLOW} BBRv3 [XanMod kernel]${NC}"
-    echo -e "${RED}3. ${YELLOW} BBRv2 + FQ + HyStart++ [good choice for vpn server] [RECOMMENDED]"
-    echo -e "${RED}4. ${YELLOW} HYBLA + FQ  ${NC}"
+    echo -e "${RED}1. ${CYAN} BBRv1 + FQ ${NC}"
+    echo -e "${RED}2. ${CYAN} BBRv3 [XanMod kernel]${NC}"
+    echo -e "${RED}3. ${CYAN} BBRv2 + FQ  ${NC}"
+    echo -e "${RED}4. ${CYAN} HYBLA + FQ   ${NC}"
     echo ""
-    echo -e "${RED}5. ${YELLOW} BBR [OpenVZ] ${NC}"
-    echo -e "${RED}0. ${YELLOW}No TCP Congestion Control${NC}"
+    echo -e "${RED}5. ${CYAN} BBR [OpenVZ] ${NC}"
+    echo -e "${RED}0. ${CYAN} No TCP Congestion Control${NC}"
     echo ""
-    echo -ne "${CYAN}Enter your choice [0-3]: ${NC}"
+    echo -ne "${YELLOW}Enter your choice [0-3]: ${NC}"
     read -r choice
 
     case $choice in
@@ -744,15 +744,12 @@ ask_bbr_version() {
             ;;
         3)
             cp /etc/sysctl.conf /etc/sysctl.conf.bak
-            echo -e "\n# Set up BBRv2 with FQ and HyStart++ suitable for packet loss reduction and VPN servers" >> /etc/sysctl.conf
-            echo "# BBRv2 + fq + HyStart++ optimization" >> /etc/sysctl.conf
+            echo -e "\n# Set up BBRv2 with FQ suitable for VPN servers" >> /etc/sysctl.conf
+            echo "# BBRv2 + fq  optimization" >> /etc/sysctl.conf
         
             # Remove existing settings
             sed -i '/^net.core.default_qdisc/d' /etc/sysctl.conf
             sed -i '/^net.ipv4.tcp_congestion_control/d' /etc/sysctl.conf
-            sed -i '/^net.ipv4.tcp_hystart/d' /etc/sysctl.conf
-            sed -i '/^net.ipv4.tcp_hystart_detect/d' /etc/sysctl.conf
-            sed -i '/^net.ipv4.tcp_hystart_plus/d' /etc/sysctl.conf
             sed -i '/^net.ipv4.tcp_rmem/d' /etc/sysctl.conf
             sed -i '/^net.ipv4.tcp_wmem/d' /etc/sysctl.conf
             sed -i '/^net.core.rmem_max/d' /etc/sysctl.conf
@@ -771,9 +768,6 @@ ask_bbr_version() {
             # Append new settings
             echo "net.core.default_qdisc=fq" >> /etc/sysctl.conf
             echo "net.ipv4.tcp_congestion_control=bbr2" >> /etc/sysctl.conf
-            echo "net.ipv4.tcp_hystart=1                        # Enables HyStart++ " >> /etc/sysctl.conf
-            echo "net.ipv4.tcp_hystart_detect=1                 # Conservative startup for smoother bandwidth ramp-up" >> /etc/sysctl.conf
-            echo "net.ipv4.tcp_hystart_plus=1                   # Uses the HyStart++ mechanism" >> /etc/sysctl.conf
             echo "net.ipv4.tcp_rmem=4096 87380 67108864" >> /etc/sysctl.conf
             echo "net.ipv4.tcp_wmem=4096 65536 67108864" >> /etc/sysctl.conf
             echo "net.core.rmem_max=67108864" >> /etc/sysctl.conf
@@ -792,7 +786,7 @@ ask_bbr_version() {
             # Apply the new settings
             sysctl -p
             if [ $? -eq 0 ]; then
-                echo -e "${GREEN}Kernel parameter optimization for OpenVZ was successful.${NC}"
+                echo -e "${GREEN}Kernel parameter optimization for OBBRv2 with FQ was successful.${NC}"
             else
                 echo -e "${RED}Optimization failed. Restoring original sysctl configuration.${NC}"
                 mv /etc/sysctl.conf.bak /etc/sysctl.conf
@@ -802,12 +796,9 @@ ask_bbr_version() {
             # Backup the original sysctl configuration
             cp /etc/sysctl.conf /etc/sysctl.conf.bak
             check_Hybla
-            echo -e "\n# Set up HYBLA with FQ and HyStart++ suitable for packetloss reduction, high latency and VPN servers" >> /etc/sysctl.conf
+            echo -e "\n# Set up HYBLA with FQ suitable for packetloss reduction, high latency and VPN servers" >> /etc/sysctl.conf
             sed -i '/^net.core.default_qdisc=/c\net.core.default_qdisc=fq' /etc/sysctl.conf
             sed -i '/^net.ipv4.tcp_congestion_control=/c\net.ipv4.tcp_congestion_control=hybla' /etc/sysctl.conf
-            sed -i '/^net.ipv4.tcp_hystart=/c\net.ipv4.tcp_hystart=1' /etc/sysctl.conf
-            sed -i '/^net.ipv4.tcp_hystart_detect=/c\net.ipv4.tcp_hystart_detect=1' /etc/sysctl.conf
-            sed -i '/^net.ipv4.tcp_hystart_plus=/c\net.ipv4.tcp_hystart_plus=1' /etc/sysctl.conf
             sed -i '/^net.ipv4.tcp_rmem=/c\net.ipv4.tcp_rmem=32768 87380 67108864' /etc/sysctl.conf
             sed -i '/^net.ipv4.tcp_wmem=/c\net.ipv4.tcp_wmem=32768 65536 67108864' /etc/sysctl.conf
             sed -i '/^net.core.rmem_max=/c\net.core.rmem_max=67108864' /etc/sysctl.conf
