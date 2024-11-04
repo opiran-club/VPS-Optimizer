@@ -501,7 +501,7 @@ remove_old_sysctl() {
     echo && echo -e "${MAGENTA}$title${NC}"
     echo && echo -e "\e[93m+-------------------------------------+\e[0m"
     sed -i '/1000000/d' /etc/profile
-echo && cat <<EOL > /etc/sysctl.conf
+cat <<EOL > /etc/sysctl.conf
 # System Configuration Settings for Improved Performance and Security
 
 # File limits
