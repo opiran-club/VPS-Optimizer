@@ -6,6 +6,8 @@
 
  - Upgrade, Time setting, Install Useful Packages, Optimize the SYSCTL, Optimize SSH
  - TCP congestion control (Tcp-BBR, XanMod-BBRv3, OpenVZ-BBR)
+ - Added queuing algorithm to combine with BBR (fq , fq_codel, ddr, cake, sfq, pfifo_fast. htb)
+ - DNS tuning using resolvconf and optional dns provider
  - update mirrorlist for iranian servers to arvan
  - update timesetting to support iranian servers
  - Grub tuning (Mobile Profile, Audio Production Profile, Virtualization Profile, Gaming Profile)
@@ -15,9 +17,6 @@
  - add "185.199.108.133 raw.githubusercontent.com" in hosts for iranian servers
 
 #### ‼️ Incoming update ‼️
- - add xanmod 6.2
- - kernel update
- - fixing google captua and install warp
  - support centos and rahel
 
 Supported Debian base (Debian , Ubuntu) with X86 & Arm64 & OpenVZ architecture 
