@@ -517,6 +517,16 @@ net.core.rmem_default = 1048576
 net.core.wmem_max = 33554432
 net.core.wmem_default = 1048576
 
+# Increase IP Fragmentation Timeout
+net.ipv4.ipfrag_high_thresh = 524288
+net.ipv4.ipfrag_low_thresh = 446464
+net.ipv4.ipfrag_time = 60
+
+# Memory Optimization
+vm.dirty_background_ratio = 5
+vm.dirty_expire_centisecs = 3000
+vm.dirty_writeback_centisecs = 500
+
 # TCP settings
 net.ipv4.tcp_rmem = 16384 1048576 33554432
 net.ipv4.tcp_wmem = 16384 1048576 33554432
@@ -531,7 +541,9 @@ net.ipv4.tcp_max_tw_buckets = 1440000
 net.ipv4.tcp_mem = 65536 1048576 33554432
 net.ipv4.tcp_mtu_probing = 1
 net.ipv4.tcp_notsent_lowat = 32768
-net.ipv4.tcp_retries2 = 8
+net.ipv4.tcp_retries1 = 3
+net.ipv4.tcp_retries2 = 5
+net.ipv4.tcp_fastopen = 3
 net.ipv4.tcp_sack = 1
 net.ipv4.tcp_dsack = 1
 net.ipv4.tcp_slow_start_after_idle = 0
@@ -562,6 +574,10 @@ net.ipv4.conf.default.rp_filter = 2
 net.ipv4.conf.all.rp_filter = 2
 net.ipv4.conf.all.accept_source_route = 0
 net.ipv4.conf.default.accept_source_route = 0
+net.ipv4.conf.all.accept_source_route = 0
+net.ipv4.conf.default.accept_source_route = 0
+net.ipv4.conf.all.accept_redirects = 0
+net.ipv4.conf.default.accept_redirects = 0
 
 # ARP settings
 net.ipv4.neigh.default.gc_thresh1 = 512
@@ -573,10 +589,12 @@ net.ipv4.conf.lo.arp_announce = 2
 net.ipv4.conf.all.arp_announce = 2
 
 # Kernel settings
+kernel.printk = 4 4 1 7
 kernel.panic = 1
-vm.dirty_ratio = 20
+vm.swappiness = 10
+vm.dirty_ratio = 15
+EOL
 
-EOL    
 cat <<EOL > /etc/security/limits.conf
 * soft nproc 655350
 * hard nproc 655350
