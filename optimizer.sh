@@ -771,7 +771,7 @@ queuing() {
     $GREEN DDR (Deficit Round Robin): $NC Balances fairness across flows; good for smooth packet delivery, though less commonly used.
     $GREEN HTB (Hierarchical Token Bucket): $NC Allows bandwidth control with multiple classes; ideal for shaping bandwidth distribution.
 
-    $MAGENTA My Suggestion for VPN servers : $GREEN Fq_codel & cake $NC"
+    $MAGENTA My Suggestion for VPN servers : $GREEN Fq_codel / sfq / cake $NC"
     echo
     echo -e "${RED}1. ${CYAN} BBR [FQ codel / FQ / cake / Sfq / ddr / htb / pfifo fast] ${NC}"
     echo -e "${RED}2. ${CYAN} BBRv3 [XanMod kernel]${NC}"
