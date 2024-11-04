@@ -751,121 +751,88 @@ ask_bbr_version() {
     echo -ne "${YELLOW}Enter your choice [0-3]: ${NC}"
     read -r choice
 
-    case $choice in
-        1)
+case $choice in
+    1)
+        cp /etc/sysctl.conf /etc/sysctl.conf.bak
+        queueing
+        sed -i '/^net.core.default_qdisc/d' /etc/sysctl.conf
+        sed -i '/^net.ipv4.tcp_congestion_control/d' /etc/sysctl.conf
+        sed -i '/^net.ipv4.tcp_rmem/d' /etc/sysctl.conf
+        sed -i '/^net.ipv4.tcp_wmem/d' /etc/sysctl.conf
+        sed -i '/^net.core.rmem_max/d' /etc/sysctl.conf
+        sed -i '/^net.core.wmem_max/d' /etc/sysctl.conf
+        sed -i '/^net.core.netdev_max_backlog/d' /etc/sysctl.conf
+        sed -i '/^net.core.somaxconn/d' /etc/sysctl.conf
+        sed -i '/^net.ipv4.tcp_notsent_lowat/d' /etc/sysctl.conf
+        sed -i '/^net.ipv4.tcp_mtu_probing/d' /etc/sysctl.conf
+        sed -i '/^net.ipv4.tcp_window_scaling/d' /etc/sysctl.conf
+        sed -i '/^net.ipv4.tcp_adv_win_scale/d' /etc/sysctl.conf
+        sed -i '/^net.ipv4.tcp_keepalive_time/d' /etc/sysctl.conf
+        sed -i '/^net.ipv4.tcp_keepalive_intvl/d' /etc/sysctl.conf
+        sed -i '/^net.ipv4.tcp_keepalive_probes/d' /etc/sysctl.conf
+        sed -i '/^net.ipv4.tcp_retries2/d' /etc/sysctl.conf
+        echo "net.core.default_qdisc=$algorithm" >> /etc/sysctl.conf
+        echo "net.ipv4.tcp_congestion_control=bbr" >> /etc/sysctl.conf
+        echo "net.ipv4.tcp_rmem=4096 87380 67108864" >> /etc/sysctl.conf
+        echo "net.ipv4.tcp_wmem=4096 65536 67108864" >> /etc/sysctl.conf
+        echo "net.core.rmem_max=67108864" >> /etc/sysctl.conf
+        echo "net.core.wmem_max=67108864" >> /etc/sysctl.conf
+        echo "net.core.netdev_max_backlog=250000" >> /etc/sysctl.conf
+        echo "net.core.somaxconn=65535" >> /etc/sysctl.conf
+        echo "net.ipv4.tcp_notsent_lowat=16384" >> /etc/sysctl.conf
+        echo "net.ipv4.tcp_mtu_probing=1" >> /etc/sysctl.conf
+        echo "net.ipv4.tcp_window_scaling=1" >> /etc/sysctl.conf
+        echo "net.ipv4.tcp_adv_win_scale=1" >> /etc/sysctl.conf
+        echo "net.ipv4.tcp_keepalive_time=1200" >> /etc/sysctl.conf
+        echo "net.ipv4.tcp_keepalive_intvl=30" >> /etc/sysctl.conf
+        echo "net.ipv4.tcp_keepalive_probes=7" >> /etc/sysctl.conf
+        echo "net.ipv4.tcp_retries2=8" >> /etc/sysctl.conf
+        sysctl -p || { echo -e "${RED}Optimization failed. Restoring original sysctl configuration.${NC}"; mv /etc/sysctl.conf.bak /etc/sysctl.conf; }
+        echo -e "${GREEN}Kernel parameter optimization for BBR with $algorithm was successful.${NC}"
+        ;;
+    2)
+        echo -e "${YELLOW}Installing and configuring XanMod & BBRv3...${NC}"
+        if grep -Ei 'ubuntu|debian' /etc/os-release >/dev/null; then
+            bash <(curl -s https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/bbrv3.sh --ipv4) || { echo -e "${RED}XanMod & BBRv3 installation failed.${NC}"; exit 1; }
+            echo -e "${GREEN}XanMod & BBRv3 installation was successful.${NC}"
+        else
+            echo -e "${RED}This script is intended for Ubuntu or Debian systems only.${NC}"
+        fi
+        ;;
+    3)
+        cp /etc/sysctl.conf /etc/sysctl.conf.bak
+        check_Hybla
+        queueing
+        sed -i '/^net.core.default_qdisc/d' /etc/sysctl.conf
+        echo "net.core.default_qdisc=$algorithm" >> /etc/sysctl.conf
+        sed -i '/^net.ipv4.tcp_congestion_control=/c\net.ipv4.tcp_congestion_control=hybla' /etc/sysctl.conf
+        # Additional sysctl settings here
+        sysctl -p || { echo -e "${RED}Optimization failed. Restoring original sysctl configuration.${NC}"; mv /etc/sysctl.conf.bak /etc/sysctl.conf; }
+        echo -e "${GREEN}Kernel parameter optimization for Hybla was successful.${NC}"
+        ;;
+    4)
+        echo -e "${YELLOW}Optimizing kernel parameters for OpenVZ BBR...${NC}"
+        if [[ -d "/proc/vz" && -e /sys/class/net/venet0 ]]; then
             cp /etc/sysctl.conf /etc/sysctl.conf.bak
-            queueing
-            sed -i '/^net.core.default_qdisc/d' /etc/sysctl.conf
-            sed -i '/^net.ipv4.tcp_congestion_control/d' /etc/sysctl.conf
-            sed -i '/^net.ipv4.tcp_rmem/d' /etc/sysctl.conf
-            sed -i '/^net.ipv4.tcp_wmem/d' /etc/sysctl.conf
-            sed -i '/^net.core.rmem_max/d' /etc/sysctl.conf
-            sed -i '/^net.core.wmem_max/d' /etc/sysctl.conf
-            sed -i '/^net.core.netdev_max_backlog/d' /etc/sysctl.conf
-            sed -i '/^net.core.somaxconn/d' /etc/sysctl.conf
-            sed -i '/^net.ipv4.tcp_notsent_lowat/d' /etc/sysctl.conf
-            sed -i '/^net.ipv4.tcp_mtu_probing/d' /etc/sysctl.conf
-            sed -i '/^net.ipv4.tcp_window_scaling/d' /etc/sysctl.conf
-            sed -i '/^net.ipv4.tcp_adv_win_scale/d' /etc/sysctl.conf
-            sed -i '/^net.ipv4.tcp_keepalive_time/d' /etc/sysctl.conf
-            sed -i '/^net.ipv4.tcp_keepalive_intvl/d' /etc/sysctl.conf
-            sed -i '/^net.ipv4.tcp_keepalive_probes/d' /etc/sysctl.conf
-            sed -i '/^net.ipv4.tcp_retries2/d' /etc/sysctl.conf
-            echo "net.core.default_qdisc=$algorithm" >> /etc/sysctl.conf
-            echo "net.ipv4.tcp_congestion_control=bbr" >> /etc/sysctl.conf
-            echo "net.ipv4.tcp_rmem=4096 87380 67108864" >> /etc/sysctl.conf
-            echo "net.ipv4.tcp_wmem=4096 65536 67108864" >> /etc/sysctl.conf
-            echo "net.core.rmem_max=67108864" >> /etc/sysctl.conf
-            echo "net.core.wmem_max=67108864" >> /etc/sysctl.conf
-            echo "net.core.netdev_max_backlog=250000" >> /etc/sysctl.conf
-            echo "net.core.somaxconn=65535" >> /etc/sysctl.conf
-            echo "net.ipv4.tcp_notsent_lowat=16384" >> /etc/sysctl.conf
-            echo "net.ipv4.tcp_mtu_probing=1" >> /etc/sysctl.conf
-            echo "net.ipv4.tcp_window_scaling=1" >> /etc/sysctl.conf
-            echo "net.ipv4.tcp_adv_win_scale=1" >> /etc/sysctl.conf
-            echo "net.ipv4.tcp_keepalive_time=1200" >> /etc/sysctl.conf
-            echo "net.ipv4.tcp_keepalive_intvl=30" >> /etc/sysctl.conf
-            echo "net.ipv4.tcp_keepalive_probes=7" >> /etc/sysctl.conf
-            echo "net.ipv4.tcp_retries2=8" >> /etc/sysctl.conf
+            sed -i '/net.core.default_qdisc/d' /etc/sysctl.conf
+            sed -i '/net.ipv4.tcp_congestion_control/d' /etc/sysctl.conf
+            tc qdisc add dev venet0 root fq_codel
+            sysctl -w net.ipv4.tcp_congestion_control=bbr || { echo -e "${RED}Optimization failed.${NC}"; mv /etc/sysctl.conf.bak /etc/sysctl.conf; exit 1; }
             sysctl -p
-            if [ $? -eq 0 ]; then
-                echo && echo -e "${GREEN}Kernel parameter optimization for BBR with $algorithm was successful.${NC}"
-            else
-                echo && echo -e "${RED}Optimization failed. Restoring original sysctl configuration.${NC}"
-                mv /etc/sysctl.conf.bak /etc/sysctl.conf
-            fi
-            ;;
-        2)
-            echo -e "${YELLOW}Installing and configuring XanMod & BBRv3...${NC}"
-            if [[ -f /etc/os-release && $(grep -Ei 'ubuntu|debian' /etc/os-release) ]]; then
-                bash <(curl -s https://raw.githubusercontent.com/opiran-club/VPS-Optimizer/main/bbrv3.sh --ipv4)
-                if [ $? -eq 0 ]; then
-                    echo -e "${GREEN}XanMod & BBRv3 installation was successful.${NC}"
-                else
-                    echo -e "${RED}XanMod & BBRv3 installation failed. Please check the script or try again.${NC}"
-                fi
-            else
-                echo -e "${RED}This script is intended for Ubuntu or Debian systems only.${NC}"
-            fi
-            ;;
-
-        3)
-            cp /etc/sysctl.conf /etc/sysctl.conf.bak
-            check_Hybla
-            queueing
-            sed -i '/^net.core.default_qdisc/d' /etc/sysctl.conf
-            echo "net.core.default_qdisc=$algorithm" >> /etc/sysctl.conf
-            sed -i '/^net.ipv4.tcp_congestion_control=/c\net.ipv4.tcp_congestion_control=hybla' /etc/sysctl.conf
-            sed -i '/^net.ipv4.tcp_rmem=/c\net.ipv4.tcp_rmem=32768 87380 67108864' /etc/sysctl.conf
-            sed -i '/^net.ipv4.tcp_wmem=/c\net.ipv4.tcp_wmem=32768 65536 67108864' /etc/sysctl.conf
-            sed -i '/^net.core.rmem_max=/c\net.core.rmem_max=67108864' /etc/sysctl.conf
-            sed -i '/^net.core.wmem_max=/c\net.core.wmem_max=67108864' /etc/sysctl.conf
-            sed -i '/^net.core.netdev_max_backlog=/c\net.core.netdev_max_backlog=100000' /etc/sysctl.conf
-            sed -i '/^net.core.somaxconn=/c\net.core.somaxconn=4096' /etc/sysctl.conf
-            sed -i '/^net.ipv4.tcp_notsent_lowat=/c\net.ipv4.tcp_notsent_lowat=16384' /etc/sysctl.conf
-            sed -i '/^net.ipv4.tcp_mtu_probing=/c\net.ipv4.tcp_mtu_probing=1' /etc/sysctl.conf
-            sed -i '/^net.ipv4.tcp_window_scaling=/c\net.ipv4.tcp_window_scaling=1' /etc/sysctl.conf
-            sed -i '/^net.ipv4.tcp_adv_win_scale=/c\net.ipv4.tcp_adv_win_scale=1' /etc/sysctl.conf
-            sed -i '/^net.ipv4.tcp_keepalive_time=/c\net.ipv4.tcp_keepalive_time=1800' /etc/sysctl.conf
-            sed -i '/^net.ipv4.tcp_keepalive_intvl=/c\net.ipv4.tcp_keepalive_intvl=75' /etc/sysctl.conf
-            sed -i '/^net.ipv4.tcp_keepalive_probes=/c\net.ipv4.tcp_keepalive_probes=9' /etc/sysctl.conf
-            sed -i '/^net.ipv4.tcp_retries2=/c\net.ipv4.tcp_retries2=10' /etc/sysctl.conf
-            sysctl -p
-            if [ $? -eq 0 ]; then
-                echo && echo -e "${GREEN}Kernel parameter optimization for Hybla was successful.${NC}"
-            else
-                echo && echo -e "${RED}Optimization failed. Restoring original sysctl configuration.${NC}"
-                mv /etc/sysctl.conf.bak /etc/sysctl.conf
-            fi
-            ;;
-        4)
-            echo && echo -e "${YELLOW}Optimizing kernel parameters for OpenVZ BBR...${NC}"
-            if [ -d "/proc/vz" ] && [ -e /sys/class/net/venet0 ]; then
-                cp /etc/sysctl.conf /etc/sysctl.conf.bak
-                sed -i '/net.core.default_qdisc/d' /etc/sysctl.conf
-                sed -i '/net.ipv4.tcp_congestion_control/d' /etc/sysctl.conf
-                tc qdisc add dev venet0 root fq_codel
-                sysctl -w net.ipv4.tcp_congestion_control=bbr
-                    sysctl -p
-                    if [ $? -eq 0 ]; then
-                        echo && echo -e "${GREEN}Kernel parameter optimization for OpenVZ was successful.${NC}"
-                    else
-                        echo && echo -e "${RED}Optimization failed. Restoring original sysctl configuration.${NC}"
-                        mv /etc/sysctl.conf.bak /etc/sysctl.conf
-                    fi
-            else
-                echo && echo -e "${RED}This system is not OpenVZ or lacks venet0 support. No changes were made.${NC}"
-            fi
-            ;;
-        0)
-            echo && echo -e "${YELLOW}No TCP congestion control selected.${NC}"
-            ;;
-        *)
-            echo && echo -e "${RED}Invalid choice. Please enter a number between 0 and 3.${NC}"
-            return 1
-            ;;
-    esac
-    press_enter
+            echo -e "${GREEN}Kernel parameter optimization for OpenVZ was successful.${NC}"
+        else
+            echo -e "${RED}This system is not OpenVZ or lacks venet0 support. No changes were made.${NC}"
+        fi
+        ;;
+    0)
+        echo -e "${YELLOW}No TCP congestion control selected.${NC}"
+        ;;
+    *)
+        echo -e "${RED}Invalid choice. Please enter a number between 0 and 3.${NC}"
+        return 1
+        ;;
+esac
+press_enter
 }
 speedtestcli() {
 if ! command -v speedtest &>/dev/null; then
