@@ -775,7 +775,7 @@ case $choice in
     3)
         cp /etc/sysctl.conf /etc/sysctl.conf.bak
         check_Hybla
-        queueing
+        queuing
         sed -i '/^net.core.default_qdisc/d' /etc/sysctl.conf
         echo "net.core.default_qdisc=$algorithm" >> /etc/sysctl.conf
         sed -i '/^net.ipv4.tcp_congestion_control=/c\net.ipv4.tcp_congestion_control=hybla' /etc/sysctl.conf
