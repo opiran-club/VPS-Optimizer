@@ -680,51 +680,34 @@ ask_bbr_version() {
             return 1
         fi
     }
-    check_os() {
+   check_os() {
+        # Check virtualization and warn if LXC or OpenVZ, as they may not support some features
         if _exists "virt-what"; then
             virt="$(virt-what)"
         elif _exists "systemd-detect-virt"; then
             virt="$(systemd-detect-virt)"
         fi
-        if [ -n "${virt}" -a "${virt}" = "lxc" ]; then
-            echo -e "${RED}Virtualization method is LXC, which is not supported.${NC}"
-        fi
-        if [ -n "${virt}" -a "${virt}" = "openvz" ] || [ -d "/proc/vz" ]; then
-            echo -e "${RED}Virtualization method is OpenVZ, which is not supported.${NC}"
+        if [ -n "${virt}" ] && [[ "${virt}" == "lxc" || "${virt}" == "openvz" ]]; then
+            echo -e "${RED}Virtualization method ${virt} is not supported.${NC}"
         fi
     }
+
     queuing() {
+        # Prompt for queuing algorithm choice and store it in 'algorithm'
+        echo -e "${CYAN}Select Queuing Algorithm${NC}"
+        echo -e "${RED}1. ${CYAN}FQ codel ${NC}"
+        echo -e "${RED}2. ${CYAN}FQ ${NC}"
+        echo -e "${RED}3. ${CYAN}Cake${NC}"
+        echo -ne "${YELLOW}Enter your choice [0-3]: ${NC}"
+        read -r choice
 
-    echo -e "${CYAN}Queuing algorithm${NC}"
-    echo ""
-    echo -e "\e[93m+-------------------------------------+\e[0m"
-    echo ""
-    echo -e "${RED}1. ${CYAN} FQ codel ${NC}"
-    echo -e "${RED}2. ${CYAN} FQ ${NC}"
-    echo -e "${RED}3. ${CYAN} Cake   ${NC}"
-    echo ""
-    echo -e "${RED}0. ${CYAN} Back${NC}"
-    echo ""
-    echo -ne "${YELLOW}Enter your choice [0-3]: ${NC}"
-    read -r choice
-
-    case $choice in
-        1)
-        algorithm="FQ codel"
-        ;;
-        2)
-        algorithm="FQ"
-        ;;
-        3)
-        algorithm="cake"
-        ;;
-        0) return 0;;
-        *)
-        echo -e "${RED}Invalid choice. Please enter a number between 0 and 3.${NC}"
-        return 1
-        ;;
-    esac
-
+        case $choice in
+            1) algorithm="FQ codel";;
+            2) algorithm="FQ";;
+            3) algorithm="cake";;
+            0) return 0;;
+            *) echo -e "${RED}Invalid choice. Enter 0-3.${NC}"; return 1;;
+        esac
     }
     clear
     title="TCP Congestion Control Optimization"
@@ -752,44 +735,16 @@ ask_bbr_version() {
     read -r choice
 
 case $choice in
-    1)
-        cp /etc/sysctl.conf /etc/sysctl.conf.bak
-        queueing
-        sed -i '/^net.core.default_qdisc/d' /etc/sysctl.conf
-        sed -i '/^net.ipv4.tcp_congestion_control/d' /etc/sysctl.conf
-        sed -i '/^net.ipv4.tcp_rmem/d' /etc/sysctl.conf
-        sed -i '/^net.ipv4.tcp_wmem/d' /etc/sysctl.conf
-        sed -i '/^net.core.rmem_max/d' /etc/sysctl.conf
-        sed -i '/^net.core.wmem_max/d' /etc/sysctl.conf
-        sed -i '/^net.core.netdev_max_backlog/d' /etc/sysctl.conf
-        sed -i '/^net.core.somaxconn/d' /etc/sysctl.conf
-        sed -i '/^net.ipv4.tcp_notsent_lowat/d' /etc/sysctl.conf
-        sed -i '/^net.ipv4.tcp_mtu_probing/d' /etc/sysctl.conf
-        sed -i '/^net.ipv4.tcp_window_scaling/d' /etc/sysctl.conf
-        sed -i '/^net.ipv4.tcp_adv_win_scale/d' /etc/sysctl.conf
-        sed -i '/^net.ipv4.tcp_keepalive_time/d' /etc/sysctl.conf
-        sed -i '/^net.ipv4.tcp_keepalive_intvl/d' /etc/sysctl.conf
-        sed -i '/^net.ipv4.tcp_keepalive_probes/d' /etc/sysctl.conf
-        sed -i '/^net.ipv4.tcp_retries2/d' /etc/sysctl.conf
-        echo "net.core.default_qdisc=$algorithm" >> /etc/sysctl.conf
-        echo "net.ipv4.tcp_congestion_control=bbr" >> /etc/sysctl.conf
-        echo "net.ipv4.tcp_rmem=4096 87380 67108864" >> /etc/sysctl.conf
-        echo "net.ipv4.tcp_wmem=4096 65536 67108864" >> /etc/sysctl.conf
-        echo "net.core.rmem_max=67108864" >> /etc/sysctl.conf
-        echo "net.core.wmem_max=67108864" >> /etc/sysctl.conf
-        echo "net.core.netdev_max_backlog=250000" >> /etc/sysctl.conf
-        echo "net.core.somaxconn=65535" >> /etc/sysctl.conf
-        echo "net.ipv4.tcp_notsent_lowat=16384" >> /etc/sysctl.conf
-        echo "net.ipv4.tcp_mtu_probing=1" >> /etc/sysctl.conf
-        echo "net.ipv4.tcp_window_scaling=1" >> /etc/sysctl.conf
-        echo "net.ipv4.tcp_adv_win_scale=1" >> /etc/sysctl.conf
-        echo "net.ipv4.tcp_keepalive_time=1200" >> /etc/sysctl.conf
-        echo "net.ipv4.tcp_keepalive_intvl=30" >> /etc/sysctl.conf
-        echo "net.ipv4.tcp_keepalive_probes=7" >> /etc/sysctl.conf
-        echo "net.ipv4.tcp_retries2=8" >> /etc/sysctl.conf
-        sysctl -p || { echo -e "${RED}Optimization failed. Restoring original sysctl configuration.${NC}"; mv /etc/sysctl.conf.bak /etc/sysctl.conf; }
-        echo -e "${GREEN}Kernel parameter optimization for BBR with $algorithm was successful.${NC}"
-        ;;
+      1)
+            # BBR with selected queuing algorithm
+            cp /etc/sysctl.conf /etc/sysctl.conf.bak
+            queuing
+            # Apply the selected queuing algorithm and BBR settings
+            sed -i '/^net.core.default_qdisc/d' /etc/sysctl.conf
+            echo "net.core.default_qdisc=$algorithm" >> /etc/sysctl.conf
+            echo "net.ipv4.tcp_congestion_control=bbr" >> /etc/sysctl.conf
+            sysctl -p || mv /etc/sysctl.conf.bak /etc/sysctl.conf
+            ;;
     2)
         echo -e "${YELLOW}Installing and configuring XanMod & BBRv3...${NC}"
         if grep -Ei 'ubuntu|debian' /etc/os-release >/dev/null; then
