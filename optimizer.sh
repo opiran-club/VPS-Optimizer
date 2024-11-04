@@ -13,6 +13,19 @@ MAGENTA="\e[95m"
 WHITE="\e[97m"
 NC="\e[0m"
 BOLD=$(tput bold)
+check_qdisc_support() {
+    local algorithm="$1"
+
+    if tc qdisc add dev lo root "$algorithm" 2>/dev/null; then
+        echo && echo -e "$GREEN $algorithm is supported by your kernel. $NC"
+        # Remove the test qdisc immediately
+        tc qdisc del dev lo root 2>/dev/null
+        return 0
+    else
+        echo && echo -e "$RED $algorithm is not supported by your kernel. $NC"
+        return 1
+    fi
+}
 ask_bbr_version_1() {
     cp /etc/sysctl.conf /etc/sysctl.conf.bak
     echo && echo -e "${YELLOW}Installing and configuring BBRv1 + FQ...${NC}"
@@ -710,23 +723,37 @@ ask_bbr_version() {
         fi
     }
 
-    queuing() {
-        # Prompt for queuing algorithm choice and store it in 'algorithm'
-        echo -e "${CYAN}Select Queuing Algorithm${NC}"
-        echo -e "${RED}1. ${CYAN}FQ codel ${NC}"
-        echo -e "${RED}2. ${CYAN}FQ ${NC}"
+queuing() {
+    while true; do
+        echo && echo -e "${CYAN}Select Queuing Algorithm${NC}"
+        echo && echo -e "${RED}1. ${CYAN}FQ codel${NC}"
+        echo -e "${RED}2. ${CYAN}FQ${NC}"
         echo -e "${RED}3. ${CYAN}Cake${NC}"
-        echo -ne "${YELLOW}Enter your choice [0-3]: ${NC}"
+        echo -e "${RED}4. ${CYAN}HTB${NC}"
+        echo -e "${RED}5. ${CYAN}SFQ${NC}"
+        echo -e "${RED}6. ${CYAN}DDR${NC}"
+        echo -e "${RED}7. ${CYAN}PFIFO FAST${NC}"
+        echo && echo -ne "${YELLOW}Enter your choice [0-3]: ${NC}"
         read -r choice
-
         case $choice in
-            1) algorithm="FQ codel";;
-            2) algorithm="FQ";;
+            1) algorithm="fq_codel";;
+            2) algorithm="fq";;
             3) algorithm="cake";;
+            4) algorithm="htb";;
+            5) algorithm="sfq";;
+            6) algorithm="ddr";;
+            7) algorithm="pfifo_fast";;
             0) return 0;;
-            *) echo -e "${RED}Invalid choice. Enter 0-3.${NC}"; return 1;;
+            *) echo -e "${RED}Invalid choice. Enter 0-3.${NC}"; continue;;
         esac
-    }
+        if check_qdisc_support "$algorithm"; then
+            echo -e "${GREEN}$algorithm will be applied after $MAGENTA reboot the server.${NC}"
+            return 0
+        else
+            echo -e "${RED}$algorithm is not supported. Please select another option.${NC}"
+        fi
+    done
+}
     clear
     title="TCP Congestion Control Optimization"
     logo
@@ -736,15 +763,19 @@ ask_bbr_version() {
     echo -e "\e[93m+-------------------------------------+\e[0m"
     echo ""
     echo -e "${RED} TIP ! $NC
-    $GREEN FQ (Fair Queuing): $NC Provides fair bandwidth distribution among flows; ideal for reducing latency by smoothing out packet delivery.
-    $GREEN FQ-CoDel: $NC Combines fair queuing with CoDel (Controlled Delay) to manage buffer bloat and reduce latency effectively. It’s suitable for most VPN and general-purpose networking cases.
-    $GREEN CAKE: $NC An advanced queuing discipline that manages both bufferbloat and fair queueing . It’s effective for WAN connections but consumes more CPU.
-    
-    $YELLOW My Suggestion is : $GREEN Fq_codel & cake $NC"
+    $GREEN FQ (Fair Queuing): $NC Allocates bandwidth fairly among flows; good for balancing latency and throughput.
+    $GREEN FQ-CoDel: $NC Combines fair queuing with delay management, reducing buffer bloat—suitable for VPNs and general traffic.
+    $GREEN CAKE: $NC Manages buffer bloat and bandwidth effectively for WAN links; more CPU-intensive but great for high-latency links.
+    $GREEN SFQ (Stochastic Fairness Queuing): $NC Simple fairness-based queuing with low overhead; works well in low-latency setups.
+    $GREEN PFIFO_FAST: $NC Simple priority-based queuing, prioritizing critical packets; suitable for basic traffic handling.
+    $GREEN DDR (Deficit Round Robin): $NC Balances fairness across flows; good for smooth packet delivery, though less commonly used.
+    $GREEN HTB (Hierarchical Token Bucket): $NC Allows bandwidth control with multiple classes; ideal for shaping bandwidth distribution.
+
+    $MAGENTA My Suggestion for VPN servers : $GREEN Fq_codel & cake $NC"
     echo
-    echo -e "${RED}1. ${CYAN} BBR + FQ codel / FQ / cake ${NC}"
+    echo -e "${RED}1. ${CYAN} BBR [FQ codel / FQ / cake / Sfq / ddr / htb / pfifo fast] ${NC}"
     echo -e "${RED}2. ${CYAN} BBRv3 [XanMod kernel]${NC}"
-    echo -e "${RED}3. ${CYAN} HYBLA + FQ codel / FQ / cake   ${NC}"
+    echo -e "${RED}3. ${CYAN} HYBLA [FQ codel / FQ / cake / Sfq / ddr / htb / pfifo fast] ${NC}"
     echo ""
     echo -e "${RED}4. ${CYAN} BBR [OpenVZ] ${NC}"
     echo -e "${RED}0. ${CYAN} Without BBR ${NC}"
