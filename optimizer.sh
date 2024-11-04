@@ -577,15 +577,15 @@ kernel.panic = 1
 vm.dirty_ratio = 20
 
 EOL    
-echo && cat <<EOL > /etc/security/limits.conf
-* soft     nproc          655350
-* hard     nproc          655350
-* soft     nofile         655350
-* hard     nofile         655350
-root soft  nproc          655350
-root hard  nproc          655350
-root soft  nofile         655350
-root hard  nofile         655350
+cat <<EOL > /etc/security/limits.conf
+* soft nproc 655350
+* hard nproc 655350
+* soft nofile 655350
+* hard nofile 655350
+root soft nproc 655350
+root hard nproc 655350
+root soft nofile 655350
+root hard nofile 655350
 EOL
     sysctl -p
     echo && echo -e "${GREEN}Sysctl configuration and optimization complete.${NC}"
