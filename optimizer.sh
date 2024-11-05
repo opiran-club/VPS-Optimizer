@@ -423,44 +423,61 @@ swap_maker() {
     
     while true; do
         echo && echo -e "$RED TIP! $NC"
-        echo -e "$CYAN It is just suggestion, Choose 2 GB if you have enough space and 512MB < RAM < 2GB $NC"
+        echo -e "$CYAN It is just a suggestion, choose 2 GB if you have enough space and 512MB < RAM < 2GB $NC"
         echo && echo -e "${YELLOW}Please select the swap file size (depends on your disk space and RAM):${NC}"
         echo -e "${RED}1.${NC} 512MB"
         echo -e "${RED}2.${NC} 1GB"
         echo -e "${RED}3.${NC} 2GB"
         echo -e "${RED}4.${NC} 4GB"
-        echo -e "${RED}5.${NC} Manually enter value"
+        echo -e "${RED}5.${NC} Manually enter value (e.g., 300M, 1G)"
         echo -e "${RED}6.${NC} No Swap"
         echo && read -r choice
 
         case $choice in
-            1|2|3|4|5|6) break ;;
-            *) echo && echo -e "${RED}Invalid choice.${NC}" ;;
+            1) swap_size="512M" ;;
+            2) swap_size="1G" ;;
+            3) swap_size="2G" ;;
+            4) swap_size="4G" ;;
+            5)
+                echo -ne "${YELLOW}Please enter the swap file size (e.g., 300M for MB, 1G for GB): ${NC}" 
+                read swap_size
+                ;;
+            6)
+                echo && echo -e "${RED}No swap file will be created. Exiting...${NC}"
+                return 0
+                ;;
+            *) 
+                echo && echo -e "${RED}Invalid choice. Please try again.${NC}" 
+                continue
+                ;;
         esac
-    done
 
-    case $choice in
-        1) swap_size="512M" ;;
-        2) swap_size="1G" ;;
-        3) swap_size="2G" ;;
-        4) swap_size="4G" ;;
-        5)
-            echo -ne "${YELLOW}Please enter the swap file size (e.g., 300M, 1.5G): ${NC}" 
-            read swap_size
-            ;;
-        6)
-            echo && echo -e "${RED}No swap file will be created. Exiting...${NC}"
-            return 0
-            ;;
-    esac
-    
-    swap_file="/swapfile"
-    if [[ $choice != 6 ]]; then
-        # Calculate count based on the size entered
-        count=$(echo "$swap_size" | awk -F'([GM])' '{ 
-            if ($2 == "G") { print $1 * 1024 } else { print $1 }
-        }')
+        # Convert swap size to megabytes
+        if [[ "$swap_size" =~ ([0-9]+)(M|G) ]]; then
+            size=${BASH_REMATCH[1]}
+            unit=${BASH_REMATCH[2]}
+            if [[ "$unit" == "G" ]]; then
+                count=$((size * 1024))  # Convert GB to MB
+            elif [[ "$unit" == "M" ]]; then
+                count=$size  # Already in MB
+            fi
+        else
+            echo -e "${RED}Invalid swap size format. Exiting...${NC}"
+            return 1
+        fi
+
+        # Debugging output to verify the count
+        echo "Calculated swap size: $swap_size"
+        echo "Calculated count in MB: $count"
+
+        if [[ -z "$count" || $count -le 0 ]]; then
+            echo -e "${RED}Invalid swap size calculated. Exiting...${NC}"
+            return 1
+        fi
         
+        swap_file="/swapfile"
+        
+        # Create the swap file
         dd if=/dev/zero of="$swap_file" bs=1M count="$count" status=progress 2>&1 || {
             echo && echo -e "${RED}Error creating swap file: $swap_file. Exiting...${NC}"
             return 1
@@ -495,12 +512,11 @@ swap_maker() {
         sysctl -p
         
         echo && echo -e "${GREEN}Swap file created and vm.swappiness set to ${RED}$swap_value${NC}."
-    fi
+    done
     
     sleep 1
     press_enter
 }
-
 swap_maker_1() {
     remove_all_swap() {
     for item in $swap_files $swap_partitions; do
