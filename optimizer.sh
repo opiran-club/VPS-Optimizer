@@ -407,6 +407,7 @@ swap_maker() {
     logo
     echo && echo -e "${MAGENTA}$title${NC}"
     echo && printf "\e[93m+-------------------------------------+\e[0m\n"
+    
     existing_swap=$(swapon -s | awk '$1 !~ /^Filename/ {print $1}')
     if [[ -n "$existing_swap" ]]; then
         echo -e "${YELLOW}Removing existing swap files...${NC}"
@@ -419,11 +420,12 @@ swap_maker() {
             }
         done
     fi
+    
     while true; do
         echo && echo -e "$RED TIP! $NC"
-        echo -e "$CYAN It is just suggestion, Choose 2 GB if you have enough space and 512gb < RAM < 2gb  $NC"
+        echo -e "$CYAN It is just suggestion, Choose 2 GB if you have enough space and 512MB < RAM < 2GB $NC"
         echo && echo -e "${YELLOW}Please select the swap file size (depends on your disk space and RAM):${NC}"
-        echo && echo -e "${RED}1.${NC} 512MB"
+        echo -e "${RED}1.${NC} 512MB"
         echo -e "${RED}2.${NC} 1GB"
         echo -e "${RED}3.${NC} 2GB"
         echo -e "${RED}4.${NC} 4GB"
@@ -451,40 +453,54 @@ swap_maker() {
             return 0
             ;;
     esac
+    
     swap_file="/swapfile"
     if [[ $choice != 6 ]]; then
-        count=$(echo "$swap_size" | awk -F'[GM]' '{print $1 * ( $2 == "G" ? 1024 : 1)}')
+        # Calculate count based on the size entered
+        count=$(echo "$swap_size" | awk -F'([GM])' '{ 
+            if ($2 == "G") { print $1 * 1024 } else { print $1 }
+        }')
+        
         dd if=/dev/zero of="$swap_file" bs=1M count="$count" status=progress 2>&1 || {
             echo && echo -e "${RED}Error creating swap file: $swap_file. Exiting...${NC}"
             return 1
         }
+        
         chmod 600 "$swap_file" || {
             echo && echo -e "${RED}Error setting permissions on swap file. Exiting...${NC}"
             return 1
         }
+        
         mkswap "$swap_file" || {
             echo && echo -e "${RED}Error setting up swap space. Exiting...${NC}"
             return 1
         }
+        
         swapon "$swap_file" || {
             echo && echo -e "${RED}Error enabling swap file. Exiting...${NC}"
             return 1
         }
+        
         echo "$swap_file none swap sw 0 0" >> /etc/fstab || {
-            echo && echo -e "${RED}Error adding swap to fstab.  Manual addition required.${NC}"
+            echo && echo -e "${RED}Error adding swap to fstab. Manual addition required.${NC}"
         }
+        
         echo && echo -e "${BLUE}Modifying swap usage threshold (vm.swappiness)...${NC}"
         echo && printf "\e[93m+-------------------------------------+\e[0m\n"
+        
         swap_value=10
         sed -i "/^vm\.swappiness=/c vm.swappiness=$swap_value" /etc/sysctl.conf || {
             echo && echo -e "${RED}Error setting swappiness. Manual modification required.${NC}"
         }
         sysctl -p
+        
         echo && echo -e "${GREEN}Swap file created and vm.swappiness set to ${RED}$swap_value${NC}."
     fi
+    
     sleep 1
     press_enter
 }
+
 swap_maker_1() {
     remove_all_swap() {
     for item in $swap_files $swap_partitions; do
