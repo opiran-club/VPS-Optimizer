@@ -452,7 +452,6 @@ swap_maker() {
                 ;;
         esac
 
-        # Convert swap size to megabytes
         if [[ "$swap_size" =~ ([0-9]+)(M|G) ]]; then
             size=${BASH_REMATCH[1]}
             unit=${BASH_REMATCH[2]}
@@ -466,7 +465,6 @@ swap_maker() {
             return 1
         fi
 
-        # Debugging output to verify the count
         echo "Calculated swap size: $swap_size"
         echo "Calculated count in MB: $count"
 
@@ -512,6 +510,7 @@ swap_maker() {
         sysctl -p
         
         echo && echo -e "${GREEN}Swap file created and vm.swappiness set to ${RED}$swap_value${NC}."
+        break
     done
     
     sleep 1
